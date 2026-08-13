@@ -1,0 +1,22 @@
+:root {
+  /* From reference: near-black with faint green tint */
+  --color-bg: #060e09;
+  --color-surface: #0b1810;
+  --color-border: rgba(62, 224, 104, 0.1);
+
+  /* Text */
+  --color-text: #e6f0e8;
+  --color-text-muted: rgba(230, 240, 232, 0.45);
+
+  /* Brand greens — matches the bioluminescent particle color in the reference */
+  --color-primary: #3ee068;
+  --color-primary-bright: #afffba;
+  --color-primary-dim: rgba(62, 224, 104, 0.2);
+
+  /* Typography */
+  --font-sans: "Space Grotesk", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+
+  /* Easing */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
