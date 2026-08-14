@@ -1,4 +1,4 @@
-import { useRef, useEffect } from 'react'
+import { useRef, useEffect, useMemo } from 'react'
 import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
@@ -22,37 +22,54 @@ export default function Hero() {
   const reduced = useReducedMotion()
 
   // ── Refs ─────────────────────────────────────────────────────────────────
-  const refs: HeroRefs = {
-    section:       useRef(null),
-    nav:           useRef(null),
-    eyebrow:       useRef(null),
-    headlineLines: useRef([]),
-    body:          useRef(null),
-    ctaWrap:       useRef(null),
-    primaryCta:    useRef(null),
-    meta:          useRef(null),
-    breathWrap:    useRef(null),
-    organism:      useRef(null),
-  }
+  // Each useRef is stable, but the object literal wrapping them is not; it is
+  // memoised so effects can depend on `refs` without re-running every render.
+  const section       = useRef<HTMLElement>(null)
+  const nav           = useRef<HTMLElement>(null)
+  const eyebrow       = useRef<HTMLSpanElement>(null)
+  const headlineLines = useRef<(HTMLSpanElement | null)[]>([])
+  const body          = useRef<HTMLParagraphElement>(null)
+  const ctaWrap       = useRef<HTMLDivElement>(null)
+  const primaryCta    = useRef<HTMLAnchorElement>(null)
+  const meta          = useRef<HTMLDivElement>(null)
+  const breathWrap    = useRef<HTMLDivElement>(null)
+  const breathInner   = useRef<HTMLDivElement>(null)
+  const organism      = useRef<HTMLImageElement>(null)
+
+  const refs: HeroRefs = useMemo(
+    () => ({
+      section, nav, eyebrow, headlineLines, body,
+      ctaWrap, primaryCta, meta, breathWrap, breathInner, organism,
+    }),
+    [],
+  )
 
   // ── GSAP entrance + exit ──────────────────────────────────────────────────
   useGSAP(
     () => {
       const entranceTl = buildEntranceTimeline(refs, reduced)
 
-      // Start idle breathing after entrance finishes
+      // Idle breathing and the scroll exit both start from the Hero's settled
+      // state, so neither may be built while the entrance is still running —
+      // see the note on buildScrollExit.
       let stopBreathing: (() => void) | undefined
-      if (entranceTl) {
-        entranceTl.eventCallback('onComplete', () => {
-          stopBreathing = startIdleBreathing(refs, reduced)
-        })
-      } else {
+      let exitTl: gsap.core.Timeline | undefined
+      const settle = () => {
         stopBreathing = startIdleBreathing(refs, reduced)
+        exitTl = buildScrollExit(refs, reduced)
       }
 
-      buildScrollExit(refs, reduced)
+      if (entranceTl) entranceTl.eventCallback('onComplete', settle)
+      else settle()
 
-      return () => stopBreathing?.()
+      // Anything created inside the onComplete lands outside useGSAP's context,
+      // so it has to be torn down by hand.
+      return () => {
+        entranceTl?.eventCallback('onComplete', null)
+        stopBreathing?.()
+        exitTl?.scrollTrigger?.kill()
+        exitTl?.kill()
+      }
     },
     { dependencies: [reduced], revertOnUpdate: true },
   )
@@ -60,7 +77,7 @@ export default function Hero() {
   // ── Cursor parallax (outside GSAP context — needs mousemove listener) ────
   useEffect(() => {
     return initCursorParallax(refs, reduced)
-  }, [reduced])
+  }, [refs, reduced])
 
   return (
     <>
@@ -100,7 +117,9 @@ export default function Hero() {
 
         {/* Links */}
         <nav aria-label="Primary navigation">
-          <ul style={{ listStyle: 'none', display: 'flex', gap: 'clamp(24px, 2.8vw, 40px)', margin: 0, padding: 0 }}>
+          {/* `display` must stay out of the inline style: an inline rule beats
+              the class selector that hides this list on mobile. */}
+          <ul className="hero-nav-links" style={{ listStyle: 'none', gap: 'clamp(24px, 2.8vw, 40px)', margin: 0, padding: 0 }}>
             {NAV_LINKS.map((link) => (
               <li key={link}>
                 <a
@@ -108,19 +127,26 @@ export default function Hero() {
                   style={{
                     fontFamily: 'var(--font-sans)',
                     fontSize: 'clamp(13px, 0.95vw, 15px)',
-                    color: 'var(--color-muted)',
+                    color: 'rgba(245,247,244,0.65)',
                     textDecoration: 'none',
                     letterSpacing: '0.02em',
                     transition: 'color 0.2s',
                   }}
                   onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--color-bone)')}
-                  onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--color-muted)')}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = 'rgba(245,247,244,0.65)')}
                 >
                   {link}
                 </a>
               </li>
             ))}
           </ul>
+
+          {/* Below 768px the four links overflow into the wordmark, so the
+              nav collapses to the single primary action (PAGE_STRUCTURE §4).
+              Kept as a real link — no hover-dependent menu on touch. */}
+          <a href="#platform" className="hero-nav-compact">
+            Explore
+          </a>
         </nav>
       </header>
 
@@ -130,6 +156,10 @@ export default function Hero() {
         ref={refs.section}
         style={{
           position: 'relative',
+          // Above the fixed ExperienceCanvas (z:1). The section is transparent
+          // so the shared canvas shows through; the page's base colour comes
+          // from <body>, not from an opaque layer here.
+          zIndex: 2,
           width: '100%',
           height: '100svh',
           minHeight: '720px',
@@ -137,16 +167,13 @@ export default function Hero() {
         }}
       >
         {/* ── Background layers ────────────────────────────────────────── */}
-        {/* z:0 Base */}
-        <div style={{ position: 'absolute', inset: 0, background: 'var(--color-abyss)', zIndex: 0 }} />
-
         {/* z:1 Radial glow — Bio Green at 72% x, 44% y (per spec §8) */}
         <div
           style={{
             position: 'absolute', inset: 0, zIndex: 1, pointerEvents: 'none',
             background: `
-              radial-gradient(ellipse 55% 50% at 72% 44%, rgba(166,255,106,0.075) 0%, transparent 70%),
-              radial-gradient(ellipse 30% 35% at 30% 60%, rgba(198,245,225,0.03) 0%, transparent 65%)
+              radial-gradient(ellipse 38% 34% at 72% 44%, rgba(166,255,106,0.038) 0%, transparent 70%),
+              radial-gradient(ellipse 22% 26% at 30% 60%, rgba(198,245,225,0.014) 0%, transparent 65%)
             `,
           }}
         />
@@ -181,7 +208,11 @@ export default function Hero() {
         />
 
         {/* z:3–4 Particles + organism */}
-        <HeroVisual breathRef={refs.breathWrap} organismRef={refs.organism} />
+        <HeroVisual
+          breathRef={refs.breathWrap}
+          breathInnerRef={refs.breathInner}
+          organismRef={refs.organism}
+        />
 
         {/* z:10 Hero copy */}
         <HeroContent
@@ -234,16 +265,22 @@ export default function Hero() {
         @media (max-width: 768px) {
           #hero { min-height: 100svh; }
 
-          /* Stack organism above copy on mobile */
+          /* Stack organism above copy on mobile.
+             These values are mirrored in heroGeometry.ts (MOBILE_W /
+             MOBILE_BLEED / MOBILE_TOP) so the Journey's WebGL organism lands
+             on the same rectangle — keep the two in sync. */
+          /* No transform override here: GSAP animates this element's
+             transform, and an !important rule would beat its inline style and
+             freeze the breathing and exit motion on mobile. */
           [data-organism-wrap] {
             position: relative !important;
             right: auto !important;
             top: auto !important;
-            transform: none !important;
+            bottom: auto !important;
             margin: 0 auto !important;
-            width: clamp(330px, 90vw, 420px) !important;
+            width: clamp(300px, 78vw, 380px) !important;
             margin-right: -5% !important;
-            margin-top: -2vh !important;
+            margin-top: -6vh !important;
           }
         }
       `}</style>

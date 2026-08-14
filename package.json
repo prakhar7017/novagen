@@ -6,7 +6,10 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "typecheck": "tsc -b --noEmit",
     "lint": "oxlint",
+    "test": "vitest run",
+    "assets": "node scripts/build-assets.mjs",
     "preview": "vite preview"
   },
   "dependencies": {

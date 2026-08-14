@@ -3,6 +3,8 @@ import Lenis from 'lenis'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import Hero from '@/sections/Hero/Hero'
+import Journey from '@/sections/Journey/Journey'
+import ExperienceCanvas from '@/scene/ExperienceCanvas'
 
 export default function App() {
   useEffect(() => {
@@ -20,6 +22,12 @@ export default function App() {
     gsap.ticker.add(tickerCallback)
     gsap.ticker.lagSmoothing(0)
 
+    // Dev-only handle so automated visual checks can jump to an exact scroll
+    // position; Lenis owns scrolling, so window.scrollTo alone is unreliable.
+    if (import.meta.env.DEV) {
+      ;(window as unknown as { __lenis?: Lenis }).__lenis = lenis
+    }
+
     const handleResize = () => ScrollTrigger.refresh()
     window.addEventListener('resize', handleResize)
 
@@ -33,8 +41,14 @@ export default function App() {
 
   return (
     <>
-      <Hero />
-      {/* Future Journey sections mount here */}
+      {/* One persistent WebGL surface behind everything (PAGE_STRUCTURE §14) */}
+      <ExperienceCanvas />
+
+      <main>
+        <Hero />
+        <Journey />
+        {/* 03 Innovation onward mount here */}
+      </main>
     </>
   )
 }

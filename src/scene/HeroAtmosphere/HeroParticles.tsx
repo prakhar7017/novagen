@@ -1,6 +1,8 @@
 import { useRef, useMemo, useEffect } from 'react'
-import { useFrame, useThree } from '@react-three/fiber'
+import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
+import { scrollProgress } from '@/store/progressRef'
+import { smoothstep } from '@/sections/Journey/journey.constants'
 
 interface Props {
   count: number
@@ -12,6 +14,8 @@ const VERT = /* glsl */`
   attribute float aSpeed;
   attribute vec3  aColor;
   uniform   float uTime;
+  uniform   float uFade;
+  uniform   float uPixelRatio;
   varying   vec3  vColor;
   varying   float vAlpha;
 
@@ -23,10 +27,12 @@ const VERT = /* glsl */`
     pos.z += sin(uTime * aSpeed * 0.10 + aPhi + 2.6)     * 0.06;
 
     vec4 mv = modelViewMatrix * vec4(pos, 1.0);
-    gl_PointSize = aSize * (280.0 / -mv.z);
+    // Small constant on purpose — see shaders.ts. These are sparse microscopic
+    // motes, not bokeh; a large multiplier reads as blurred green blobs.
+    gl_PointSize = aSize * uPixelRatio * (8.0 / -mv.z);
 
     vColor = aColor;
-    vAlpha = 0.25 + 0.75 * abs(sin(uTime * aSpeed * 0.35 + aPhi));
+    vAlpha = (0.25 + 0.75 * abs(sin(uTime * aSpeed * 0.35 + aPhi))) * uFade;
     gl_Position = projectionMatrix * mv;
   }
 `
@@ -50,7 +56,6 @@ const SIGNAL_MINT = new THREE.Color('#c6f5e1')
 
 export default function HeroParticles({ count }: Props) {
   const matRef = useRef<THREE.ShaderMaterial | null>(null)
-  const { pointer } = useThree()
 
   const geo = useMemo(() => {
     const pos    = new Float32Array(count * 3)
@@ -70,7 +75,7 @@ export default function HeroParticles({ count }: Props) {
       pos[i*3+1] = yRange[0] + Math.random() * (yRange[1] - yRange[0])
       pos[i*3+2] = zRange[0] + Math.random() * (zRange[1] - zRange[0])
 
-      sizes[i]  = 1.0 + Math.random() * 2.5   // 1–3.5px
+      sizes[i]  = 0.8 + Math.random() * 1.8   // ≈1.3–4 CSS px on screen
       phis[i]   = Math.random() * Math.PI * 2
       speeds[i] = 0.3 + Math.random() * 0.7
 
@@ -94,7 +99,11 @@ export default function HeroParticles({ count }: Props) {
     const m = new THREE.ShaderMaterial({
       vertexShader:   VERT,
       fragmentShader: FRAG,
-      uniforms: { uTime: { value: 0 } },
+      uniforms: {
+        uTime: { value: 0 },
+        uFade: { value: 1 },
+        uPixelRatio: { value: 1.5 },
+      },
       transparent: true,
       blending:    THREE.AdditiveBlending,
       depthWrite:  false,
@@ -103,15 +112,13 @@ export default function HeroParticles({ count }: Props) {
     return m
   }, [])
 
-  // Very subtle cursor reaction: only the foreground particles get a tiny push
-  // We achieve this by passing mouse position as a uniform (used in vertex shader
-  // for the nearest particles — here kept extremely subtle, no galaxy effect).
-  useFrame(({ clock }) => {
-    if (matRef.current) {
-      matRef.current.uniforms.uTime.value = clock.elapsedTime
-    }
-    // pointer is already -1→1 NDC from R3F state
-    void pointer // consumed to avoid unused var lint
+  useFrame(({ clock, gl }) => {
+    if (!matRef.current) return
+    matRef.current.uniforms.uTime.value = clock.elapsedTime
+    matRef.current.uniforms.uPixelRatio.value = gl.getPixelRatio()
+    // Atmosphere belongs to the Hero: it recedes once the Journey's own
+    // particle population takes over the stage.
+    matRef.current.uniforms.uFade.value = 1 - smoothstep(0.0, 0.14, scrollProgress.journey)
   })
 
   useEffect(() => () => { geo.dispose(); mat.dispose() }, [geo, mat])

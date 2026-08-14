@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "./tokens.css";
+@import "./journey.css";
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -25,8 +26,88 @@ body {
 ::-webkit-scrollbar-track { background: var(--color-abyss); }
 ::-webkit-scrollbar-thumb { background: rgba(166,255,106,0.2); border-radius: 2px; }
 
-/* Headline reveal clip — wraps each line */
+/* Headline reveal clip — wraps each line.
+   overflow:hidden is what makes the yPercent reveal work, but it also cuts
+   descenders, since a tight line-height leaves the tail of "y"/"g"/"p" below
+   the content box. Padding extends the box (overflow clips at the padding
+   edge, so the tail is inside it) and a matching negative margin cancels the
+   extra space, keeping the original line rhythm. */
 .line-clip {
   overflow: hidden;
   display: block;
+}
+
+.hero-headline .line-clip,
+.journey-headline .line-clip {
+  padding-bottom: 0.22em;
+  margin-bottom: -0.16em;
+}
+
+/* ── Hero copy column ──────────────────────────────────────────────────────
+   The headline contains one unbreakable 13-glyph word ("programmable.")
+   measuring ~7em. Because .line-clip is overflow:hidden, the column must
+   always be wider than 7em x font-size or the word is silently cut off.
+   Each breakpoint below keeps >= 25% headroom over that figure.          */
+.hero-copy {
+  position: relative;
+  z-index: 10;
+  padding-left: clamp(20px, 4.4vw, 64px);
+  padding-right: 24px;
+  max-width: min(50%, 700px);
+}
+
+.hero-headline {
+  font-family: var(--font-sans);
+  font-size: clamp(2.6rem, 4.4vw, 4.4rem);
+  font-weight: 700;
+  line-height: 0.93;
+  letter-spacing: -0.02em;
+  color: var(--color-bone);
+  margin-bottom: 1.75rem;
+  text-wrap: balance;
+}
+
+.hero-body {
+  max-width: 460px;
+}
+
+/* Tablet landscape — organism narrows, copy column takes more room */
+@media (max-width: 1024px) {
+  .hero-copy { max-width: min(58%, 560px); }
+}
+
+/* Tablet portrait */
+@media (max-width: 900px) {
+  .hero-copy { max-width: 78%; }
+}
+
+/* ── Header ──────────────────────────────────────────────────────────────── */
+
+.hero-nav-links {
+  display: flex;
+}
+
+.hero-nav-compact {
+  display: none;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--color-bio-green);
+  text-decoration: none;
+  padding: 6px 0;
+}
+
+/* Mobile — copy spans the viewport; percentage widths would starve the
+   headline and reintroduce the clip. */
+@media (max-width: 768px) {
+  .hero-nav-links { display: none; }
+  .hero-nav-compact { display: inline-flex; }
+
+  .hero-copy {
+    max-width: 100%;
+    padding-right: 20px;
+  }
+  .hero-headline { font-size: clamp(2.3rem, 10.5vw, 3.2rem); }
+  .hero-body { max-width: 100%; }
 }

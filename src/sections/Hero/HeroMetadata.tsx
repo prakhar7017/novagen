@@ -43,7 +43,7 @@ export default function HeroMetadata({ metaRef }: Props) {
         <div
           style={{
             position: 'absolute',
-            bottom: 'clamp(24px, 3vh, 40px)',
+            bottom: 'clamp(48px, 5.5vh, 68px)',
             left: 'clamp(20px, 4.4vw, 64px)',
           }}
         >
@@ -57,7 +57,7 @@ export default function HeroMetadata({ metaRef }: Props) {
         <div
           style={{
             position: 'absolute',
-            bottom: 'clamp(24px, 3vh, 40px)',
+            bottom: 'clamp(48px, 5.5vh, 68px)',
             right: 'clamp(20px, 4.4vw, 64px)',
             textAlign: 'right',
           }}

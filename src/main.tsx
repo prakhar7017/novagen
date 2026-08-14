@@ -9,6 +9,11 @@ import App from './app/App'
 // Register GSAP plugins once at the module level
 gsap.registerPlugin(ScrollTrigger, useGSAP)
 
+// Dev-only handles for the verification scripts in scripts/
+if (import.meta.env.DEV) {
+  Object.assign(window, { gsap, ScrollTrigger })
+}
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <App />

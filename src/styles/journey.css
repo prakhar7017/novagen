@@ -1,0 +1,310 @@
+/* ── Section 02 · Biological Journey ──────────────────────────────────────
+   The stage is held by position:sticky rather than a GSAP pin, so the section
+   contributes its own scroll length and needs no pin-spacer.                */
+
+.journey {
+  position: relative;
+  z-index: 2; /* above the fixed ExperienceCanvas */
+  width: 100%;
+}
+
+.journey-stage {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  width: 100%;
+  overflow: hidden;
+}
+
+/* ── Background ──────────────────────────────────────────────────────────── */
+
+.journey-bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  /* Deeper and cooler than the Hero so the sections do not read as identical.
+     Kept light: this layer sits *above* the WebGL stage, so heavy alpha here
+     mutes the imagery the section exists to show. */
+  background:
+    radial-gradient(ellipse 46% 40% at 68% 50%, rgba(166, 255, 106, 0.030) 0%, transparent 72%),
+    linear-gradient(180deg, rgba(6, 16, 15, 0.10) 0%, rgba(6, 16, 15, 0.42) 100%);
+}
+
+.journey-grid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.55;
+  background-image:
+    linear-gradient(rgba(166, 255, 106, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(166, 255, 106, 0.02) 1px, transparent 1px);
+  background-size: 96px 96px;
+}
+
+/* Guarantees copy contrast over the full-bleed cell/nucleus imagery */
+.journey-scrim {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    100deg,
+    rgba(7, 17, 15, 0.92) 0%,
+    rgba(7, 17, 15, 0.72) 26%,
+    rgba(7, 17, 15, 0.18) 48%,
+    transparent 66%
+  );
+}
+
+/* ── Story copy ──────────────────────────────────────────────────────────── */
+
+.journey-copy-col {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  padding-left: clamp(20px, 4.6vw, 72px);
+  pointer-events: none;
+}
+
+/* All seven states occupy the same box; only opacity separates them. */
+.journey-copy {
+  position: absolute;
+  max-width: clamp(320px, 34vw, 520px);
+  will-change: opacity, transform;
+}
+
+.journey-label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-family: var(--font-mono);
+  font-size: clamp(10px, 0.78vw, 12px);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-signal-mint);
+  opacity: 0.75;
+  margin-bottom: 1.5rem;
+}
+
+.journey-label-index {
+  color: var(--color-bio-green);
+}
+
+.journey-label-rule {
+  width: 28px;
+  height: 1px;
+  background: currentColor;
+  opacity: 0.4;
+}
+
+.journey-headline {
+  font-family: var(--font-sans);
+  font-size: clamp(2rem, 3.6vw, 3.6rem);
+  font-weight: 700;
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+  color: var(--color-bone);
+  margin-bottom: 1.4rem;
+}
+
+.journey-body {
+  font-family: var(--font-sans);
+  font-size: clamp(1rem, 1.2vw, 1.18rem);
+  line-height: 1.62;
+  color: var(--color-muted);
+  max-width: 430px;
+}
+
+/* ── Step rail ───────────────────────────────────────────────────────────── */
+
+.journey-steps {
+  position: absolute;
+  left: clamp(20px, 4.6vw, 72px);
+  bottom: clamp(48px, 6vh, 76px);
+  z-index: 4;
+  display: flex;
+  gap: 14px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  pointer-events: none;
+}
+
+.journey-step {
+  transition: none; /* GSAP owns these values */
+}
+
+/* ── Metadata ────────────────────────────────────────────────────────────── */
+
+.journey-meta-slot {
+  position: absolute;
+  right: clamp(20px, 4.6vw, 72px);
+  bottom: clamp(48px, 6vh, 76px);
+  z-index: 4;
+  min-width: 190px;
+  min-height: 76px;
+  pointer-events: none;
+}
+
+.journey-meta {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: right;
+}
+
+.journey-meta-row {
+  display: flex;
+  justify-content: flex-end;
+  gap: 14px;
+  font-family: var(--font-mono);
+  font-size: clamp(9px, 0.72vw, 11px);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  line-height: 1.5;
+}
+
+.journey-meta-key,
+.journey-meta-val {
+  white-space: nowrap; /* keys like "GENE EXPRESSION" must not wrap mid-label */
+}
+
+.journey-meta-key {
+  color: var(--color-muted);
+  opacity: 0.55;
+}
+
+.journey-meta-val {
+  color: var(--color-signal-mint);
+  opacity: 0.8;
+}
+
+/* ── Tablet landscape ────────────────────────────────────────────────────── */
+
+@media (max-width: 1024px) {
+  .journey-copy {
+    max-width: 38vw;
+  }
+  .journey-headline {
+    font-size: clamp(1.8rem, 4vw, 2.6rem);
+  }
+}
+
+/* ── Tablet portrait & mobile ────────────────────────────────────────────── */
+/* Visual occupies the upper area, copy sits beneath it — not the desktop
+   side-by-side proportions merely squeezed (prompt §39).                    */
+
+@media (max-width: 900px) {
+  .journey-copy-col {
+    align-items: flex-end;
+    padding: 0 clamp(20px, 5vw, 32px) 0;
+  }
+
+  .journey-copy {
+    position: absolute;
+    bottom: clamp(96px, 15vh, 150px);
+    max-width: 100%;
+    width: calc(100% - clamp(40px, 10vw, 64px));
+  }
+
+  .journey-scrim {
+    background: linear-gradient(
+      to top,
+      rgba(7, 17, 15, 0.95) 0%,
+      rgba(7, 17, 15, 0.82) 30%,
+      rgba(7, 17, 15, 0.18) 58%,
+      transparent 78%
+    );
+  }
+
+  .journey-body {
+    max-width: 100%;
+  }
+
+  .journey-steps {
+    bottom: clamp(28px, 4vh, 44px);
+    gap: 11px;
+  }
+
+  .journey-meta-slot {
+    bottom: clamp(28px, 4vh, 44px);
+    min-width: 0;
+    min-height: 0;
+  }
+
+  /* Two rows maximum on small screens — the rest is noise */
+  .journey-meta-row:nth-child(n + 3) {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .journey-headline {
+    font-size: clamp(1.7rem, 7.6vw, 2.3rem);
+  }
+  .journey-body {
+    font-size: 1rem;
+  }
+  .journey-steps {
+    font-size: 10px;
+    gap: 9px;
+  }
+}
+
+/* ── Reduced motion: plain document ──────────────────────────────────────── */
+
+.journey-static {
+  position: relative;
+  z-index: 2;
+  padding: clamp(64px, 10vh, 120px) clamp(20px, 4.6vw, 72px);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(64px, 9vh, 112px);
+}
+
+.journey-static-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: clamp(24px, 4vw, 64px);
+  align-items: center;
+  max-width: 1440px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.journey-static-visual {
+  position: relative;
+  border: 1px solid rgba(166, 255, 106, 0.08);
+  background: rgba(14, 29, 23, 0.35);
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+}
+
+.journey-static-visual img,
+.journey-static-svg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.journey-meta--static {
+  position: static;
+  margin-top: 2rem;
+  text-align: left;
+  opacity: 1;
+}
+
+.journey-meta--static .journey-meta-row {
+  justify-content: flex-start;
+}
+
+@media (max-width: 900px) {
+  .journey-static-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

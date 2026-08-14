@@ -28,14 +28,11 @@ export default function HeroContent({
 
   return (
     <div
+      className="hero-copy"
       style={{
-        position: 'relative',
-        zIndex: 10,
         // Vertically centered but slightly low (per spec §16)
         top: '47%',
         transform: 'translateY(-45%)',
-        paddingLeft: 'clamp(20px, 4.4vw, 64px)',
-        maxWidth: 'min(46%, 680px)',
       }}
     >
       {/* Eyebrow */}
@@ -56,18 +53,7 @@ export default function HeroContent({
       </span>
 
       {/* Headline — each line in its own clip wrapper */}
-      <h1
-        style={{
-          fontFamily: 'var(--font-sans)',
-          fontSize: 'clamp(3rem, 6.5vw, 6.5rem)',
-          fontWeight: 700,
-          lineHeight: 0.93,
-          letterSpacing: '-0.02em',
-          color: 'var(--color-bone)',
-          marginBottom: '1.75rem',
-          maxWidth: '650px',
-        }}
-      >
+      <h1 className="hero-headline">
         {['Biology,', 'made programmable.'].map((line, i) => (
           <span key={line} className="line-clip" style={{ display: 'block' }}>
             <span
@@ -85,12 +71,12 @@ export default function HeroContent({
       {/* Supporting copy */}
       <p
         ref={bodyRef}
+        className="hero-body"
         style={{
           fontFamily: 'var(--font-sans)',
           fontSize: 'clamp(1rem, 1.35vw, 1.18rem)',
           lineHeight: 1.65,
           color: 'var(--color-muted)',
-          maxWidth: '480px',
           opacity: 0,
           marginBottom: '2.5rem',
         }}
