@@ -1,22 +1,26 @@
 :root {
-  /* From reference: near-black with faint green tint */
-  --color-bg: #060e09;
-  --color-surface: #0b1810;
-  --color-border: rgba(62, 224, 104, 0.1);
+  /* ── Brand palette (from design spec) ─────────────────────────────── */
+  --color-abyss:        #07110f;
+  --color-deep-tissue:  #0e1d17;
+  --color-bio-green:    #a6ff6a;
+  --color-signal-mint:  #c6f5e1;
+  --color-bone:         #f5f7f4;
+  --color-muted:        #8d9b93;
 
-  /* Text */
-  --color-text: #e6f0e8;
-  --color-text-muted: rgba(230, 240, 232, 0.45);
-
-  /* Brand greens — matches the bioluminescent particle color in the reference */
-  --color-primary: #3ee068;
-  --color-primary-bright: #afffba;
-  --color-primary-dim: rgba(62, 224, 104, 0.2);
+  /* Semantic aliases */
+  --color-bg:           var(--color-abyss);
+  --color-surface:      var(--color-deep-tissue);
+  --color-text:         var(--color-bone);
+  --color-text-muted:   var(--color-muted);
+  --color-primary:      var(--color-bio-green);
+  --color-accent:       var(--color-signal-mint);
+  --color-border:       rgba(166, 255, 106, 0.08);
 
   /* Typography */
   --font-sans: "Space Grotesk", system-ui, sans-serif;
   --font-mono: "JetBrains Mono", monospace;
 
   /* Easing */
-  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-expo:  cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out:    cubic-bezier(0.65, 0, 0.35, 1);
 }

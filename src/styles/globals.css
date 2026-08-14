@@ -1,27 +1,32 @@
 @import "tailwindcss";
 @import "./tokens.css";
 
-*, *::before, *::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-html, body, #root {
-  height: 100%;
-  /* Lenis handles smooth scrolling — disable browser default */
-  scroll-behavior: auto;
-}
+html { scroll-behavior: auto; } /* Lenis handles smooth scroll */
 
 body {
-  background: var(--color-bg);
-  color: var(--color-text);
+  background: var(--color-abyss);
+  color: var(--color-bone);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
 }
 
-/* Scrollbar */
-::-webkit-scrollbar { width: 4px; }
-::-webkit-scrollbar-track { background: var(--color-bg); }
-::-webkit-scrollbar-thumb { background: var(--color-primary-dim); border-radius: 2px; }
+/* Keyboard focus — visible but restrained */
+:focus-visible {
+  outline: 1.5px solid var(--color-bio-green);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* Thin scrollbar */
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-track { background: var(--color-abyss); }
+::-webkit-scrollbar-thumb { background: rgba(166,255,106,0.2); border-radius: 2px; }
+
+/* Headline reveal clip — wraps each line */
+.line-clip {
+  overflow: hidden;
+  display: block;
+}
