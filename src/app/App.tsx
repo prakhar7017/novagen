@@ -5,7 +5,10 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import Hero from '@/sections/Hero/Hero'
 import Journey from '@/sections/Journey/Journey'
 import Innovation from '@/sections/Innovation/Innovation'
+import Technology from '@/sections/Technology/Technology'
+import Capabilities from '@/sections/Capabilities/Capabilities'
 import ExperienceCanvas from '@/scene/ExperienceCanvas'
+import { registerScroller } from '@/lib/scroller'
 
 export default function App() {
   useEffect(() => {
@@ -29,10 +32,16 @@ export default function App() {
       ;(window as unknown as { __lenis?: Lenis }).__lenis = lenis
     }
 
+    // Lenis owns the scroll position, so anything that wants to move the page —
+    // the Technology pipeline's stage shortcuts, for now — has to go through it
+    // rather than through window.scrollTo.
+    const unregisterScroller = registerScroller(lenis)
+
     const handleResize = () => ScrollTrigger.refresh()
     window.addEventListener('resize', handleResize)
 
     return () => {
+      unregisterScroller()
       gsap.ticker.remove(tickerCallback)
       window.removeEventListener('resize', handleResize)
       lenis.destroy()
@@ -49,7 +58,9 @@ export default function App() {
         <Hero />
         <Journey />
         <Innovation />
-        {/* 04 Technology onward mount here */}
+        <Technology />
+        <Capabilities />
+        {/* 06 Research onward mounts here */}
       </main>
     </>
   )

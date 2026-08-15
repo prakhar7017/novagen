@@ -25,6 +25,21 @@ const JOBS = [
   // quality than the story assets — at display size the difference is invisible
   // and it saves ~80KB on a below-the-fold, lazily loaded image.
   { src: 'INNOVATION_MICROSCOPY_FIELD.png',  dir: 'innovation', out: 'innovation-microscopy.webp', width: 1240, alpha: false, quality: 74 },
+  // Section 04 · Technology. The specimen is drawn into the shared canvas at
+  // roughly 420px square and never larger, so 900px covers a 2x display. Its
+  // fluorescent membrane detail compresses about as badly as the Innovation
+  // field, hence the reduced quality — at display size, behind an erosion
+  // shader, the difference is invisible and it saves ~120KB. Genuine alpha
+  // outside the silhouette: the erosion depends on it.
+  { src: 'TECHNOLOGY_SAMPLE_SPECIMEN.png',   dir: 'technology', out: 'sample-specimen.webp', width: 900, alpha: true, quality: 78 },
+  // Section 05 · Capabilities. Both are drawn inside a module rather than
+  // full-bleed, so they are sized to 2x the largest box the grid ever gives
+  // them (~640px for the spatial field, ~430px for the protein).
+  // The microscopy field is opaque and fills its module edge to edge; the
+  // protein keeps genuine alpha, since it floats over the module surface and
+  // its rim glow reads through the transparent corners.
+  { src: 'SPATIAL_BIOLOGY_MICROSCOPY.png',   dir: 'capabilities', out: 'spatial-biology.webp',     width: 1280, alpha: false, quality: 76 },
+  { src: 'PROTEIN_ENGINEERING_STRUCTURE.png', dir: 'capabilities', out: 'protein-engineering.webp', width: 880,  alpha: true,  quality: 84 },
 ]
 
 for (const job of JOBS) {

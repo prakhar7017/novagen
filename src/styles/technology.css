@@ -1,0 +1,674 @@
+/* ── Section 04 · Technology / Platform ───────────────────────────────────
+   Back to the dark environment after Innovation's Bone, and back to WebGL —
+   but a lighter instrument than the Journey. The stage is held by
+   position:sticky rather than a GSAP pin, matching section 02: the section
+   contributes its own scroll length and needs no pin-spacer under Lenis.
+
+   Every layer here is either transparent or semi-transparent. The shared
+   canvas is fixed *behind* the document, so an opaque section background would
+   simply hide the platform it exists to show.                                */
+
+.technology {
+  position: relative;
+  z-index: 2; /* above the fixed ExperienceCanvas */
+  width: 100%;
+}
+
+.technology-stage {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  width: 100%;
+  overflow: hidden;
+}
+
+/* ── Environment ─────────────────────────────────────────────────────────
+   Base wash, measurement grid and a soft glow under the platform. §37 caps
+   the grid at 3% and the section fails outright if any of this starts
+   reading as a HUD, so all three are deliberately at the edge of visible. */
+
+.technology-bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 58% 48% at 66% 46%, rgba(166, 255, 106, 0.035) 0%, transparent 72%),
+    linear-gradient(180deg, rgba(6, 16, 15, 0.32) 0%, rgba(6, 16, 15, 0.58) 100%);
+}
+
+/* Opacity is owned by GSAP — it lifts while the spatial map is being
+   established and settles back afterwards (§38), which is the environment's
+   only piece of narrative behaviour. */
+.technology-grid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(198, 245, 225, 1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(198, 245, 225, 1) 1px, transparent 1px);
+  background-size: 88px 88px;
+}
+
+/* Minor divisions — the difference between a grid and an instrument's scale.
+   Nested inside the parent's opacity, so at the map's 4% these are under 1%. */
+.technology-grid::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(198, 245, 225, 0.3) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(198, 245, 225, 0.3) 1px, transparent 1px);
+  background-size: 22px 22px;
+  -webkit-mask-image: radial-gradient(ellipse 60% 55% at 66% 48%, #000 10%, transparent 78%);
+  mask-image: radial-gradient(ellipse 60% 55% at 66% 48%, #000 10%, transparent 78%);
+}
+
+.technology-glow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    circle 40vmin at 66% 46%,
+    rgba(166, 255, 106, 0.055) 0%,
+    rgba(166, 255, 106, 0.018) 42%,
+    transparent 72%
+  );
+}
+
+/* Keeps the copy column legible where the platform overlaps it */
+.technology-scrim {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    100deg,
+    rgba(7, 17, 15, 0.9) 0%,
+    rgba(7, 17, 15, 0.68) 28%,
+    rgba(7, 17, 15, 0.16) 52%,
+    transparent 68%
+  );
+}
+
+/* ── Layout ──────────────────────────────────────────────────────────────
+   Header top-left with its instrumentation opposite, the active stage at the
+   bottom of the copy column, the rail along the bottom edge. The platform
+   occupies the right two thirds and is free to overlap the container (§44). */
+
+.technology-inner {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-rows: auto 1fr auto;
+  grid-template-areas:
+    'head meta'
+    'copy copy'
+    'rail rail';
+  gap: clamp(16px, 3vh, 32px) 32px;
+  padding: clamp(30px, 5.5vh, 58px) clamp(24px, 4.4vw, 64px) clamp(28px, 4.5vh, 46px);
+  /* The stage is a backdrop; only the rail takes pointer events. */
+  pointer-events: none;
+}
+
+/* ── Header ──────────────────────────────────────────────────────────────── */
+
+.technology-header {
+  grid-area: head;
+  max-width: 720px;
+}
+
+.technology-label {
+  display: flex;
+  align-items: baseline;
+  font-family: var(--font-mono);
+  font-size: clamp(10px, 0.78vw, 12px);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-signal-mint);
+  opacity: 0.8;
+  margin-bottom: clamp(14px, 2.4vh, 22px);
+}
+
+.technology-label-index {
+  color: var(--color-bio-green);
+}
+
+.technology-label-slash {
+  margin: 0 8px;
+  opacity: 0.45;
+}
+
+.technology-headline {
+  font-family: var(--font-sans);
+  /* Under the Hero, over everything else on the page (§12). */
+  font-size: clamp(2.6rem, 5.8vw, 5.6rem);
+  font-weight: 700;
+  line-height: 0.94;
+  letter-spacing: -0.025em;
+  color: var(--color-bone);
+  max-width: 720px;
+}
+
+.technology-headline .line-clip,
+.technology-stage-title .line-clip {
+  padding-bottom: 0.22em;
+  margin-bottom: -0.16em;
+}
+
+.technology-lead {
+  margin-top: clamp(16px, 2.6vh, 26px);
+  max-width: 440px;
+  font-size: clamp(0.98rem, 1.1vw, 1.06rem);
+  line-height: 1.6;
+  color: var(--color-muted);
+}
+
+/* ── Stage copy ──────────────────────────────────────────────────────────
+   All five occupy one box at the bottom of the column; only opacity separates
+   them, so the platform above never reflows as the stage changes.          */
+
+.technology-stage-slot {
+  grid-area: copy;
+  position: relative;
+  align-self: end;
+  max-width: min(46%, 480px);
+  min-height: 190px;
+}
+
+.technology-stage-copy {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  will-change: opacity;
+}
+
+.technology-stage-label {
+  display: flex;
+  align-items: baseline;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-signal-mint);
+  opacity: 0.85;
+  margin-bottom: 14px;
+}
+
+.technology-stage-index {
+  color: var(--color-bio-green);
+}
+
+.technology-stage-slash {
+  margin: 0 7px;
+  opacity: 0.45;
+}
+
+.technology-stage-title {
+  font-family: var(--font-sans);
+  font-size: clamp(1.5rem, 2.4vw, 2.3rem);
+  font-weight: 700;
+  line-height: 1.0;
+  letter-spacing: -0.02em;
+  color: var(--color-bone);
+  margin-bottom: 0.9rem;
+}
+
+.technology-stage-body {
+  font-size: clamp(0.95rem, 1.05vw, 1.02rem);
+  line-height: 1.6;
+  color: var(--color-muted);
+  max-width: 400px;
+}
+
+/* ── Metadata ────────────────────────────────────────────────────────────
+   Thin mono readouts, never more than three groups — a fourth is the point at
+   which this becomes a dashboard (§22, §62).                               */
+
+.technology-meta-slot {
+  grid-area: meta;
+  position: relative;
+  min-width: 210px;
+  min-height: 74px;
+  text-align: right;
+}
+
+.technology-meta {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: grid;
+  gap: 7px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  white-space: nowrap;
+  will-change: opacity;
+}
+
+.technology-meta-row {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.technology-meta-key {
+  color: var(--color-muted);
+  opacity: 0.7;
+  text-transform: uppercase;
+}
+
+/* Deliberately not uppercased: text-transform maps the micro sign to Greek
+   capital Mu, which would print "8 MM" instead of "8 µm". */
+.technology-meta-value {
+  color: var(--color-signal-mint);
+}
+
+/* ── Pipeline rail ───────────────────────────────────────────────────────── */
+
+.technology-pipeline {
+  grid-area: rail;
+  position: relative;
+  width: 100%;
+  max-width: 1500px;
+  margin: 0 auto;
+  pointer-events: auto;
+}
+
+.technology-pipeline-track {
+  position: absolute;
+  top: 4px;
+  left: 10%;
+  right: 10%;
+  height: 1px;
+  background: rgba(198, 245, 225, 0.14);
+  overflow: hidden;
+}
+
+.technology-pipeline-fill {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, rgba(166, 255, 106, 0.35), var(--color-bio-green));
+  transform-origin: left center;
+  transform: scaleX(var(--tech-fill, 0));
+}
+
+.technology-pipeline-list {
+  display: flex;
+  list-style: none;
+}
+
+.technology-pipeline-item {
+  flex: 1 1 0;
+  display: flex;
+  justify-content: center;
+  min-width: 0;
+}
+
+.technology-pipeline-node {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 0 6px 4px;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+  text-align: center;
+}
+
+/* Shape as well as colour: the active step is a filled dot in a ring, the
+   completed ones are filled, the rest are outlines (§55). */
+.technology-pipeline-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  border: 1px solid rgba(198, 245, 225, 0.32);
+  background: var(--color-abyss);
+  transition:
+    background-color 0.35s var(--ease-out-expo),
+    border-color 0.35s var(--ease-out-expo),
+    box-shadow 0.35s var(--ease-out-expo);
+}
+
+.technology-pipeline-index {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: var(--color-muted);
+  opacity: 0.55;
+  transition: color 0.35s var(--ease-out-expo), opacity 0.35s var(--ease-out-expo);
+}
+
+.technology-pipeline-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+  opacity: 0.55;
+  transition: color 0.35s var(--ease-out-expo), opacity 0.35s var(--ease-out-expo);
+}
+
+.technology-pipeline-node.is-done .technology-pipeline-dot {
+  background: rgba(198, 245, 225, 0.55);
+  border-color: rgba(198, 245, 225, 0.55);
+}
+
+.technology-pipeline-node.is-done .technology-pipeline-index,
+.technology-pipeline-node.is-done .technology-pipeline-label {
+  color: var(--color-signal-mint);
+  opacity: 0.68;
+}
+
+.technology-pipeline-node.is-active .technology-pipeline-dot {
+  background: var(--color-bio-green);
+  border-color: var(--color-bio-green);
+  box-shadow: 0 0 0 3px rgba(166, 255, 106, 0.14);
+}
+
+.technology-pipeline-node.is-active .technology-pipeline-index,
+.technology-pipeline-node.is-active .technology-pipeline-label {
+  color: var(--color-bio-green);
+  opacity: 1;
+}
+
+.technology-pipeline-node:hover .technology-pipeline-label,
+.technology-pipeline-node:focus-visible .technology-pipeline-label {
+  opacity: 0.9;
+}
+
+/* ── Ingress ─────────────────────────────────────────────────────────────
+   Innovation's own microscopy field, opening from a small window to full
+   bleed while the Bone veil recedes behind it (§5). The veil is flat Bone so
+   that, while this section is rising into view, the entire viewport is still
+   the colour Innovation was — there is no seam to see.                     */
+
+.technology-ingress {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.technology-ingress-veil {
+  position: absolute;
+  inset: 0;
+  background: var(--color-bone);
+}
+
+.technology-ingress-plate {
+  position: absolute;
+  inset: 0;
+  /* Matches the clip the timeline animates from, so the plate is already a
+     window rather than a full-bleed image on the first frame. */
+  clip-path: inset(26% 33% 24% 33%);
+}
+
+/* Holds the plate's contents so its arrival fade and its dissolve can be
+   animated independently — see TechnologyIngress. */
+.technology-ingress-plate-in {
+  position: absolute;
+  inset: 0;
+}
+
+.technology-ingress-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* Pulling back from a slight magnification is what makes the expansion read
+     as the specimen opening rather than an image sliding into place. */
+  transform: scale(1.04);
+}
+
+.technology-ingress-shade {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 70% 60% at 50% 46%, rgba(7, 17, 15, 0.45) 0%, rgba(7, 17, 15, 0.92) 78%),
+    linear-gradient(180deg, rgba(7, 17, 15, 0.5) 0%, rgba(7, 17, 15, 0.86) 100%);
+}
+
+/* ── Flowing layout (≤768px and reduced motion) ──────────────────────────── */
+
+.technology--flow {
+  background: var(--color-abyss);
+  overflow: hidden;
+}
+
+.technology-ingress-band {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 40vh;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    var(--color-bone) 0%,
+    #b7c3bb 14%,
+    #465b50 38%,
+    #14241e 66%,
+    rgba(7, 17, 15, 0) 100%
+  );
+}
+
+/* The same specimen field carries the transition here as in the pinned
+   version — the section should not change what it is made of by breakpoint. */
+.technology-ingress-band::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url('/assets/innovation/innovation-microscopy.webp');
+  background-size: cover;
+  background-position: 50% 40%;
+  opacity: 0.55;
+  -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 34%, #000 62%, transparent 100%);
+  mask-image: linear-gradient(180deg, transparent 0%, #000 34%, #000 62%, transparent 100%);
+}
+
+.technology-flow {
+  position: relative;
+  z-index: 2;
+  padding: 22vh clamp(20px, 5vw, 40px) clamp(64px, 9vh, 96px);
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.technology-flow .technology-headline {
+  font-size: clamp(2.9rem, 12vw, 3.5rem);
+  line-height: 0.96;
+}
+
+.technology-flow .technology-lead {
+  font-size: 1.02rem;
+  max-width: 100%;
+}
+
+.technology-flow-stages {
+  list-style: none;
+  margin-top: clamp(36px, 6vh, 60px);
+}
+
+/* The rail is the gutter these hang from — §48's vertical progress, without a
+   second widget to keep in sync. */
+.technology-flow-item {
+  position: relative;
+  padding-left: 26px;
+  padding-bottom: clamp(34px, 5vh, 52px);
+}
+
+.technology-flow-item::before {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 10px;
+  bottom: 0;
+  width: 1px;
+  background: rgba(198, 245, 225, 0.14);
+}
+
+.technology-flow-item:last-child::before {
+  bottom: auto;
+  height: 40px;
+}
+
+.technology-flow-label {
+  position: relative;
+}
+
+.technology-flow-label .technology-pipeline-dot {
+  position: absolute;
+  left: -26px;
+  top: 2px;
+}
+
+.technology-flow-label.is-done .technology-pipeline-dot {
+  background: rgba(198, 245, 225, 0.55);
+  border-color: rgba(198, 245, 225, 0.55);
+}
+
+.technology-flow-label.is-active .technology-pipeline-dot {
+  background: var(--color-bio-green);
+  border-color: var(--color-bio-green);
+  box-shadow: 0 0 0 3px rgba(166, 255, 106, 0.14);
+}
+
+.technology-flow .technology-stage-title {
+  font-size: clamp(1.75rem, 7.5vw, 2.15rem);
+  margin-bottom: 0.8rem;
+}
+
+.technology-flow .technology-stage-body {
+  font-size: 1rem;
+  max-width: 100%;
+}
+
+.technology-meta--flow {
+  position: static;
+  margin-top: 18px;
+  display: grid;
+  gap: 6px;
+  text-align: left;
+}
+
+.technology-meta--flow .technology-meta-row {
+  justify-content: flex-start;
+  gap: 10px;
+}
+
+/* ── Drawn stage diagrams ───────────────────────────────────────────────── */
+
+.technology-diagram {
+  position: relative;
+  /* Wide enough that a cluster's connections are longer than the cells they
+     join — below about 400px the nearest-neighbour links disappear inside
+     their own nodes and the network stops reading as one. */
+  max-width: 420px;
+  margin: 0 0 18px;
+  border: 1px solid rgba(198, 245, 225, 0.07);
+  background:
+    radial-gradient(ellipse 60% 60% at 50% 48%, rgba(166, 255, 106, 0.05) 0%, transparent 72%),
+    rgba(9, 22, 18, 0.6);
+}
+
+.technology-diagram-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* ── Laptop ──────────────────────────────────────────────────────────────── */
+
+@media (max-width: 1366px) {
+  .technology-headline {
+    /* §46 wants 62–72px here; 5.2vw lands at 66px on a 1280 viewport. */
+    font-size: clamp(2.6rem, 5.2vw, 4.6rem);
+  }
+  .technology-inner {
+    padding-left: clamp(24px, 3.8vw, 48px);
+    padding-right: clamp(24px, 3.8vw, 48px);
+  }
+}
+
+/* ── Tablet landscape ────────────────────────────────────────────────────── */
+
+@media (max-width: 1024px) {
+  .technology-header {
+    max-width: 560px;
+  }
+  .technology-stage-slot {
+    max-width: min(52%, 400px);
+    min-height: 170px;
+  }
+  .technology-lead {
+    max-width: 380px;
+    font-size: 0.95rem;
+  }
+  .technology-meta-slot {
+    min-width: 170px;
+  }
+  .technology-meta {
+    font-size: 9.5px;
+  }
+  /* The rail stays horizontal — it is still readable at this width (§47) —
+     but the labels tighten so five of them fit without wrapping. */
+  .technology-pipeline-label {
+    font-size: 10px;
+    letter-spacing: 0.08em;
+  }
+  .technology-pipeline-node {
+    gap: 9px;
+  }
+}
+
+/* Genuinely short windows only — 800px-tall laptops have room for the full
+   headline, and §46 asks for 62–72px there. Below this the copy column and the
+   rail need the space more than the type does. */
+@media (max-height: 760px) and (min-width: 769px) {
+  .technology-headline {
+    font-size: clamp(2.4rem, 4.6vw, 3.9rem);
+  }
+  .technology-lead {
+    margin-top: 14px;
+  }
+  .technology-stage-slot {
+    min-height: 160px;
+  }
+}
+
+/* ── Mobile ──────────────────────────────────────────────────────────────── */
+
+@media (max-width: 768px) {
+  .technology-flow {
+    padding-top: 20vh;
+  }
+  .technology-ingress-band {
+    height: 30vh;
+  }
+}
+
+/* On a phone the column itself is the constraint, and five 250px-tall
+   diagrams would turn a five-stage read into a long scroll. */
+@media (max-width: 480px) {
+  .technology-diagram {
+    max-width: 300px;
+  }
+}
+
+@media (max-width: 380px) {
+  .technology-flow {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+  .technology-flow-item {
+    padding-left: 22px;
+  }
+  .technology-flow-label .technology-pipeline-dot {
+    left: -22px;
+  }
+}

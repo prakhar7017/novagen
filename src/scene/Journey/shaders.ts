@@ -12,7 +12,7 @@
 // ── Shared noise ────────────────────────────────────────────────────────────
 // Hash-based value noise + 4-octave fbm. Cheap enough for a fullscreen pass on
 // integrated GPUs and avoids shipping a noise texture.
-const NOISE = /* glsl */ `
+export const NOISE = /* glsl */ `
   float hash21(vec2 p) {
     p = fract(p * vec2(127.1, 311.7));
     p += dot(p, p + 34.23);

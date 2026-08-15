@@ -1,5 +1,6 @@
 import { Suspense, useState, useRef, useMemo } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
+import type * as THREE from 'three'
 import DissolveStage from './DissolveStage'
 import ParticleSystem from './ParticleSystem'
 import CandidateReveal from './CandidateReveal'
@@ -32,12 +33,21 @@ export default function JourneyScene({
   // converging. A ref guards the state write so this flips exactly once.
   const [candidateMounted, setCandidateMounted] = useState(false)
   const mountedRef = useRef(false)
+  const root = useRef<THREE.Group>(null)
 
   useFrame(() => {
     if (!mountedRef.current && scrollProgress.journey > MILESTONE.networkStart - 0.1) {
       mountedRef.current = true
       setCandidateMounted(true)
     }
+
+    // The Journey's state is a pure function of its own progress, which rests
+    // at 1 forever once the section is behind us — so without this gate its
+    // final frame (a dimmed candidate over a thinned field) would still be
+    // drawn underneath Technology when the canvas is switched back on. The
+    // aperture is opaque Bone well before handoff 0.985, so nothing visible
+    // is being cut off here.
+    if (root.current) root.current.visible = scrollProgress.handoff < 0.985
   })
 
   const groupX = useMemo(
@@ -57,7 +67,7 @@ export default function JourneyScene({
   )
 
   return (
-    <>
+    <group ref={root}>
       <Suspense fallback={null}>
         <DissolveStage />
       </Suspense>
@@ -70,6 +80,6 @@ export default function JourneyScene({
           </Suspense>
         )}
       </group>
-    </>
+    </group>
   )
 }

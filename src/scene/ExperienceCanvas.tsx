@@ -3,6 +3,7 @@ import { Canvas } from '@react-three/fiber'
 import { PerformanceMonitor } from '@react-three/drei'
 import HeroParticles from './HeroAtmosphere/HeroParticles'
 import JourneyScene from './Journey/JourneyScene'
+import TechnologyScene from './Technology/TechnologyScene'
 import { useMediaQuery } from '@/hooks/useMediaQuery'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { useExperienceStore } from '@/store/experienceStore'
@@ -40,6 +41,12 @@ export default function ExperienceCanvas() {
         ? 3500
         : 6000
 
+  // Deliberately two orders of magnitude below the Journey: this section reads
+  // as an instrument, and §25 caps the network at 250 nodes because past that
+  // the clusters stop being legible as separate regions — a limit of the eye
+  // long before it is a limit of the GPU.
+  const technologyNodes = isTablet ? 160 : 218
+
   return (
     <Canvas
       dpr={dpr}
@@ -73,6 +80,13 @@ export default function ExperienceCanvas() {
           pointerEnabled={!isCoarsePointer}
           offsetVisual={!isTabletPortrait}
         />
+      )}
+
+      {/* Below 769px Technology is a normally-flowing document with drawn
+          diagrams rather than a pinned WebGL sequence (§49), so there is
+          nothing for the canvas to do there either. */}
+      {!reduced && !isMobile && (
+        <TechnologyScene nodeCount={technologyNodes} offsetVisual={!isTabletPortrait} />
       )}
     </Canvas>
   )

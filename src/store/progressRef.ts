@@ -21,6 +21,14 @@ export const scrollProgress = {
    * timeline's mapping is untouched by the transition.
    */
   handoff: 0,
+  /**
+   * 0–1 through the Innovation → Technology ingress, where the microscopy plate
+   * expands and the Bone surface gives way to the platform environment. Drives
+   * the WebGL gate: the Technology scene draws nothing until this leaves 0.
+   */
+  techIngress: 0,
+  /** 0–1 through the Technology pipeline: sample → map → interpret → predict → validate */
+  technology: 0,
 }
 
 // Dev-only handle so the verification scripts can assert on the same numbers
