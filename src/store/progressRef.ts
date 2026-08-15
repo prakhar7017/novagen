@@ -15,6 +15,12 @@ export const scrollProgress = {
   hero: 0,
   /** 0–1 through the entire Biological Journey */
   journey: 0,
+  /**
+   * 0–1 through the Journey → Innovation handoff, which occupies a tail of
+   * scroll *after* `journey` has already reached 1. Kept separate so the story
+   * timeline's mapping is untouched by the transition.
+   */
+  handoff: 0,
 }
 
 // Dev-only handle so the verification scripts can assert on the same numbers

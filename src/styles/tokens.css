@@ -6,6 +6,10 @@
   --color-signal-mint:  #c6f5e1;
   --color-bone:         #f5f7f4;
   --color-muted:        #8d9b93;
+  /* Secondary text on the Bone surface. --color-muted is tuned for dark
+     backgrounds and drops to ~2.2:1 on Bone, so light sections use this
+     deeper gray-green instead. */
+  --color-muted-dark:   #65726b;
 
   /* Semantic aliases */
   --color-bg:           var(--color-abyss);

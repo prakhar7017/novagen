@@ -5,6 +5,7 @@ import HeroParticles from './HeroAtmosphere/HeroParticles'
 import JourneyScene from './Journey/JourneyScene'
 import { useMediaQuery } from '@/hooks/useMediaQuery'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
+import { useExperienceStore } from '@/store/experienceStore'
 
 /**
  * The single persistent WebGL surface for the whole site.
@@ -23,6 +24,7 @@ export default function ExperienceCanvas() {
   const isTablet = useMediaQuery('(max-width: 1024px)')
   const isCoarsePointer = useMediaQuery('(pointer: coarse)')
   const reduced = useReducedMotion()
+  const canvasActive = useExperienceStore((s) => s.canvasActive)
 
   const [dpr, setDpr] = useState(isMobile ? 1 : 1.5)
 
@@ -41,6 +43,11 @@ export default function ExperienceCanvas() {
   return (
     <Canvas
       dpr={dpr}
+      // Innovation and everything below it are opaque, so once one of them owns
+      // the viewport there is nothing to draw. 'never' halts the loop entirely;
+      // scrolling back flips it to 'always' and the scene resumes from the same
+      // scroll-derived state, since every value is a pure function of progress.
+      frameloop={canvasActive ? 'always' : 'never'}
       gl={{ antialias: false, alpha: true, powerPreference: 'high-performance' }}
       camera={{ position: [0, 0, 5], fov: 50, near: 0.1, far: 50 }}
       style={{

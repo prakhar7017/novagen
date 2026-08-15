@@ -4,6 +4,7 @@ import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import Hero from '@/sections/Hero/Hero'
 import Journey from '@/sections/Journey/Journey'
+import Innovation from '@/sections/Innovation/Innovation'
 import ExperienceCanvas from '@/scene/ExperienceCanvas'
 
 export default function App() {
@@ -47,7 +48,8 @@ export default function App() {
       <main>
         <Hero />
         <Journey />
-        {/* 03 Innovation onward mount here */}
+        <Innovation />
+        {/* 04 Technology onward mount here */}
       </main>
     </>
   )

@@ -3,6 +3,8 @@ import { useGSAP } from '@gsap/react'
 import { buildJourneyTimeline, type JourneyRefs } from '@/animation/journeyTimeline'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { useMediaQuery } from '@/hooks/useMediaQuery'
+import { HANDOFF_VH } from '@/sections/Innovation/innovation.constants'
+import InnovationAperture from '@/sections/Innovation/InnovationAperture'
 import JourneyCopy from './JourneyCopy'
 import JourneyHUD from './JourneyHUD'
 import JourneyStatic from './JourneyStatic'
@@ -31,8 +33,10 @@ export default function Journey() {
     [],
   )
 
-  useGSAP(() => buildJourneyTimeline(refs, reduced), {
-    dependencies: [reduced],
+  const handoffVh = isMobile ? HANDOFF_VH.mobile : HANDOFF_VH.desktop
+
+  useGSAP(() => buildJourneyTimeline(refs, reduced, handoffVh), {
+    dependencies: [reduced, handoffVh],
     revertOnUpdate: true,
   })
 
@@ -48,7 +52,11 @@ export default function Journey() {
       ref={refs.section}
       className="journey"
       aria-label="The biological journey"
-      style={{ height: `${scrollLength}vh` }}
+      // The story owns `scrollLength`; the extra `handoffVh` is the tail where
+      // the stage is still stuck but the story has finished, which is where the
+      // Innovation aperture opens. The timeline's end is offset by the same
+      // amount, so the story's pacing is identical either way.
+      style={{ height: `${scrollLength + handoffVh}vh` }}
     >
       <div className="journey-stage">
         {/* Background: darker and more technical than the Hero, per
@@ -60,6 +68,10 @@ export default function Journey() {
 
         <JourneyCopy copyRef={refs.copy} linesRef={refs.lines} />
         <JourneyHUD metaRef={refs.meta} stepsRef={refs.steps} />
+
+        {/* Section 03's arrival, staged from inside the Journey — see the
+            component for why it cannot live in the Innovation section. */}
+        <InnovationAperture handoffVh={handoffVh} />
       </div>
     </section>
   )

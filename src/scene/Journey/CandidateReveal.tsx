@@ -55,11 +55,19 @@ export default function CandidateReveal() {
     const j = scrollProgress.journey
     const reveal = smoothstep(MILESTONE.candidateStart + 0.01, 1.0, j)
 
-    mat.opacity = reveal
+    // Handoff to Innovation: the candidate draws back and dims to roughly a
+    // quarter of its weight while the Bone aperture opens over it, so the
+    // section change reads as pulling away from a microscope rather than a cut
+    // (prompt §6). `handoff` only leaves 0 after `journey` has reached 1, so
+    // this never interferes with the reveal above.
+    const h = scrollProgress.handoff
+    const opacity = reveal * (1 - 0.75 * h)
+
+    mat.opacity = opacity
     if (meshRef.current) {
-      meshRef.current.visible = reveal > 0.002
+      meshRef.current.visible = opacity > 0.002
       // Settles inward slightly as it resolves — arriving, not zooming
-      meshRef.current.scale.setScalar(1.08 - reveal * 0.08)
+      meshRef.current.scale.setScalar((1.08 - reveal * 0.08) * (1 - 0.28 * h))
     }
   })
 

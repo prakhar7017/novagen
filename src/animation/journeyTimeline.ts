@@ -29,7 +29,12 @@ export interface JourneyRefs {
  * a tween placed at t = 0.37 fires at journey progress 0.37 and the copy stays
  * locked to the WebGL milestones in journey.constants.
  */
-export function buildJourneyTimeline(refs: JourneyRefs, reduced: boolean) {
+export function buildJourneyTimeline(
+  refs: JourneyRefs,
+  reduced: boolean,
+  /** vh reserved at the end of the section for the Innovation handoff */
+  handoffVh: number,
+) {
   if (reduced) return
 
   const section = refs.section.current
@@ -39,8 +44,13 @@ export function buildJourneyTimeline(refs: JourneyRefs, reduced: boolean) {
     scrollTrigger: {
       trigger: section,
       start: 'top top',
-      end: 'bottom bottom',
+      // Ends `handoffVh` earlier than the section's own bottom. The section was
+      // made exactly that much taller, so the story still spans the same number
+      // of pixels and every cue lands where it always did; the extra length is
+      // pure runway for the aperture handoff (see HANDOFF_VH).
+      end: () => `bottom bottom+=${(window.innerHeight * handoffVh) / 100}`,
       scrub: 0.8,
+      invalidateOnRefresh: true,
       onUpdate: (self) => {
         scrollProgress.journey = self.progress
       },

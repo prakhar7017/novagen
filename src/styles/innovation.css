@@ -1,0 +1,780 @@
+/* ── Section 03 · Innovation / Our Approach ───────────────────────────────
+   The site's first light surface. Everything here is HTML, CSS and SVG: no
+   canvas of its own, and the shared one is stopped while this section owns the
+   viewport (prompt §42).                                                     */
+
+.innovation {
+  position: relative;
+  z-index: 2; /* above the fixed ExperienceCanvas */
+  width: 100%;
+  background: var(--color-bone);
+  color: var(--color-abyss);
+  overflow: hidden;
+}
+
+.innovation-inner {
+  position: relative;
+  z-index: 2;
+  max-width: 1536px;
+  margin: 0 auto;
+  padding: clamp(84px, 13vh, 130px) clamp(20px, 4.4vw, 64px) clamp(96px, 13vh, 128px);
+}
+
+/* ── Surface texture ─────────────────────────────────────────────────────
+   Both layers exist to stop a large flat Bone field reading as a blank page.
+   Neither should be identifiable as a texture at normal viewing distance.   */
+
+.innovation-grain {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.022;
+  filter: url(#innovation-grain);
+  background: #000;
+}
+
+.innovation-grid {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(7, 17, 15, 0.022) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(7, 17, 15, 0.022) 1px, transparent 1px);
+  background-size: 92px 92px;
+  /* The aperture panel that hands over to this section is flat Bone, so a grid
+     starting at the section's exact top edge would draw a line across the
+     handoff. Fading it in over the first stretch removes that edge. */
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 260px);
+  mask-image: linear-gradient(to bottom, transparent 0, #000 260px);
+}
+
+/* ── Metadata row ────────────────────────────────────────────────────────── */
+
+.innovation-meta {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 24px;
+  font-family: var(--font-mono);
+  font-size: clamp(10px, 0.78vw, 12px);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  margin-bottom: clamp(40px, 6vh, 64px);
+}
+
+.innovation-meta-label {
+  color: #3d5147;
+}
+
+.innovation-meta-index {
+  color: var(--color-abyss);
+}
+
+.innovation-meta-slash {
+  margin: 0 8px;
+  opacity: 0.4;
+}
+
+.innovation-meta-scale {
+  display: flex;
+  gap: 14px;
+  color: var(--color-muted-dark);
+  opacity: 0.62;
+}
+
+.innovation-meta-scale-key {
+  opacity: 0.7;
+}
+
+/* ── Headline ────────────────────────────────────────────────────────────── */
+
+.innovation-headline {
+  font-family: var(--font-sans);
+  font-size: clamp(2.8rem, 5.4vw, 5.1rem);
+  font-weight: 700;
+  line-height: 0.95;
+  letter-spacing: -0.032em;
+  color: var(--color-abyss);
+  max-width: 1120px;
+}
+
+/* Matches the Hero and Journey: overflow:hidden drives the line reveal, and
+   the padding/margin pair keeps it from clipping descenders. */
+.innovation-headline .line-clip {
+  padding-bottom: 0.2em;
+  margin-bottom: -0.16em;
+}
+
+/* The only Bio Green in the section's typography. On Bone the raw brand green
+   sits near 1.3:1, so a hairline dark halo is what makes a 10px glyph read as
+   a deliberate accent rather than a missing full stop. */
+.innovation-accent {
+  color: var(--color-bio-green);
+  text-shadow: 0 0 1.2px rgba(7, 17, 15, 0.85);
+}
+
+/* ── Two-column body ─────────────────────────────────────────────────────── */
+
+/* Copy and principles stack in the left column, the specimen spans both rows
+   on the right. Placement is explicit so the DOM can stay in single-column
+   reading order — copy, specimen, principles — for narrow screens. */
+.innovation-body {
+  display: grid;
+  grid-template-columns: minmax(0, 40fr) minmax(0, 56fr);
+  grid-template-rows: auto 1fr;
+  column-gap: clamp(48px, 6.4vw, 104px);
+  align-items: start;
+  margin-top: clamp(64px, 11vh, 124px);
+}
+
+.innovation-copy {
+  grid-column: 1;
+  grid-row: 1;
+  max-width: 540px;
+}
+
+.innovation-visual {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+}
+
+.innovation-principles {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+.innovation-eyebrow {
+  font-family: var(--font-mono);
+  font-size: clamp(10px, 0.78vw, 12px);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-muted-dark);
+  margin-bottom: clamp(24px, 3vh, 36px);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.innovation-eyebrow::before {
+  content: '';
+  width: 26px;
+  height: 1px;
+  background: var(--color-abyss);
+  opacity: 0.28;
+}
+
+.innovation-lead {
+  font-family: var(--font-sans);
+  font-size: clamp(1.25rem, 1.7vw, 1.6rem);
+  line-height: 1.34;
+  letter-spacing: -0.012em;
+  color: var(--color-abyss);
+  margin-bottom: clamp(20px, 2.6vh, 30px);
+}
+
+.innovation-paragraph {
+  font-family: var(--font-sans);
+  font-size: clamp(1rem, 1.28vw, 1.18rem);
+  line-height: 1.6;
+  color: var(--color-muted-dark);
+  max-width: 520px;
+}
+
+.innovation-paragraph + .innovation-paragraph {
+  margin-top: 1.1em;
+}
+
+/* ── Principles ──────────────────────────────────────────────────────────── */
+
+.innovation-principles {
+  list-style: none;
+  margin: clamp(44px, 6vh, 68px) 0 0;
+  padding: 0;
+}
+
+.innovation-principle {
+  position: relative;
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr);
+  gap: 16px;
+  padding: clamp(18px, 2.4vh, 26px) 0;
+}
+
+.innovation-principle-rule {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: rgba(7, 17, 15, 0.13);
+  transform-origin: left center;
+}
+
+.innovation-principle-index {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: var(--color-muted-dark);
+  opacity: 0.62;
+  padding-top: 0.28em;
+}
+
+.innovation-principle-text {
+  display: block;
+}
+
+.innovation-principle-title {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: clamp(11px, 0.82vw, 12.5px);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-abyss);
+  margin-bottom: 8px;
+}
+
+.innovation-principle-detail {
+  display: block;
+  font-family: var(--font-sans);
+  font-size: clamp(0.95rem, 1.05vw, 1.02rem);
+  line-height: 1.5;
+  color: var(--color-muted-dark);
+  max-width: 400px;
+}
+
+/* ── Microscopy visual ───────────────────────────────────────────────────── */
+
+.innovation-visual {
+  margin: 0;
+  justify-self: end;
+  width: 100%;
+  max-width: 620px;
+}
+
+/* Between a rectangle and a specimen window: a wide arch above, tight corners
+   below. Coded rather than baked into the asset (prompt §18). */
+.innovation-visual-frame {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  border-radius: 108px 108px 32px 32px;
+  background: #04100c;
+  border: 1px solid rgba(7, 17, 15, 0.12);
+  box-shadow: 0 30px 80px rgba(7, 17, 15, 0.08);
+  isolation: isolate;
+}
+
+.innovation-visual-reveal {
+  position: absolute;
+  inset: 0;
+}
+
+/* 8% taller than the frame with a 4% overhang each side, so ±3% of parallax
+   travel can never expose an edge. */
+.innovation-visual-parallax {
+  position: absolute;
+  inset: -4% 0;
+  will-change: transform;
+}
+
+.innovation-visual-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 50%;
+  display: block;
+}
+
+.innovation-visual-vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse 78% 68% at 50% 48%,
+    transparent 42%,
+    rgba(4, 14, 11, 0.42) 100%
+  );
+}
+
+.innovation-visual-caption {
+  margin-top: 18px;
+  font-family: var(--font-mono);
+  font-size: clamp(10px, 0.74vw, 11.5px);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-muted-dark);
+  opacity: 0.6;
+}
+
+/* ── Inspection lens ─────────────────────────────────────────────────────── */
+
+/* 1.08x about the cursor displaces the image by ~6px at the rim and nothing at
+   the centre, which on a fractal specimen is imperceptible — so the lens has to
+   announce itself at its edge rather than through the magnification. The ring
+   plus a short inward falloff is what makes it read as an optic; a glow or a
+   larger zoom would make it read as an effect (§21, §22). */
+.innovation-lens {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
+/* The rim has to be a generated child, not an inset shadow on the lens itself:
+   an inset shadow paints below the element's descendants, so the magnified
+   image inside covers it completely. */
+.innovation-lens::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  pointer-events: none;
+  box-shadow:
+    inset 0 0 0 1.5px rgba(198, 245, 225, 0.55),
+    inset 0 0 22px rgba(4, 14, 11, 0.45);
+}
+
+.innovation-lens-inner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 0 0;
+  filter: contrast(1.16) saturate(1.14) brightness(1.07);
+}
+
+/* ── Annotations ─────────────────────────────────────────────────────────── */
+
+.innovation-annotations {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* The declared coordinate is the target marker, not the row: the offsets below
+   pull the row so the 20px marker straddles the point on whichever side the
+   label runs. */
+.innovation-annotation {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  color: var(--color-signal-mint);
+  transform: translate(-10px, -50%);
+}
+
+.innovation-annotation--left {
+  flex-direction: row-reverse;
+  transform: translate(calc(-100% + 10px), -50%);
+}
+
+.innovation-annotation-marker {
+  width: 20px;
+  height: 20px;
+  flex: none;
+  color: var(--color-bio-green);
+  opacity: 0.85;
+}
+
+.innovation-annotation-leader {
+  width: 26px;
+  height: 1px;
+  background: currentColor;
+  opacity: 0.42;
+}
+
+.innovation-annotation-text {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  /* Two radii rather than one: the tight shadow separates the glyph edges from
+     whatever fluorescence is directly behind them, the wide one darkens the
+     patch around the label. Enough to stay readable over a bright cell without
+     becoming a chip or a badge. */
+  text-shadow:
+    0 0 3px rgba(4, 14, 11, 0.95),
+    0 1px 12px rgba(4, 14, 11, 0.85);
+}
+
+.innovation-annotation--left .innovation-annotation-text {
+  text-align: right;
+}
+
+.innovation-annotation-label {
+  opacity: 0.7;
+}
+
+/* Authored in its final case — see the note on ANNOTATIONS. */
+.innovation-annotation-value {
+  color: #eafff2;
+  text-transform: none;
+  letter-spacing: 0.1em;
+}
+
+/* ── Biological scale line ───────────────────────────────────────────────── */
+
+.innovation-scale {
+  display: flex;
+  align-items: center;
+  gap: clamp(20px, 3vw, 40px);
+  margin-top: clamp(64px, 9vh, 104px);
+  padding-top: clamp(24px, 3vh, 32px);
+  border-top: 1px solid rgba(7, 17, 15, 0.1);
+}
+
+.innovation-scale-key,
+.innovation-scale-name {
+  font-family: var(--font-mono);
+  font-size: clamp(10px, 0.74vw, 11.5px);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.innovation-scale-key {
+  color: var(--color-muted-dark);
+  opacity: 0.55;
+  white-space: nowrap;
+}
+
+.innovation-scale-track {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  flex: 1;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+}
+
+.innovation-scale-item {
+  display: flex;
+  align-items: center;
+  gap: clamp(10px, 1.4vw, 20px);
+  min-width: 0;
+}
+
+.innovation-scale-item:not(:last-child) {
+  flex: 1;
+}
+
+.innovation-scale-stage {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding-left: clamp(10px, 1.4vw, 20px);
+}
+
+.innovation-scale-item:first-child .innovation-scale-stage {
+  padding-left: 0;
+}
+
+.innovation-scale-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: rgba(7, 17, 15, 0.22);
+  transition: background 0.45s var(--ease-out-expo), box-shadow 0.45s var(--ease-out-expo);
+}
+
+.innovation-scale-name {
+  color: var(--color-muted-dark);
+  opacity: 0.62;
+  transition: color 0.45s var(--ease-out-expo), opacity 0.45s var(--ease-out-expo);
+}
+
+/* The active marker is the one place Bio Green is load-bearing on Bone, so it
+   carries a dark ring rather than relying on the fill alone. */
+.innovation-scale-stage.is-active .innovation-scale-dot {
+  background: var(--color-bio-green);
+  box-shadow: 0 0 0 1px rgba(7, 17, 15, 0.5);
+}
+
+.innovation-scale-stage.is-active .innovation-scale-name {
+  color: var(--color-abyss);
+  opacity: 1;
+}
+
+.innovation-scale-rule {
+  flex: 1;
+  height: 1px;
+  min-width: 16px;
+  background: rgba(7, 17, 15, 0.14);
+}
+
+/* ── Journey → Innovation aperture ───────────────────────────────────────
+   Lives inside the Journey's sticky stage — see InnovationAperture.tsx.     */
+
+.innovation-aperture {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  overflow: hidden;
+  pointer-events: none;
+  visibility: hidden;
+  opacity: 0;
+  /* Horizontal origin of the aperture, matched to where JourneyScene places
+     the molecular candidate (a 13% right-of-centre group offset). Read back by
+     the handoff timeline so the breakpoint below is the single definition. */
+  --aperture-x: 63%;
+}
+
+/* Slightly wider than tall, so what opens is an ovoid rather than a geometric
+   circle — enough to read as biological without becoming a blob (prompt §18).
+   `closest-side` is load-bearing: it pins 100% of the gradient ray to half the
+   element box, so a stop percentage converts to a pixel radius predictably.
+   The default (farthest-corner) would put 100% at the diagonal instead, and the
+   scale maths in innovationTimeline.ts depends on this. */
+.innovation-aperture-disc {
+  position: absolute;
+  left: var(--aperture-x);
+  top: 50%;
+  width: 104vmax;
+  height: 94vmax;
+  margin-left: -52vmax;
+  margin-top: -47vmax;
+  transform: scale(0);
+  will-change: transform;
+  background: radial-gradient(
+    ellipse closest-side at 50% 50%,
+    #f5f7f4 0 86%,
+    rgba(245, 247, 244, 0.92) 90%,
+    rgba(198, 245, 225, 0.5) 94%,
+    rgba(245, 247, 244, 0) 100%
+  );
+}
+
+/* ── Light-surface header ────────────────────────────────────────────────
+   The fixed header is styled inline for the dark sections, so overriding it on
+   Bone needs !important. Scoped to the attribute the surface trigger sets, and
+   deliberately limited to colour.                                            */
+
+/* Declared for both surfaces so the change reads as a fade rather than a pop as
+   the aperture floods the top of the screen. It has to beat the nav links'
+   inline transition, otherwise the links and the wordmark cross over at
+   different speeds; 0.3s is close enough to the Hero's own 0.2s hover that the
+   hover feel is unchanged. */
+header a {
+  transition: color 0.3s var(--ease-out-expo) !important;
+}
+
+[data-surface='light'] header a {
+  color: rgba(7, 17, 15, 0.62) !important;
+}
+
+/* The inline mouseenter handler writes a Bone colour that this has to beat. */
+[data-surface='light'] header a:hover {
+  color: var(--color-abyss) !important;
+}
+
+[data-surface='light'] header > a {
+  color: var(--color-abyss) !important;
+}
+
+[data-surface='light'] header > a span {
+  color: #4e9c19 !important;
+}
+
+[data-surface='light'] .hero-nav-compact {
+  color: #4e9c19 !important;
+}
+
+/* ── Large desktop ───────────────────────────────────────────────────────── */
+
+@media (min-width: 1601px) {
+  .innovation-visual {
+    max-width: 660px;
+  }
+}
+
+/* ── Laptop ──────────────────────────────────────────────────────────────── */
+/* The frame is portrait, so its width sets the section's height. A 620px frame
+   is 775px tall, which is generous at 900px of viewport and cramped at 800 —
+   hence a smaller cap here rather than a single figure everywhere (§33). */
+
+@media (max-width: 1366px) {
+  .innovation-visual {
+    max-width: 560px;
+  }
+}
+
+/* ── Tablet landscape ────────────────────────────────────────────────────── */
+
+@media (max-width: 1024px) {
+  .innovation-body {
+    grid-template-columns: minmax(0, 42fr) minmax(0, 58fr);
+    gap: clamp(36px, 4.6vw, 56px);
+  }
+
+  .innovation-visual-frame {
+    border-radius: 76px 76px 26px 26px;
+  }
+
+  /* Three readouts crowd a frame this size */
+  .innovation-annotation.is-secondary {
+    display: none;
+  }
+}
+
+/* ── Tablet portrait ─────────────────────────────────────────────────────── */
+/* One column: the argument is read first and the specimen supports it, rather
+   than a desktop grid squeezed into half the width (prompt §35).             */
+
+@media (max-width: 900px) {
+  .innovation-aperture {
+    --aperture-x: 50%;
+  }
+
+  /* Explicit placement is dropped, so the three children fall back to DOM
+     order: copy, specimen, principles. */
+  .innovation-body {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: none;
+    row-gap: clamp(48px, 7vh, 72px);
+  }
+
+  .innovation-copy,
+  .innovation-visual,
+  .innovation-principles {
+    grid-column: 1;
+    grid-row: auto;
+  }
+
+  .innovation-copy {
+    max-width: 100%;
+  }
+
+  .innovation-visual {
+    justify-self: start;
+    max-width: 704px;
+  }
+
+  /* A 4:5 frame at full tablet width would stand ~89vh tall and swallow the
+     screen. Capping the height crops the specimen slightly through the
+     object-fit already on the image, which costs less than shrinking the frame
+     back to two thirds of the column (§35). */
+  .innovation-visual-frame {
+    max-height: 66vh;
+    border-radius: 76px 76px 26px 26px;
+  }
+
+  .innovation-headline {
+    font-size: clamp(3.2rem, 7.4vw, 3.9rem);
+    line-height: 0.97;
+  }
+
+  .innovation-principles {
+    margin-top: 0;
+  }
+
+  .innovation-meta-scale {
+    display: none;
+  }
+}
+
+/* ── Mobile ──────────────────────────────────────────────────────────────── */
+/* 640px rather than 768: tablet portrait still carries the two-line headline,
+   the annotations and the wider gutters. */
+
+@media (max-width: 640px) {
+  .innovation-inner {
+    padding: clamp(80px, 11vh, 96px) 20px 88px;
+  }
+
+  .innovation-headline {
+    font-size: clamp(2.8rem, 12vw, 3.4rem);
+    line-height: 0.98;
+    letter-spacing: -0.028em;
+  }
+
+  .innovation-lead {
+    font-size: 1.18rem;
+  }
+
+  .innovation-paragraph {
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+
+  .innovation-visual-frame {
+    max-height: none;
+    border-radius: 44px 44px 22px 22px;
+  }
+
+  .innovation-visual-caption {
+    letter-spacing: 0.08em;
+  }
+
+  /* At this width the leaders and labels overlap the specimen they point at */
+  .innovation-annotations {
+    display: none;
+  }
+
+  .innovation-principle {
+    grid-template-columns: 30px minmax(0, 1fr);
+    gap: 12px;
+  }
+
+  /* The scale line stacks: the label above, the sequence below, so four
+     stages never compress into unreadable slivers. */
+  .innovation-scale {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 18px;
+  }
+
+  .innovation-scale-item {
+    gap: 8px;
+  }
+
+  .innovation-scale-stage {
+    padding-left: 8px;
+    gap: 7px;
+  }
+
+  .innovation-scale-name {
+    font-size: 9.5px;
+    letter-spacing: 0.08em;
+  }
+
+  .innovation-scale-rule {
+    min-width: 8px;
+  }
+}
+
+/* ── Reduced motion ──────────────────────────────────────────────────────── */
+/* No aperture, no parallax, no lens. The section is already in its finished
+   state in the markup, so suppressing every animation loses nothing.         */
+
+@media (prefers-reduced-motion: reduce) {
+  .innovation-aperture {
+    display: none;
+  }
+
+  .innovation-lens {
+    display: none;
+  }
+
+  .innovation-visual-parallax,
+  .innovation-visual-img,
+  .innovation-aperture-disc {
+    transform: none !important;
+    will-change: auto;
+  }
+
+  .innovation-scale-dot,
+  .innovation-scale-name {
+    transition: none;
+  }
+}
