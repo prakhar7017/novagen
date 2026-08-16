@@ -134,7 +134,7 @@ export default function InnovationVisual({ frameRef, revealRef, annotationsRef }
           <div ref={lens} className="innovation-lens" aria-hidden="true">
             <div ref={lensInner} className="innovation-lens-inner">
               <div className="innovation-visual-parallax">
-                <img className="innovation-visual-img" src={MICROSCOPY_SRC} alt="" />
+                <img className="innovation-visual-img" src={MICROSCOPY_SRC} alt="" decoding="async" />
               </div>
             </div>
           </div>

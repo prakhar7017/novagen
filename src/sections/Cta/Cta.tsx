@@ -6,7 +6,6 @@ import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { useExperienceStore } from '@/store/experienceStore'
 import CtaCellDrawn from './CtaCellDrawn'
 import CtaContent from './CtaContent'
-import CtaGrain from './CtaGrain'
 import { CTA_VH } from './cta.constants'
 
 /**
@@ -83,7 +82,6 @@ export default function Cta() {
       aria-labelledby="cta-title"
       style={flowing ? undefined : { height: `${CTA_VH}vh` }}
     >
-      <CtaGrain />
 
       <div className="cta-stage">
         {/* §35–§37 — one soft Bio Green field, a fainter mint secondary, 2–3%

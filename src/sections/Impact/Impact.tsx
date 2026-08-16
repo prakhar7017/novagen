@@ -15,7 +15,6 @@ import ImpactFlow from './ImpactFlow'
 import ImpactHeader from './ImpactHeader'
 import ImpactIngress from './ImpactIngress'
 import ImpactMetrics from './ImpactMetrics'
-import ImpactGrain from './ImpactGrain'
 import ImpactSteps from './ImpactSteps'
 import { IMPACT_DISCLOSURE, IMPACT_VH } from './impact.constants'
 import type { ImpactDensity } from '@/scene/Impact/impactTargets'
@@ -138,7 +137,6 @@ export default function Impact() {
         className="impact impact--flow"
         aria-labelledby="impact-title"
       >
-        <ImpactGrain />
         <div className="impact-bg" aria-hidden="true" />
         <div className="impact-grain" aria-hidden="true" />
         <ImpactFlow refs={refs} density={DENSITY.flow} />
@@ -154,7 +152,6 @@ export default function Impact() {
       aria-labelledby="impact-title"
       style={{ height: `${IMPACT_VH}vh` }}
     >
-      <ImpactGrain />
 
       <div className="impact-stage">
         {/* Environment (§29): base wash, a very faint measurement grid and one

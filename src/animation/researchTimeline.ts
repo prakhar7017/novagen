@@ -59,24 +59,17 @@ export function buildResearchIngress(panel: HTMLElement, fill: HTMLElement) {
     },
     defaults: { ease: 'none' },
   })
-    .fromTo(
-      fill,
-      { clipPath: 'inset(100% 0% 0% 0%)' },
-      { clipPath: 'inset(0% 0% 0% 0%)', duration: 0.78, ease: 'power2.inOut' },
-      0,
-    )
-    // The leading edge, travelling on its own tween rather than pinned to the
-    // clip: a 1px line cannot ride a mask boundary, so it is given the same
-    // duration and the same easing and simply arrives at the same place. It is
-    // what makes the reveal read as a surface arriving rather than as a
-    // gradient being cross-faded.
-    .fromTo(
-      edge,
-      { top: '100%', opacity: 0 },
-      { top: '0%', duration: 0.78, ease: 'power2.inOut' },
-      0,
-    )
-    .to(edge, { opacity: 0.55, duration: 0.22 }, 0.04)
+    // The surface slides up behind the panel's own overflow rather than being
+    // uncovered by an animated clip-path. Same movement, same easing, but a
+    // compositor transform instead of a full-viewport repaint per frame — this
+    // tween spans the whole Capabilities → Research boundary, which was the
+    // roughest transition on the page before the change.
+    .fromTo(fill, { yPercent: 100 }, { yPercent: 0, duration: 0.78, ease: 'power2.inOut' }, 0)
+    // The leading edge now sits at the top of the surface and rides it, which
+    // is what it was always imitating with a second tween of its own. All that
+    // is left for it is the fade: in as the surface starts moving, out before
+    // it arrives, so the Bone finishes on its own rather than under a line.
+    .fromTo(edge, { opacity: 0 }, { opacity: 0.55, duration: 0.22 }, 0.04)
     .to(edge, { opacity: 0, duration: 0.24 }, 0.62)
 }
 

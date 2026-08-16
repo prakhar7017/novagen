@@ -59,24 +59,6 @@ export default function Research() {
 
   return (
     <section id="research" ref={section} className="research" aria-labelledby="research-title">
-      {/* Paper grain, generated rather than shipped (ASSET_MANIFEST §17). Its
-          own filter id: the Innovation and Hero grains run at other
-          frequencies and sharing one would change all three. */}
-      <svg style={{ position: 'absolute', width: 0, height: 0 }} aria-hidden="true">
-        <defs>
-          <filter id="research-grain">
-            <feTurbulence
-              type="fractalNoise"
-              baseFrequency="0.82"
-              numOctaves="4"
-              stitchTiles="stitch"
-              result="noise"
-            />
-            <feColorMatrix type="saturate" values="0" in="noise" />
-          </filter>
-        </defs>
-      </svg>
-
       {/* The Capabilities → Research handoff (§5, §6).
 
           A Bone panel that lives *above* this section's top edge and paints

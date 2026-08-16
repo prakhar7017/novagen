@@ -74,24 +74,6 @@ export default function Innovation() {
       className="innovation"
       aria-labelledby="innovation-title"
     >
-      {/* Paper grain, generated rather than shipped as a texture
-          (ASSET_MANIFEST §17). Its own filter id so it cannot collide with the
-          Hero's, which uses a different frequency. */}
-      <svg style={{ position: 'absolute', width: 0, height: 0 }} aria-hidden="true">
-        <defs>
-          <filter id="innovation-grain">
-            <feTurbulence
-              type="fractalNoise"
-              baseFrequency="0.86"
-              numOctaves="4"
-              stitchTiles="stitch"
-              result="noise"
-            />
-            <feColorMatrix type="saturate" values="0" in="noise" />
-          </filter>
-        </defs>
-      </svg>
-
       <div className="innovation-grain" aria-hidden="true" />
       <div className="innovation-grid" aria-hidden="true" />
 
