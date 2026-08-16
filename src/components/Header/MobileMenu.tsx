@@ -13,18 +13,6 @@ interface Props {
   reduced: boolean
 }
 
-/**
- * The compact-viewport menu (§11–§13).
- *
- * A full-screen Abyss panel rather than a slide-in drawer: at 390px a drawer
- * costs a scrim, a shadow and an edge, and buys nothing the whole screen does
- * not already give. The links are large but restrained — this is a menu of four
- * destinations, not a landing page.
- *
- * Kept mounted rather than conditionally rendered, so the close animation has
- * something to animate, and marked `inert` while closed so nothing inside it is
- * focusable, findable or announced in that state.
- */
 export default function MobileMenu({
   open,
   onClose,
@@ -36,7 +24,6 @@ export default function MobileMenu({
   const panel = useRef<HTMLDivElement>(null)
   const items = useRef<(HTMLLIElement | null)[]>([])
 
-  // ── Reveal (§12) ─────────────────────────────────────────────────────────
   useGSAP(
     () => {
       const el = panel.current
@@ -52,9 +39,6 @@ export default function MobileMenu({
       const tl = gsap.timeline()
       if (open) {
         tl.set(el, { autoAlpha: 1 })
-          // Clipped open from the top edge rather than faded: the panel
-          // arrives as a surface moving down over the page, which is the same
-          // language every section boundary on this site uses.
           .fromTo(
             el,
             { clipPath: 'inset(0% 0% 100% 0%)' },
@@ -82,16 +66,12 @@ export default function MobileMenu({
     { dependencies: [open, reduced] },
   )
 
-  // ── Scroll lock, Escape, and focus (§13) ─────────────────────────────────
   useEffect(() => {
     if (!open) return
 
     lockScroll()
 
     const el = panel.current
-    // Focus moves into the panel rather than staying on the toggle behind it,
-    // so the next Tab lands on a menu link and a screen reader starts reading
-    // what just opened.
     const focusables = () =>
       Array.from(
         el?.querySelectorAll<HTMLElement>('a[href], button:not([disabled])') ?? [],
@@ -105,8 +85,6 @@ export default function MobileMenu({
         return
       }
       if (event.key !== 'Tab') return
-      // Trapped: with the page inert behind it, Tab reaching the browser
-      // chrome and coming back into a hidden document is worse than a loop.
       const list = focusables()
       if (list.length === 0) return
       const first = list[0]
@@ -127,9 +105,6 @@ export default function MobileMenu({
     }
   }, [open, onClose])
 
-  // Separated from the effect above so focus returns only when the menu is
-  // actually dismissed — not on unmount during a resize, which would steal
-  // focus from wherever the reader had moved it.
   const wasOpen = useRef(false)
   useEffect(() => {
     if (wasOpen.current && !open) returnFocusTo.current?.focus()

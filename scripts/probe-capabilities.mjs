@@ -1,15 +1,3 @@
-/**
- * Visual verification harness for Section 05 — Capabilities.
- *
- * Drives a real Chromium at each required viewport, screenshots the section
- * before any interaction, then hovers each module and captures its
- * micro-interaction, and reports the layout facts the acceptance criteria care
- * about (section height in vh, grid width, module boxes, overflow, console
- * errors). Run with the dev server already listening.
- *
- *   node scripts/probe-capabilities.mjs [--url http://localhost:5180]
- *        [--out screens/cap] [--only 1440x900] [--reduced] [--hover]
- */
 import { chromium } from '@playwright/test'
 import { mkdir, readdir, access } from 'node:fs/promises'
 import { join } from 'node:path'
@@ -27,11 +15,9 @@ async function findLocalChromium() {
         await access(exe)
         return exe
       } catch {
-        /* try the next build */
       }
     }
   } catch {
-    /* no local cache — let Playwright decide */
   }
   return undefined
 }
@@ -47,9 +33,6 @@ const OUT = argOf('--out', 'screens/cap')
 const ONLY = argOf('--only', null)
 const REDUCED = args.includes('--reduced')
 const HOVER = args.includes('--hover')
-// Emulates a real touchscreen, so `(hover: hover) and (pointer: fine)` fails
-// and the visuals run their idle focus path instead of waiting for a pointer
-// (§44). Without this a phone viewport in Playwright still reports a mouse.
 const TOUCH = args.includes('--touch')
 
 const SHOT_TIMEOUT = 90000
@@ -88,10 +71,6 @@ await mkdir(OUT, { recursive: true })
 const executablePath = await findLocalChromium()
 console.log(`chromium: ${executablePath ?? '(playwright default)'}\n`)
 
-// Software rasterisation is opt-in. Forcing SwiftShader makes every frame
-// GPU-bound in a way no reader's machine is, which buries the costs that are
-// actually worth finding; `--swiftshader` puts it back for a machine with no
-// usable GPU.
 const GPU_ARGS = process.argv.includes('--swiftshader')
   ? ['--enable-unsafe-swiftshader', '--use-gl=angle', '--use-angle=swiftshader', '--disable-lcd-text']
   : ['--disable-lcd-text']
@@ -152,9 +131,6 @@ for (const vp of VIEWPORTS) {
     await page.waitForTimeout(settle)
   }
 
-  // The Technology → Capabilities handoff, sampled where each part of it is
-  // actually happening: the validated candidate drawing back, the signal
-  // crossing the seam, then the section landing.
   await goto(geo.top - geo.vh * 1.4)
   await safeShot(page, join(dir, '00a-candidate.png'), `${vp.label}/candidate`)
 
@@ -167,7 +143,6 @@ for (const vp of VIEWPORTS) {
   await goto(geo.top - geo.vh * 0.35)
   await safeShot(page, join(dir, '01-arrive.png'), `${vp.label}/arrive`)
 
-  // The section at rest, before any pointer has touched it.
   await goto(geo.top)
   await safeShot(page, join(dir, '02-header.png'), `${vp.label}/header`)
 
@@ -177,7 +152,6 @@ for (const vp of VIEWPORTS) {
   await goto(geo.top + geo.height - geo.vh)
   await safeShot(page, join(dir, '04-exit.png'), `${vp.label}/exit`)
 
-  // ── Interaction sweep ─────────────────────────────────────────────────────
   if (HOVER && !REDUCED) {
     for (const id of MODULES) {
       const box = await page.evaluate((sel) => {
@@ -188,7 +162,6 @@ for (const vp of VIEWPORTS) {
       }, id)
       if (!box) continue
 
-      // Scroll the module fully into view first, then re-read its box.
       await page.evaluate((sel) => {
         const el = document.querySelector(`.cap-module--${sel}`)
         const r = el.getBoundingClientRect()
@@ -205,8 +178,6 @@ for (const vp of VIEWPORTS) {
         return { x: r.x, y: r.y, w: r.width, h: r.height }
       }, id)
 
-      // Three positions across the visual — a capability whose interaction only
-      // works at the centre is a capability with one state.
       for (const [name, fx, fy] of [
         ['a', 0.28, 0.4],
         ['b', 0.55, 0.6],
@@ -217,7 +188,6 @@ for (const vp of VIEWPORTS) {
         await safeShot(page, join(dir, `hover-${id}-${name}.png`), `${vp.label}/hover-${id}`)
       }
 
-      // Fast movement then exit — the state must not stick.
       await page.mouse.move(b.x + 4, b.y + 4, { steps: 2 })
       await page.mouse.move(b.x - 220, b.y - 220, { steps: 2 })
       await page.waitForTimeout(700)
@@ -225,7 +195,6 @@ for (const vp of VIEWPORTS) {
     }
   }
 
-  // ── Measurements ──────────────────────────────────────────────────────────
   const metrics = await page.evaluate(() => {
     const box = (sel) => {
       const el = document.querySelector(sel)
@@ -254,7 +223,6 @@ for (const vp of VIEWPORTS) {
       overflowX: document.documentElement.scrollWidth > window.innerWidth + 1,
       svgCount: document.querySelectorAll('.capabilities svg').length,
       canvasCount: document.querySelectorAll('.capabilities canvas').length,
-      // Live state, so a run can tell an idling visual from a dead one.
       hoverCapable: matchMedia('(hover: hover) and (pointer: fine)').matches,
       netActive: document.querySelector('.cap-network-svg')?.dataset.active ?? 'n/a',
       locus: document.querySelector('.cap-readout--genomic .cap-readout-val')?.textContent,

@@ -1,20 +1,5 @@
-/* ── Section 07 · Impact / Outcomes ───────────────────────────────────────
-   Back to the dark environment after Research's Bone, and the boldest type on
-   the page. §6 wants this change to feel earned: Research was light, editorial
-   and about evidence; this is dark, oversized and about consequence.
-
-   Every layer here is either transparent or semi-transparent. The shared canvas
-   is fixed *behind* the document, so an opaque section background would simply
-   hide the network the section exists to show.
-
-   §55 fails this section outright if it reads as three statistic cards, so
-   there is no card, no border around a number, and no box anywhere except the
-   one editorial frame around the human crop.                                  */
-
 .impact {
   position: relative;
-  /* Above Research (z:3) so the ingress panel can paint over the end of it,
-     and below the fixed header (z:50) so the wordmark stays on top. */
   z-index: 4;
   width: 100%;
 }
@@ -27,30 +12,16 @@
   overflow: hidden;
 }
 
-/* ── Environment (§29) ───────────────────────────────────────────────────
-   #07110F base, a restrained Bio Green field, a fainter Signal Mint secondary,
-   a 1–2% grid and 2–4% grain. Every one of these is at the edge of visible on
-   purpose — the network is the light source in this section, not the room. */
-
 .impact-bg {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  /* Every layer is semi-transparent, including the base: the shared canvas is
-     fixed *behind* the document, and a solid #07110F here would hide the
-     network the section exists to show. The body is already Abyss, so the wash
-     reads as the same colour. */
   background:
     radial-gradient(ellipse 52% 46% at 68% 44%, rgba(166, 255, 106, 0.055) 0%, transparent 70%),
     radial-gradient(ellipse 46% 40% at 24% 72%, rgba(198, 245, 225, 0.028) 0%, transparent 72%),
     linear-gradient(180deg, rgba(7, 17, 15, 0.42) 0%, rgba(6, 15, 14, 0.24) 58%, rgba(7, 17, 15, 0.5) 100%);
 }
 
-/* §29 caps this at 1–2%, and that strength lives in the gradient's own alpha
-   rather than in the element's opacity — GSAP owns the element opacity as a
-   plain 0→1 gate (it arrives with the environment during the handoff and leaves
-   during the closing collapse, §54), and a tween to 1 over a 1.4% element would
-   simply cancel the restraint. */
 .impact-grid {
   position: absolute;
   inset: 0;
@@ -73,45 +44,25 @@
   );
 }
 
-/* §29 — 2–4%. A generated grain rather than a shipped texture, matching the
-   device Innovation and Research use at their own frequencies. A conic
-   repeating-gradient was the cheaper option and looked like one: at 3px it is a
-   visible checkerboard, not noise. */
 .impact-grain {
   position: absolute;
   inset: 0;
   z-index: 1;
   pointer-events: none;
   opacity: 0.035;
-  /* The same fractalNoise these sections have always used, but rasterised once
-     as a tiled image instead of re-evaluated as a live `filter: url(#…)`. The
-     filter form is recomputed whenever the element repaints, and this element
-     is full-bleed over a canvas that repaints every frame — measured at 6.1s of
-     long tasks across a scroll pass, against 2.0s without it. The noise is
-     identical; only when it is generated has changed. */
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
   mix-blend-mode: screen;
 }
 
-/* ── Research → Impact handoff (§7) ──────────────────────────────────────
-   A full-bleed Bone veil inside the held stage. It rises with the section — Bone
-   meeting Bone, so the boundary itself is invisible — and is then clipped away
-   downward over the identical scatter drawn in Signal Mint underneath.         */
-
 .impact-veil {
   position: absolute;
   inset: 0;
-  /* Above everything in the stage, including the copy: until the flood passes,
-     this section has not visually begun. */
   z-index: 6;
   pointer-events: none;
   background: var(--color-bone);
   clip-path: inset(0% 0% 0% 0%);
 }
 
-/* The leading edge of the arriving environment. Mint and green rather than
-   neutral: it is the first of Impact's illumination, and it is gone before the
-   dark finishes landing. */
 .impact-veil-edge {
   position: absolute;
   left: 0;
@@ -128,9 +79,6 @@
   );
 }
 
-/* The scatter, drawn twice at identical coordinates: dark ink inside the veil,
-   Signal Mint under it. Both carry the same tweens, so the inversion happens in
-   place rather than as a cross-fade between two fields (§7). */
 .impact-signals {
   position: absolute;
   inset: 0;
@@ -138,7 +86,6 @@
   opacity: 0;
 }
 
-/* Over the environment, under the section's own copy. */
 .impact-signals--lit {
   z-index: 1;
 }
@@ -150,8 +97,6 @@
 }
 
 .impact-signals--ink .impact-signal-dot {
-  /* Dark enough to read as a deliberate field on Bone rather than as dust on
-     the lens — §7 wants these points to be the last thing Research says. */
   background: rgba(7, 17, 15, 0.8);
 }
 
@@ -160,9 +105,6 @@
   box-shadow: 0 0 4px rgba(198, 245, 225, 0.45);
 }
 
-/* Research's unexplained 14.8M, strengthening as the section that explains it
-   arrives. Owned here rather than in research.css because the state belongs to
-   the handoff, not to Research. */
 .research-footer-marker {
   transition: color 0.7s var(--ease-out-expo);
 }
@@ -171,20 +113,14 @@
   color: rgba(7, 17, 15, 0.17);
 }
 
-/* ── Shell ──────────────────────────────────────────────────────────────── */
-
 .impact-inner {
   position: relative;
   z-index: 2;
   height: 100%;
-  /* §48 — content stops growing at 1560px so the composition never drifts
-     apart on a 1920 display. */
   max-width: 1560px;
   margin: 0 auto;
   padding: clamp(72px, 10vh, 112px) 64px clamp(56px, 8vh, 88px);
 }
-
-/* ── Header (§10, §11) ───────────────────────────────────────────────────── */
 
 .impact-label {
   display: flex;
@@ -213,8 +149,6 @@
   color: rgba(198, 245, 225, 0.35);
 }
 
-/* The provenance line (§50). Faint, but present and readable — the figures
-   below are concept data and the page says so. */
 .impact-label-meta {
   display: flex;
   align-items: baseline;
@@ -226,8 +160,6 @@
   color: rgba(198, 245, 225, 0.6);
 }
 
-/* §11 — 68–84px, under 900px of measure, deliberately smaller than the metrics
-   it introduces. If the headline wins that contest the hierarchy has failed. */
 .impact-headline {
   font-family: var(--font-sans);
   font-size: clamp(2.9rem, 4.4vw, 4.1rem);
@@ -248,22 +180,9 @@
   font-size: clamp(0.94rem, 1vw, 1.02rem);
   line-height: 1.56;
   color: var(--color-muted);
-  /* Narrower than the headline and narrower than the metric statement below
-     it: this paragraph introduces the section, and on a 900px-tall stage every
-     line it takes is a line the metric column loses. */
   max-width: 400px;
 }
 
-/* ── Metrics (§12, §30, §31) ─────────────────────────────────────────────
-   Three states stacked in one box on the left, all in the document at all
-   times. Only opacity and a masked transform separate them, so a screen reader
-   reads SCALE → PRIORITIZE → VALIDATE in order while the eye sees one.        */
-
-/* Anchored to a baseline just above the step indicator and grown *upward*
-   rather than centred: the three states are different heights, and a centred
-   stack would move the figure — the one element that must not move between
-   states — by a few dozen pixels each time. `inset: 0` would also collapse the
-   list to zero height and clip the statement, since every item is absolute. */
 .impact-metrics {
   position: absolute;
   left: 64px;
@@ -299,25 +218,13 @@
   color: rgba(198, 245, 225, 0.32);
 }
 
-/* §30 — the largest type on the site. Bone, no gradient, negative tracking,
-   and the suffix is the only part that ever takes the accent. */
 .impact-metric-figure {
   font-family: var(--font-sans);
-  /* Both axes, not just width. The column grows upward from a fixed baseline,
-     so the figure's height is what decides whether it collides with the header
-     above it — and a 1440x760 browser window is a 1440-wide layout with 760px
-     to spend. Sized on width alone this walked straight into the lead. */
   font-size: clamp(6.4rem, min(12vw, 20vh), 11.5rem);
   font-weight: 700;
   line-height: 0.9;
   letter-spacing: -0.045em;
   color: var(--color-bone);
-  /* The mask §39 asks for: the outgoing figure lifts out of the same window the
-     incoming one rises into. A line-height under 1 puts the cap line above the
-     content box, so the box is extended in both directions and the extra space
-     cancelled by matching negative margins — otherwise overflow:hidden flattens
-     the tops of the digits. Both extensions are far smaller than the ±104% the
-     swap travels, so neither figure escapes the window. */
   padding-top: 0.11em;
   margin-top: -0.11em;
   padding-bottom: 0.06em;
@@ -328,9 +235,6 @@
   display: block;
 }
 
-/* §30 — "a small portion, such as suffix M / × / %, may use Bio Green".
-   Slightly smaller as well as accented: a unit is not the same size of idea as
-   the quantity it qualifies. */
 .impact-metric-suffix {
   color: var(--color-bio-green);
   font-size: 0.72em;
@@ -338,7 +242,6 @@
   margin-left: 0.02em;
 }
 
-/* §31 — 20–26px, 400–480px measure, Signal Mint. */
 .impact-metric-description {
   margin-top: clamp(10px, 1.6vh, 18px);
   font-family: var(--font-sans);
@@ -358,13 +261,9 @@
   max-width: 420px;
 }
 
-/* Thin mono readouts. Decorative, and never the only place a fact appears. */
 .impact-metric-meta {
   display: flex;
   flex-wrap: wrap;
-  /* A row gap as well as a column one: on a narrow screen the third pair wraps,
-     and without vertical separation its label lands directly under the previous
-     pair's value and reads as a fourth reading of it. */
   gap: clamp(10px, 1.4vh, 14px) clamp(20px, 2.2vw, 32px);
   margin-top: clamp(18px, 2.6vh, 28px);
   padding-top: 12px;
@@ -389,11 +288,6 @@
 .impact-metric-meta-row dd {
   color: rgba(198, 245, 225, 0.78);
 }
-
-/* ── Step indicator (§32) ────────────────────────────────────────────────
-   Three marks along the bottom edge. Not navigation: nothing is clickable and
-   nothing is focusable, and the active word appears only on the current step so
-   the resting state stays three small numbers.                                */
 
 .impact-steps {
   position: absolute;
@@ -457,15 +351,8 @@
   opacity: 1;
 }
 
-/* ── Confidence arc (§25) ────────────────────────────────────────────────
-   One hairline track and one hairline arc, centred on the composition the
-   scene draws the validated target into. No gauge, no needle, no ticks.       */
-
 .impact-arc {
   position: absolute;
-  /* Matches the scene's right bias (viewport.width * 0.17 from centre) and its
-     small vertical lift, so the ring frames the target rather than sitting
-     beside it. */
   left: 67%;
   top: 47%;
   width: clamp(220px, 26vh, 320px);
@@ -478,8 +365,6 @@
 .impact-arc-track,
 .impact-arc-active {
   fill: none;
-  /* The viewBox is 100 units across a ~280px box, so 0.5 user units renders as
-     roughly 1.4 CSS pixels — §25's "1–2px perceived". */
   stroke-width: 0.5;
   vector-effect: non-scaling-stroke;
 }
@@ -491,15 +376,9 @@
 .impact-arc-active {
   stroke: var(--color-bio-green);
   stroke-linecap: round;
-  /* Twelve o'clock, clockwise — an instrument, not a loading spinner. */
   transform: rotate(-90deg);
   transform-origin: 50% 50%;
 }
-
-/* ── Human moment (§26–§28) ──────────────────────────────────────────────
-   One small crop and three short lines, at the lower right. §27 caps it at
-   260–360px and is emphatic that the biological candidate stays the anchor, so
-   this is deliberately the smallest composed element on the stage.            */
 
 .impact-human {
   position: absolute;
@@ -514,8 +393,6 @@
   overflow: hidden;
   aspect-ratio: 8 / 5;
   border-radius: 2px;
-  /* An editorial crop, not a photo card: a hairline and a corner notch rather
-     than a rounded, shadowed panel. */
   border: 1px solid rgba(198, 245, 225, 0.14);
   background: rgba(8, 19, 16, 0.6);
   clip-path: inset(100% 0% 0% 0%);
@@ -526,8 +403,6 @@
   height: 100%;
   object-fit: cover;
   display: block;
-  /* Pulled toward the section's palette so it sits in the environment rather
-     than on top of it. */
   filter: saturate(0.88) contrast(1.04) brightness(0.92);
 }
 
@@ -558,29 +433,15 @@
   display: block;
 }
 
-/* ── Flowing presentation (§41–§44, §49) ─────────────────────────────────
-   Not the pinned stage stacked: three metric blocks in normal document flow,
-   each with its own static diagram directly under its number.                 */
-
 .impact--flow {
   background: linear-gradient(180deg, #07110f 0%, #060f0e 50%, #07110f 100%);
   position: relative;
 }
 
-/* The Research → Impact handoff, in the flowing layout (§7).
-
-   There is no held stage here, so there is no veil to clip away — but two flat
-   surfaces meeting at a line is exactly the background cut §7 rules out. Bone
-   is carried a short way into the dark section and given out instead, so the
-   boundary is a change of environment rather than an edge. Kept shorter than
-   the section's own top padding: any of it reaching the label would put Bone
-   under type that is drawn for the dark. */
 .impact--flow::before {
   content: '';
   position: absolute;
   inset: 0 0 auto 0;
-  /* Always shorter than the section's own top padding, which is
-     clamp(72px, 11vh, 112px). */
   height: clamp(64px, 9vh, 88px);
   background: linear-gradient(
     180deg,
@@ -599,12 +460,7 @@
 
 .impact-inner--flow {
   height: auto;
-  /* §44 — 20px gutters on a phone. */
   padding: clamp(72px, 11vh, 112px) 20px clamp(80px, 12vh, 120px);
-  /* This layout is also the reduced-motion presentation, at every width — not
-     only the phone one. Left to stretch, a 1440px column scales the 640×400
-     diagrams to more than double size and the dense state stops reading as a
-     field of signals and starts reading as the constellation §16 rules out. */
   max-width: 720px;
   margin: 0 auto;
 }
@@ -617,12 +473,10 @@
 .impact-metric--flow {
   position: static;
   opacity: 1;
-  /* §44 — 90–130px between metric blocks. */
   margin-bottom: clamp(90px, 13vh, 130px);
 }
 
 .impact-metric--flow .impact-metric-figure {
-  /* §43 — 74–104px at 390px wide, and never wide enough to overflow. */
   font-size: clamp(4.6rem, 23vw, 6.4rem);
 }
 
@@ -663,17 +517,9 @@
   fill: var(--color-bio-green);
 }
 
-/* In the flowing layout the arc frames the validated diagram rather than a
-   WebGL target, so it is centred on its own box. */
 .impact--flow .impact-arc {
   left: 50%;
   top: 50%;
-  /* Sized from the diagram's *height*, which is the dimension that constrains
-     it: the visual box is 8:5, so a ring measured off the width would be
-     taller than the box it frames. Proportional rather than capped in pixels,
-     because the same column is 350px wide on a phone and 680 under reduced
-     motion on a desktop, and a target whose outlying evidence crosses the ring
-     reads as a diagram with a circle behind it rather than a framed result. */
   height: 88%;
   width: auto;
   aspect-ratio: 1;
@@ -687,7 +533,6 @@
 }
 
 .impact--flow .impact-human-frame {
-  /* §44 — 280–360px of height from a full-width crop. */
   aspect-ratio: 16 / 10;
   max-height: 360px;
   clip-path: inset(0% 0% 0% 0%);
@@ -697,9 +542,6 @@
   font-size: clamp(1.24rem, 6vw, 1.7rem);
 }
 
-/* The provenance sentence in full. Visible in the flowing layout, where there
-   is room for it; screen-reader-only on the pinned stage, where the header's
-   "Concept data / Portfolio demonstration" carries it instead (§50). */
 .impact-disclosure {
   margin-top: clamp(48px, 7vh, 72px);
   padding-top: 20px;
@@ -712,16 +554,11 @@
   max-width: 520px;
 }
 
-/* ── Large desktop (§48) ─────────────────────────────────────────────────── */
-
 @media (min-width: 1600px) {
-  /* §48 — the metric must not grow endlessly. 11.5rem lands at ~184px. */
   .impact-metric-figure {
     font-size: min(11.5rem, 20vh);
   }
 }
-
-/* ── Laptop (§47) ────────────────────────────────────────────────────────── */
 
 @media (max-width: 1366px) {
   .impact-inner {
@@ -735,19 +572,14 @@
   .impact-human {
     right: 48px;
   }
-  /* §47 — 110–155px. */
   .impact-metric-figure {
     font-size: clamp(6.4rem, min(11.4vw, 20vh), 9.6rem);
   }
-  /* §47 — the visualization steps back about 10%. */
   .impact-arc {
     width: clamp(200px, 24vh, 280px);
     height: clamp(200px, 24vh, 280px);
   }
 }
-
-/* ── Tablet landscape (§46) ──────────────────────────────────────────────
-   The left/right composition survives; the type and the ring come down.       */
 
 @media (max-width: 1100px) and (min-width: 769px) and (orientation: landscape) {
   .impact-inner {
@@ -763,14 +595,9 @@
     width: min(50%, 480px);
     transform: translateY(-40%);
   }
-  /* §46 — 90–130px. */
   .impact-metric-figure {
     font-size: clamp(5.6rem, 12vw, 8.1rem);
   }
-  /* Tightened, not removed. §50 wants every figure explained in text a reader
-     can actually read, and the column grows upward from a fixed baseline, so
-     the sentence costs headroom the figure has to spare rather than pushing
-     anything into the step indicator. */
   .impact-metric-statement {
     margin-top: 10px;
     font-size: 0.9rem;
@@ -781,11 +608,6 @@
     width: clamp(220px, 26vw, 270px);
   }
 }
-
-/* ── Tablet portrait (§45) ───────────────────────────────────────────────
-   §45 prefers vertical progression here rather than the desktop left/right
-   composition forced into a narrow frame: the metric column takes the lower
-   half of the stage and the network keeps the upper half to itself.           */
 
 @media (max-width: 1024px) and (min-width: 769px) and (orientation: portrait) {
   .impact-inner {
@@ -814,15 +636,12 @@
   .impact-metric-statement {
     max-width: 460px;
   }
-  /* The network owns the upper half, so the ring moves with it. */
   .impact-arc {
     left: 50%;
     top: 32%;
     width: clamp(190px, 30vw, 260px);
     height: clamp(190px, 30vw, 260px);
   }
-  /* No room for a photograph beside a full-width metric column: the human
-     moment travels to the top right, at its smallest allowed size. */
   .impact-human {
     right: 40px;
     top: 34%;
@@ -833,8 +652,6 @@
     display: none;
   }
 }
-
-/* ── Mobile (§43, §44) ───────────────────────────────────────────────────── */
 
 @media (max-width: 480px) {
   .impact-headline {
@@ -853,20 +670,7 @@
   }
 }
 
-/* ── Short viewport ──────────────────────────────────────────────────────
-   The stage is one 100svh screen and the metric column is anchored to a
-   baseline near its bottom, growing *upward*. Height is therefore a real
-   constraint on this layout and not merely a comfort — but every rule above
-   answers to width, so a wide-and-short window (a 1440x900 display is about
-   760px of viewport once browser chrome is subtracted) walked the largest type
-   on the site into the paragraph above it. These two tiers put the vertical
-   budget back: the type comes down, the header tightens, and the column's
-   baseline rises to meet it.                                                  */
-
 @media (min-width: 769px) and (max-height: 940px) {
-  /* The floor is set by the fixed header rather than by taste: below about
-     60px the section label rides up under the navigation bar it scrolls
-     beneath. */
   .impact-inner {
     padding-top: clamp(60px, 7vh, 72px);
   }
@@ -876,13 +680,8 @@
   .impact-lead {
     margin-top: clamp(10px, 1.6vh, 18px);
     line-height: 1.5;
-    /* Wider, so the paragraph spends the dimension this window has spare: at
-       400px it wraps to four lines, at 560 to three. */
     max-width: 560px;
   }
-  /* Raised, not lowered. Pulling the column down to clear the header only
-     moved the collision to the other end and left the mono readouts sitting on
-     the step indicator; the height freed above has to be spent on both gaps. */
   .impact-metrics {
     bottom: clamp(76px, 12vh, 112px);
   }
@@ -912,12 +711,6 @@
     bottom: clamp(28px, 4.5vh, 48px);
   }
 }
-
-/* ── Reduced motion (§49) ────────────────────────────────────────────────
-   The flowing presentation is what renders, and no timelines are built at all,
-   so every element is already in its final state: all three diagrams drawn,
-   all three figures readable, the arc at its full 91%, the crop uncovered.
-   What is left is to silence the transitions CSS owns.                        */
 
 @media (prefers-reduced-motion: reduce) {
   .impact-step,

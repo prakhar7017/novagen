@@ -1,15 +1,5 @@
 import { JOURNEY_STATES } from './journey.constants'
 
-/**
- * Reduced-motion Journey.
- *
- * Same seven states, same copy, no pinning and no scroll-linked WebGL — just a
- * normally-scrolling document with a still image per state. ACCEPTANCE_CRITERIA
- * §18 requires the content to stay complete when motion is suppressed, so this
- * is a genuine alternative rendering rather than the cinematic version with the
- * animation switched off.
- */
-
 const STILLS: Record<string, string> = {
   origin: '/assets/story/01-organism.webp',
   explore: '/assets/story/02-cell-cluster.webp',
@@ -17,7 +7,6 @@ const STILLS: Record<string, string> = {
   discover: '/assets/story/07-molecular-candidate.webp',
 }
 
-/** Deterministic scatter so the static diagrams are stable across renders. */
 function seeded(n: number, salt: number) {
   const x = Math.sin(n * 12.9898 + salt * 78.233) * 43758.5453
   return x - Math.floor(x)

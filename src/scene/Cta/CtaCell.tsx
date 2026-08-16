@@ -16,8 +16,6 @@ import { SEED, impactFit } from '@/scene/Impact/impactTargets'
 import { smoothstep } from '@/sections/Journey/journey.constants'
 import { scrollProgress } from '@/store/progressRef'
 
-// Kept out of the frame callback so nothing allocates there. The travel is a
-// few dozen pixels — the target settling out of the headline's way (§21).
 function posX(p: number) {
   return CELL_POSITION.from.x + (CELL_POSITION.to.x - CELL_POSITION.from.x) * smoothstep(0, 0.8, p)
 }
@@ -27,54 +25,28 @@ function posY(p: number) {
 }
 
 interface Props {
-  /** Desktop pointer only — the closing frame gets less interaction than the Hero (§24) */
   pointerEnabled: boolean
 }
 
-/**
- * The closing biological cell (§7, §20–§24).
- *
- * Two draws: one quad for the membrane, core, glow and filaments, and thirty-four
- * points for the interior signals. That is the entire section's GPU cost, which
- * is the point — §52 asks the last dark scene on the page to be the lightest,
- * and everything expensive that ran above it has been disposed by the time this
- * is on screen.
- *
- * The one subtle piece of arithmetic is `uSpan`. The cell has to *begin* as a
- * pixel-exact copy of the point Impact collapsed to, then grow a frame around
- * that point without the point itself changing size. Scaling the mesh would
- * scale both. So the mesh is fixed at its final size and the shader divides
- * distance by `uSpan`, which starts at exactly the ratio between the seed's
- * on-screen half-extent and this cell's. At the handoff frame the two objects
- * are indistinguishable; one frame later only this one is drawn.
- */
 export default function CtaCell({ pointerEnabled }: Props) {
   const viewport = useThree((s) => s.viewport)
   const size = useThree((s) => s.size)
 
-  // ── Sizing ───────────────────────────────────────────────────────────────
-  // Solved from a CSS-pixel target rather than authored in world units: §21 and
-  // §40–§45 state the cell as a perceived diameter, and world units mean nothing
-  // to the layout it has to sit beside.
   const { half, span0 } = useMemo(() => {
     const worldPerPx = viewport.width / Math.max(1, size.width)
     const halfPx = cellDiameterPx(size.width) / (2 * CELL_RADIUS)
     const halfWorld = halfPx * worldPerPx
 
-    // Where Impact leaves its target, in the same units.
     const seedHalf = (SEED.plane / 2) * SEED.finalScale * impactFit(viewport.width)
 
     return { half: halfWorld, span0: Math.min(1, seedHalf / Math.max(1e-4, halfWorld)) }
   }, [viewport.width, size.width])
 
-  // ── Interior population ──────────────────────────────────────────────────
   const pointGeo = useMemo(() => {
     const points = buildCellPoints()
     const g = new THREE.BufferGeometry()
     const n = points.length
 
-    // The orbits are solved in the vertex shader, so `position` is never read —
-    // but three's bounding-sphere machinery requires the attribute to exist.
     g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(n * 3), 3))
 
     const radius = new Float32Array(n)
@@ -115,9 +87,6 @@ export default function CtaCell({ pointerEnabled }: Props) {
           uOpacity: { value: 0 },
           uTime: { value: 0 },
           uRadius: { value: CELL_RADIUS },
-          // The same three values Impact's seed ends on, plus the membrane —
-          // §22's dark emerald, which on an additive surface over Abyss reads as
-          // a translucent skin rather than as a filled disc.
           uCore: { value: new THREE.Color('#e8fff0') },
           uHalo: { value: new THREE.Color('#a6ff6a') },
           uMembrane: { value: new THREE.Color('#124f3b') },
@@ -175,21 +144,14 @@ export default function CtaCell({ pointerEnabled }: Props) {
     const form = ctaForm(p)
     const interior = ctaInterior(p)
 
-    // span0 → 1: the inherited point holds its size on screen while the frame
-    // around it opens out. At p = 0 this is Impact's seed exactly.
     const span = span0 + (1 - span0) * ctaSpan(p)
 
     const cu = cellMat.uniforms
     cu.uSpan.value = span
-    // The point grows by a third while its frame roughly doubles: §22 asks for
-    // a small central core, and the whole difference between a cell and a
-    // target is which of the two is the subject.
     cu.uCoreSpan.value = span0 * (1 + 0.34 * ctaSpan(p))
     cu.uForm.value = form
     cu.uInterior.value = interior
     cu.uTime.value = t
-    // Impact's seed ends at 0.95, not 1 — starting anywhere else would put a
-    // step in the brightness at the exact frame the handoff happens.
     cu.uOpacity.value = 0.95 + 0.05 * form
 
     const pu = pointMat.uniforms
@@ -201,12 +163,8 @@ export default function CtaCell({ pointerEnabled }: Props) {
 
     if (points.current) points.current.visible = interior > 0.004
 
-    // §23 — under a fifth of a degree, on a 90-second period. Present in a
-    // long look, invisible in a short one.
     g.rotation.z = Math.sin(t * 0.07) * 0.0032
 
-    // §24 — about four perceived pixels, and less than the Hero's. Frame-rate
-    // independent smoothing, matching every other scene on the page.
     const worldPerPx = viewport.width / Math.max(1, size.width)
     const tx = pointerEnabled ? state.pointer.x * 4 * worldPerPx : 0
     const ty = pointerEnabled ? state.pointer.y * 3 * worldPerPx : 0
@@ -214,8 +172,6 @@ export default function CtaCell({ pointerEnabled }: Props) {
     drift.current.x += (tx - drift.current.x) * k
     drift.current.y += (ty - drift.current.y) * k
 
-    // The cell travels with the page once the closing stage is released, so it
-    // does not float over the footer that rises past it.
     const depart = scrollProgress.ctaDepart * viewport.height
 
     g.position.x = viewport.width * (posX(p) - 0.5) + drift.current.x

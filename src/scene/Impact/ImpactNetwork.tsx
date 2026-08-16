@@ -19,7 +19,6 @@ interface Props {
 const LINE_COLOR = new THREE.Color('#c6f5e1')
 const LINE_ACTIVE = new THREE.Color('#a6ff6a')
 
-/** Shared attribute set — the morph needs the identical buffers everywhere. */
 function morphAttributes(pop: ImpactPopulation) {
   return {
     aScale: new THREE.BufferAttribute(pop.scale, 3),
@@ -32,27 +31,11 @@ function morphAttributes(pop: ImpactPopulation) {
   }
 }
 
-/**
- * The biological relationship field, and what filtering does to it.
- *
- * Four draws — dust, connections, bridges, nodes — over two populations and one
- * morph function, so a connection can never drift off the nodes it joins and
- * the haze can never compress on a different schedule from the network inside
- * it. §36 rules out a component per node and §37 rules out rebuilding the
- * system between states; the whole 14.8M → 72× → 91% story is this one
- * population reorganising under three uniforms.
- *
- * Nothing allocates in useFrame and no React state is touched there: every
- * value below is a pure function of `scrollProgress.impact`, which is what
- * makes a paused or reversed scrub land on exactly the frame it should.
- */
 export default function ImpactNetwork({ targets }: Props) {
   const nodeAttrs = useMemo(() => morphAttributes(targets.nodes), [targets])
 
   const signalGeo = useMemo(() => {
     const g = new THREE.BufferGeometry()
-    // `position` is never read by the shader — the morph computes it — but
-    // three's bounding-sphere machinery requires the attribute to exist.
     g.setAttribute('position', new THREE.BufferAttribute(targets.signals.scale, 3))
     for (const [name, attr] of Object.entries(morphAttributes(targets.signals))) {
       g.setAttribute(name, attr)
@@ -71,8 +54,6 @@ export default function ImpactNetwork({ targets }: Props) {
     return g
   }, [targets, nodeAttrs])
 
-  // All three line sets share the node buffers and differ only in their index,
-  // so the connections track their nodes exactly through every arrangement.
   const [linesGeo, bridgesGeo, evidenceGeo] = useMemo(() => {
     const build = (index: Uint16Array) => {
       const g = new THREE.BufferGeometry()
@@ -100,9 +81,6 @@ export default function ImpactNetwork({ targets }: Props) {
         uniforms: {
           uMorph: { value: 0 },
           uCompress: { value: 0 },
-          // Wider than the nodes': the haze is allowed to lag, and the lag is
-          // most of what makes the collapse read as a filter passing through a
-          // volume rather than as a single scale transform.
           uStagger: { value: 0.22 },
           uTime: { value: 0 },
           uReveal: { value: 0 },
@@ -152,9 +130,6 @@ export default function ImpactNetwork({ targets }: Props) {
         uniforms: {
           uMorph: { value: 0 },
           uCompress: { value: 0 },
-          // Tighter still for lines: with a wide stagger the two ends of a
-          // connection sit at different morph values and the line spans the
-          // whole frame instead of joining its neighbours.
           uStagger: { value: 0.03 },
           uTime: { value: 0 },
           uDraw: { value: 0 },
@@ -170,8 +145,6 @@ export default function ImpactNetwork({ targets }: Props) {
     [],
   )
 
-  // Same program, their own uniforms: bridges retire when filtering starts and
-  // the evidence paths are the only connections that outlive it.
   const bridgesMat = useMemo(() => linesMat.clone(), [linesMat])
   const evidenceMat = useMemo(() => linesMat.clone(), [linesMat])
 
@@ -218,8 +191,6 @@ export default function ImpactNetwork({ targets }: Props) {
     const morph = impactMorph(p)
     const compress = impactCompress(p)
     const reveal = smoothstep(M.populateIn, M.populateOn, p)
-    // Connections are traced in behind the dust: the field has to be dense
-    // before the readable relationships inside it appear (§15, §16).
     const draw = smoothstep(M.populateIn + 0.05, M.populateOn + 0.06, p)
     const filter = smoothstep(M.filterStart, M.filterEnd, p)
     const validate = smoothstep(M.validateStart, M.validateEnd, p)
@@ -260,21 +231,12 @@ export default function ImpactNetwork({ targets }: Props) {
       u.uOpacity.value = opacity
     }
 
-    // Low enough that a few hundred additive segments still read as thin
-    // instrument lines rather than as a glowing mesh (§29) — and lifted a little
-    // as filtering proceeds, because the few pathways left have to carry the
-    // structure the retired ones used to.
     write(linesMat, (0.34 + 0.22 * filter) * draw * (1 - exit))
     linesMat.uniforms.uValidate.value = validate
 
-    // Bridges retire as soon as filtering begins: the regions they join are
-    // about to move apart, and a link between a candidate and material that
-    // stayed behind stops being a relationship the moment that happens (§20).
     write(bridgesMat, 0.3 * draw * (1 - filter) * (1 - exit))
     bridgesMat.uniforms.uValidate.value = validate
 
-    // The evidence paths are the reverse: invisible while the full network is
-    // drawn over them, and the only connections still lit at 91% (§24).
     write(evidenceMat, 0.5 * validate * (1 - exit * 0.7))
     evidenceMat.uniforms.uValidate.value = 0
 

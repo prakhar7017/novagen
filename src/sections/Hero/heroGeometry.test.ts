@@ -1,28 +1,21 @@
 import { describe, it, expect } from 'vitest'
 import { heroOrganismRect, HERO_ORGANISM } from './heroGeometry'
 
-/**
- * The Hero's DOM organism and the Journey's WebGL organism must land on the
- * same screen rectangle or the handoff between them is visible as a jump.
- * These tests pin the contract that both sides read.
- */
-
 describe('heroOrganismRect', () => {
   it('clamps width to the desktop band', () => {
-    expect(heroOrganismRect(800, 900).width).toBe(400) // min
+    expect(heroOrganismRect(800, 900).width).toBe(400)
     expect(heroOrganismRect(1440, 900).width).toBeCloseTo(1440 * 0.46)
-    expect(heroOrganismRect(2400, 900).width).toBe(700) // max
+    expect(heroOrganismRect(2400, 900).width).toBe(700)
   })
 
   it('clamps width to the mobile band', () => {
-    expect(heroOrganismRect(360, 800).width).toBe(300) // min
-    expect(heroOrganismRect(500, 800).width).toBe(380) // max
+    expect(heroOrganismRect(360, 800).width).toBe(300)
+    expect(heroOrganismRect(500, 800).width).toBe(380)
   })
 
   it('switches layout at the 768px breakpoint', () => {
     const mobile = heroOrganismRect(768, 1024)
     const desktop = heroOrganismRect(769, 1024)
-    // Desktop centres vertically; mobile sits at the top of the stage
     expect(desktop.centerY).toBeCloseTo(512)
     expect(mobile.centerY).toBeLessThan(512)
   })

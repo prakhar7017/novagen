@@ -1,12 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { buildParticleTargets } from './particleTargets'
 
-/**
- * The particle buffers are built once and then only read by the GPU, so a bad
- * value here is invisible in code and shows up as a smear of geometry on
- * screen. These tests pin the invariants the shader relies on.
- */
-
 const COUNT = 2000
 const targets = buildParticleTargets(COUNT)
 
@@ -23,13 +17,10 @@ describe('buildParticleTargets', () => {
   })
 
   it('produces only finite, bounded coordinates', () => {
-    // Scanned in plain JS with a single assertion: one expect() per coordinate
-    // is ~30k calls and slow enough to trip the default test timeout.
     const bad: string[] = []
     for (const key of ARRANGEMENTS) {
       const buf = targets[key]
       for (let i = 0; i < buf.length; i++) {
-        // Well outside the camera frustum would mean an unseen population
         if (!Number.isFinite(buf[i]) || Math.abs(buf[i]) >= 12) {
           bad.push(`${key}[${i}]=${buf[i]}`)
           if (bad.length > 5) break
@@ -64,7 +55,6 @@ describe('buildParticleTargets', () => {
     for (let i = 0; i < COUNT; i++) {
       const r = targets.color[i * 3]
       const b = targets.color[i * 3 + 2]
-      // Bio green is far redder-than-blue; signal mint is nearly balanced
       if (r - b > 0.15) green++
       if (!(targets.color[i * 3 + 1] > 0)) unlit++
     }
@@ -90,7 +80,6 @@ describe('network connections', () => {
       degree.set(idx, (degree.get(idx) ?? 0) + 1)
     }
     for (const d of degree.values()) expect(d).toBeLessThanOrEqual(4)
-    // All-to-all over n nodes would be n(n-1)/2 pairs; this must be nowhere near
     const pairs = targets.lineIndices.length / 2
     expect(pairs).toBeLessThan(targets.nodeCount * 2)
   })

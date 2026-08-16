@@ -9,14 +9,6 @@ interface Props {
   leadRef: React.RefObject<HTMLParagraphElement | null>
 }
 
-/**
- * Section label, headline and supporting copy.
- *
- * Sized under Technology's, which is itself under the Hero's (§9): this section
- * is the consequence of the platform, not a second introduction to it, and the
- * modules — not the type — are the top of its hierarchy. Each line sits in its
- * own clip box so it can rise into place rather than fading up as a block.
- */
 export default function CapabilitiesHeader({ labelRef, linesRef, leadRef }: Props) {
   return (
     <div className="capabilities-header">
@@ -29,9 +21,6 @@ export default function CapabilitiesHeader({ labelRef, linesRef, leadRef }: Prop
           Capabilities
         </span>
 
-        {/* The right-hand readout Innovation and Technology both carry.
-            Deliberately faint, and hidden below 900px where it would compete
-            with the section number for a short line of space. */}
         <span className="capabilities-label-scale" aria-hidden="true">
           <span className="capabilities-label-scale-key">Scales</span>
           <span className="capabilities-label-scale-val">

@@ -1,12 +1,3 @@
-/**
- * Reduced-motion verification.
- *
- * With prefers-reduced-motion: reduce the Journey must fall back to normal
- * document flow: no tall pinned stage, every state's copy readable at once,
- * no scroll-driven animation. Run with the dev server listening.
- *
- *   node scripts/probe-reduced.mjs --url http://localhost:5181
- */
 import { chromium } from '@playwright/test'
 import { join } from 'node:path'
 import { homedir } from 'node:os'
@@ -32,10 +23,6 @@ const url = arg('url', 'http://localhost:5181')
 const outDir = arg('out', 'screens/reduced')
 mkdirSync(outDir, { recursive: true })
 
-// Software rasterisation is opt-in. Forcing SwiftShader makes every frame
-// GPU-bound in a way no reader's machine is, which buries the costs that are
-// actually worth finding; `--swiftshader` puts it back for a machine with no
-// usable GPU.
 const GPU_ARGS = process.argv.includes('--swiftshader')
   ? ['--enable-unsafe-swiftshader', '--use-gl=angle', '--use-angle=swiftshader', '--disable-lcd-text']
   : ['--disable-lcd-text']
@@ -68,7 +55,6 @@ for (const vp of [
       text: h.textContent,
       opacity: getComputedStyle(h.closest('[class*="copy"], section, article') ?? h).opacity,
     }))
-    // Anything sticky/pinned left over?
     const sticky = [...document.querySelectorAll('#journey *')].filter((el) => {
       const p = getComputedStyle(el).position
       return p === 'sticky' || p === 'fixed'

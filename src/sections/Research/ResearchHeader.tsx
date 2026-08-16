@@ -10,18 +10,6 @@ interface Props {
   rootRef: React.RefObject<HTMLDivElement | null>
 }
 
-/**
- * The section header (§10–§13).
- *
- * An editorial spread rather than a centred introduction: the label and
- * headline hold the left, the supporting copy sits low on the right, and the
- * asymmetry between them is the section's first statement about what kind of
- * page this is. Nothing is centred anywhere in Research.
- *
- * The headline is the largest type since the Hero and the last large type on
- * the page before Impact — Research is where the site stops explaining itself
- * and starts showing work, so it is allowed one clear declarative line.
- */
 export default function ResearchHeader({ rootRef }: Props) {
   return (
     <header ref={rootRef} className="research-header">
@@ -34,9 +22,6 @@ export default function ResearchHeader({ rootRef }: Props) {
           {RESEARCH_LABEL}
         </span>
 
-        {/* The right-hand readout every section since Innovation carries.
-            "Portfolio concept" is doing real work here: it is the line that
-            keeps a page of fictional studies from reading as a claim. */}
         <span className="research-label-meta">
           <span className="research-label-meta-key">{RESEARCH_META.key}</span>
           <span className="research-label-meta-val">{RESEARCH_META.value}</span>

@@ -1,20 +1,3 @@
-/**
- * Scroll-response probe.
- *
- * Frame pacing can be perfect and the page can still feel wrong: Lenis eases
- * the scroll position toward the wheel, and every scrubbed timeline then eases
- * its own progress toward that position. The two lags compound, and what a
- * reader notices is that things keep moving after they have stopped.
- *
- * Sends a short burst of wheel events, stops, and measures how long the page
- * keeps travelling afterwards — optionally sweeping Lenis's smoothing so the
- * setting is chosen from a number rather than from taste.
- *
- *   node scripts/probe-settle.mjs [--url ...] [--durations 1.15,0.9,0.7]
- *
- * The sweep needs the dev-only `window.__lenis` handle, so point it at the dev
- * server; without `--durations` it just reports whatever is configured.
- */
 import { chromium } from '@playwright/test'
 import { readdir, access } from 'node:fs/promises'
 import { join } from 'node:path'
@@ -32,11 +15,9 @@ async function findLocalChromium() {
         await access(exe)
         return exe
       } catch {
-        /* next */
       }
     }
   } catch {
-    /* default */
   }
   return undefined
 }
@@ -73,8 +54,6 @@ await page.goto(URL, { waitUntil: 'domcontentloaded', timeout: 60000 })
 await page.waitForTimeout(3000)
 await page.mouse.move(720, 450)
 
-// Park inside Technology: a long pinned section, so a burst stays well clear of
-// any boundary and measures the scroll response rather than a transition.
 const target = await page.evaluate(() => {
   const el = document.getElementById('technology')
   return Math.round(el.getBoundingClientRect().top + window.scrollY + 200)
@@ -88,7 +67,6 @@ await page.waitForTimeout(2000)
 async function burst(label) {
   await page.evaluate(() => window.__start())
   const t0 = Date.now()
-  // Ten notches and then nothing — the way a reader flicks a wheel.
   for (let i = 0; i < 10; i++) {
     await page.mouse.wheel(0, 120)
     await page.waitForTimeout(10)

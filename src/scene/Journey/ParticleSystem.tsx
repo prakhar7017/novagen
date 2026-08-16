@@ -18,7 +18,6 @@ import { scrollProgress } from '@/store/progressRef'
 
 interface Props {
   count: number
-  /** Cursor response is disabled on touch devices */
   pointerEnabled: boolean
 }
 
@@ -29,19 +28,10 @@ export default function ParticleSystem({ count, pointerEnabled }: Props) {
 
   const targets = useMemo(() => buildParticleTargets(count), [count])
 
-  /**
-   * Smaller devices run a smaller population, which thins every arrangement —
-   * the expression profile's columns especially. Nudging point size up by the
-   * square root of the shortfall restores roughly the same coverage. Desktop
-   * (the authoring count) is left exactly as-is.
-   */
   const densityBoost = useMemo(() => Math.min(1.6, Math.sqrt(6000 / count)), [count])
 
-  // ── Point cloud ──────────────────────────────────────────────────────────
   const pointsGeo = useMemo(() => {
     const g = new THREE.BufferGeometry()
-    // `position` is required by three's bounding-sphere machinery even though
-    // the vertex shader computes the real position from the morph attributes.
     g.setAttribute('position', new THREE.BufferAttribute(targets.field, 3))
     g.setAttribute('aNucleus', new THREE.BufferAttribute(targets.nucleus, 3))
     g.setAttribute('aField', new THREE.BufferAttribute(targets.field, 3))
@@ -54,9 +44,6 @@ export default function ParticleSystem({ count, pointerEnabled }: Props) {
     return g
   }, [targets])
 
-  // ── Network connections ──────────────────────────────────────────────────
-  // Built from the same buffers and morphed by the same code path, so the
-  // lines track their nodes exactly rather than drifting out of register.
   const linesGeo = useMemo(() => {
     const g = new THREE.BufferGeometry()
     g.setAttribute('position', new THREE.BufferAttribute(targets.network, 3))
@@ -101,9 +88,6 @@ export default function ParticleSystem({ count, pointerEnabled }: Props) {
         depthWrite: false,
         uniforms: {
           uMorph: { value: 0 },
-          // Much tighter than the points': with a wide stagger the two ends of
-          // a connection sit at different morph values and the line stretches
-          // across the whole field instead of joining neighbours.
           uStagger: { value: 0.14 },
           uTime: { value: 0 },
           uColor: { value: LINE_COLOR },
@@ -131,10 +115,7 @@ export default function ParticleSystem({ count, pointerEnabled }: Props) {
     const t = state.clock.elapsedTime
 
     const morph = morphIndex(j)
-    // Particles emerge from the nucleus surface as it destabilises
     const reveal = smoothstep(MILESTONE.shatterStart, MILESTONE.shatterEnd, j)
-    // §30: density falls away once the candidate resolves, so the final state
-    // reads as clarity rather than more complexity.
     const dim = 1 - smoothstep(MILESTONE.candidateStart, 1.0, j) * 0.72
 
     const pu = pointsMat.uniforms
@@ -142,11 +123,9 @@ export default function ParticleSystem({ count, pointerEnabled }: Props) {
     pu.uTime.value = t
     pu.uReveal.value = reveal
     pu.uDim.value = dim
-    // Tracks adaptive DPR changes from PerformanceMonitor
     pu.uSizeScale.value = state.gl.getPixelRatio() * densityBoost
 
     if (pointerEnabled) {
-      // Eased toward the cursor; amplitude is deliberately tiny (spec §27)
       pu.uPointer.value.x += (pointer.x * 0.09 - pu.uPointer.value.x) * 0.05
       pu.uPointer.value.y += (pointer.y * 0.06 - pu.uPointer.value.y) * 0.05
     }
@@ -154,7 +133,6 @@ export default function ParticleSystem({ count, pointerEnabled }: Props) {
     const lu = linesMat.uniforms
     lu.uMorph.value = morph
     lu.uTime.value = t
-    // Connections only exist while the network reads as a network
     lu.uOpacity.value =
       clamp01(smoothstep(MILESTONE.networkStart + 0.02, MILESTONE.networkEnd, j)) *
       (1 - smoothstep(MILESTONE.candidateStart, MILESTONE.candidateEnd, j)) *

@@ -1,48 +1,19 @@
-/* ── Section 06 · Research ────────────────────────────────────────────────
-   Back to Bone after Capabilities' dark modules, and back to editorial
-   composition after two sections of instruments. This is the quietest surface
-   on the page: no canvas, no pin, one interaction, and the whole hierarchy
-   carried by type, whitespace and hairlines.
-
-   §56 fails the section outright if it reads as blog cards, a news list or a
-   resources grid, so there is exactly one bordered box in here — the dark
-   figure panel in study 03 — and nothing anywhere that wraps a title and a
-   summary together in a card.                                                */
-
 .research {
   position: relative;
-  /* Above Capabilities (z:2) so the ingress panel can paint over the end of
-     it, and below the fixed header (z:50) so the wordmark stays on top. */
   z-index: 3;
   width: 100%;
   background: var(--color-bone);
   color: var(--color-abyss);
-  /* Deliberately not clipped: the ingress panel lives outside this box. */
 }
 
-/* Paper grain — the same device as Innovation, at a different frequency and
-   the same near-invisible strength. Its only job is to stop a large flat Bone
-   field reading as a blank page. */
 .research-grain {
   position: absolute;
   inset: 0;
   z-index: 1;
   pointer-events: none;
   opacity: 0.02;
-  /* The same fractalNoise these sections have always used, but rasterised once
-     as a tiled image instead of re-evaluated as a live `filter: url(#…)`. The
-     filter form is recomputed whenever the element repaints, and this element
-     is full-bleed over a canvas that repaints every frame — measured at 6.1s of
-     long tasks across a scroll pass, against 2.0s without it. The noise is
-     identical; only when it is generated has changed. */
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
 }
-
-/* ── Capabilities → Research handoff (§5, §6) ────────────────────────────
-   A Bone panel sitting entirely above this section's top edge, painting over
-   the end of the previous one as it scrolls past. GSAP uncovers it upward
-   through a straight-edged mask; with reduced motion it simply never shows and
-   the two sections meet at their shared boundary.                            */
 
 .research-ingress {
   position: absolute;
@@ -50,8 +21,6 @@
   right: 0;
   z-index: 1;
   pointer-events: none;
-  /* The panel is now what clips the surface, so the surface itself can be a
-     layer that slides. */
   overflow: hidden;
 }
 
@@ -59,29 +28,15 @@
   position: absolute;
   inset: 0;
   background: var(--color-bone);
-  /* Below the panel until the scrub raises it.
 
-     A transform rather than the `clip-path: inset()` this used to animate. A
-     scrubbed clip-path repaints the full width of the viewport on the main
-     thread every frame, and this one runs across the entire Capabilities →
-     Research boundary — which measured as the roughest transition on the page,
-     at a 383ms median frame. Sliding a layer is compositor work and costs
-     nothing per frame. The result is pixel-identical: the surface is one flat
-     colour, so a rising clip edge and a rising layer edge are the same edge. */
   transform: translateY(100%);
   will-change: transform;
 }
 
-/* The leading edge of the rising surface. Green rather than neutral: it is the
-   last of Capabilities' illumination leaving the page, and it is gone before
-   the Bone finishes arriving. */
 .research-ingress-edge {
   position: absolute;
   left: 0;
   right: 0;
-  /* Pinned to the top of the surface, which is now the leading edge itself —
-     when the fill was clipped rather than moved this had to travel on its own
-     matching tween, because a line cannot ride a mask boundary. */
   top: 0;
   height: 1px;
   opacity: 0;
@@ -94,20 +49,14 @@
   );
 }
 
-/* ── Shell ──────────────────────────────────────────────────────────────── */
-
 .research-inner {
   position: relative;
   z-index: 2;
-  /* §41 — content stops growing at 1500px so paragraphs never widen past
-     their measure on a 1920 display. */
   max-width: 1500px;
   margin: 0 auto;
-  /* §40 — 64px gutters, 130–160 top, 160 bottom. */
   padding: clamp(88px, 15vh, 152px) 64px clamp(104px, 16vh, 168px);
 }
 
-/* Hairlines between studies rather than borders around them (§32). */
 .research-rule {
   display: block;
   height: 1px;
@@ -118,8 +67,6 @@
 .research-rule--tight {
   margin-top: clamp(56px, 7.6vh, 76px);
 }
-
-/* ── Header (§10–§13) ────────────────────────────────────────────────────── */
 
 .research-label {
   display: flex;
@@ -140,11 +87,7 @@
   white-space: nowrap;
 }
 
-/* The section's only green in the header (§34). */
 .research-label-index {
-  /* The same darkened Bio Green the wordmark takes on this surface. Raw brand
-     green sits near 1.3:1 on Bone, and a 12px mono glyph at that contrast
-     reads as a printing fault rather than as the section number. */
   color: #4e9c19;
 }
 
@@ -165,8 +108,6 @@
   opacity: 0.7;
 }
 
-/* Editorial spread rather than a centred introduction: headline left,
-   supporting copy low on the right (§13). Nothing in Research is centred. */
 .research-header-body {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 400px);
@@ -176,7 +117,6 @@
 
 .research-headline {
   font-family: var(--font-sans);
-  /* §12 — 68–84px at desktop. */
   font-size: clamp(4rem, 5.5vw, 5.4rem);
   font-weight: 700;
   line-height: 0.96;
@@ -185,8 +125,6 @@
   max-width: 1020px;
 }
 
-/* overflow:hidden drives the line reveal; the padding/margin pair keeps it
-   from clipping descenders. Matches every other headline on the page. */
 .research-headline .line-clip,
 .study-title .line-clip,
 .research-footer-statement .line-clip {
@@ -199,18 +137,12 @@
 }
 
 .research-lead {
-  /* §31 — 17–19px. */
   font-size: clamp(1.06rem, 1.2vw, 1.19rem);
   line-height: 1.62;
   color: var(--color-muted-dark);
   max-width: 400px;
   padding-bottom: 0.5rem;
 }
-
-/* ── Studies ─────────────────────────────────────────────────────────────
-   Three rows, three proportions, alternating direction (§24). The lead study
-   is the anchor; the second is deliberately smaller, because a second feature
-   at the same weight flattens the section into two of everything.            */
 
 .research-study {
   display: grid;
@@ -220,7 +152,6 @@
 
 .research-study--lead {
   grid-template-columns: minmax(0, 65fr) minmax(0, 35fr);
-  /* §40 — header to lead study, 110–150. */
   margin-top: clamp(84px, 13vh, 132px);
 }
 
@@ -234,24 +165,15 @@
   margin-top: clamp(56px, 7.6vh, 76px);
 }
 
-/* ── Study image frame ───────────────────────────────────────────────────
-   §16: the image is the object. No glass, no card, no panel — a radius, a
-   hairline and a shadow soft enough that it reads as weight rather than as a
-   drop shadow.                                                               */
-
 .study-frame {
   position: relative;
   overflow: hidden;
   border-radius: clamp(20px, 2vw, 30px);
   border: 1px solid rgba(7, 17, 15, 0.1);
-  /* §17 — barely there. On Bone anything heavier reads as a UI card. */
   box-shadow: 0 28px 70px rgba(7, 17, 15, 0.07);
-  /* Behind the image while it decodes, so the reveal never uncovers Bone. */
   background: var(--color-abyss);
 }
 
-/* Native ratio of the tissue field — used uncropped so the readouts over it
-   address the biology they name (§16). */
 .study-frame--lead {
   aspect-ratio: 3 / 2;
 }
@@ -260,8 +182,6 @@
   aspect-ratio: 16 / 10;
 }
 
-/* Carries the parallax and everything positioned over the biology, so the
-   readouts drift with the image rather than across it (§36). */
 .study-image {
   position: absolute;
   inset: 0;
@@ -275,16 +195,9 @@
   object-fit: cover;
 }
 
-/* 4:3 source into a 16:10 frame: the crop is vertical, and this keeps it
-   centred on the structure rather than on the empty upper field. */
 .study-img--protein {
   object-position: 52% 46%;
 }
-
-/* ── Lead study interaction (§19, §20) ───────────────────────────────────
-   A region of the field comes up in brightness and contrast under the pointer.
-   Not a magnifier and not a lens: the page already used inspection twice, and
-   a third would make this read as the same exhibit.                          */
 
 .study-spot {
   position: absolute;
@@ -292,7 +205,6 @@
   pointer-events: none;
   background-size: cover;
   background-position: center;
-  /* §20 — brightness +5%, contrast +7%, and nothing else. */
   filter: brightness(1.05) contrast(1.07) saturate(1.03);
   opacity: 0;
   transition: opacity 0.3s var(--ease-out-expo);
@@ -314,7 +226,6 @@
   opacity: 1;
 }
 
-/* A faint ring, not a glow (§20). */
 .study-spot-ring {
   position: absolute;
   left: var(--spot-x, 50%);
@@ -334,24 +245,18 @@
   opacity: 1;
 }
 
-/* ── Lead study readouts (§18) ───────────────────────────────────────────── */
-
 .study-annotations {
   position: absolute;
   inset: 0;
   pointer-events: none;
 }
 
-/* The declared coordinate is the marker, not the row: the offsets pull the row
-   so the marker straddles the point on whichever side the label runs. */
 .study-annotation {
   position: absolute;
   display: flex;
   align-items: center;
   color: #dffff1;
   transform: translate(-9px, -50%);
-  /* Legible at rest over dark fluorescence, and a clear step up when the
-     spotlight reaches them — an overlay nobody can read is decoration. */
   opacity: 0.78;
   transition: opacity 0.34s var(--ease-out-expo);
 }
@@ -399,10 +304,6 @@
   letter-spacing: 0.12em;
   text-transform: uppercase;
   white-space: nowrap;
-  /* Two radii: the tight shadow separates the glyphs from whatever
-     fluorescence is directly behind them, the wide one darkens the patch
-     around the label — enough to stay readable over a bright cell without
-     becoming a chip. */
   text-shadow:
     0 0 4px rgba(7, 17, 15, 0.96),
     0 0 10px rgba(7, 17, 15, 0.9),
@@ -417,7 +318,6 @@
   opacity: 0.72;
 }
 
-/* Authored in final case: text-transform maps µ to Greek capital Mu. */
 .study-annotation-value {
   color: #eafff2;
   text-transform: none;
@@ -444,7 +344,6 @@
   background: currentColor;
 }
 
-/* End ticks — the difference between a scale bar and a stray rule. */
 .study-scale-bar::before,
 .study-scale-bar::after {
   content: '';
@@ -463,8 +362,6 @@
   right: 0;
 }
 
-/* ── Study text column ───────────────────────────────────────────────────── */
-
 .study-body {
   padding-top: clamp(2px, 0.8vh, 12px);
 }
@@ -480,7 +377,6 @@
   color: var(--color-muted-dark);
 }
 
-/* The current-study marker (§30). The only piece of state in the section. */
 .study-index-mark {
   width: 6px;
   height: 6px;
@@ -497,7 +393,6 @@
 
 .study-title {
   font-family: var(--font-sans);
-  /* §31 — 36–48px at desktop, 34–42 on a laptop. */
   font-size: clamp(1.95rem, 2.7vw, 2.6rem);
   font-weight: 600;
   line-height: 1.06;
@@ -508,17 +403,11 @@
 
 .study-summary {
   margin-top: clamp(16px, 2vh, 22px);
-  /* §31 — 17–19px. */
   font-size: clamp(1.06rem, 1.2vw, 1.19rem);
   line-height: 1.62;
   color: var(--color-muted-dark);
   max-width: 46ch;
 }
-
-/* ── Study metadata ──────────────────────────────────────────────────────
-   A description list, and hairlines rather than a bordered block: these are
-   properties of the study, and the rules are the only animated element in the
-   text column (§22).                                                          */
 
 .study-meta {
   margin-top: clamp(26px, 3.4vh, 40px);
@@ -559,10 +448,6 @@
   text-align: right;
 }
 
-/* ── Study 03 · research figure (§27–§29) ────────────────────────────────
-   The section's only dark surface, and the only place a scientific grid is
-   allowed to appear (§33): inside the diagram, never across the section.     */
-
 .study-figure {
   position: relative;
   overflow: hidden;
@@ -585,7 +470,6 @@
 .figure-state-label,
 .figure-shared-label {
   font-family: var(--font-mono);
-  /* User units, and the viewBox is very close to 1:1 at desktop widths. */
   font-size: 11px;
   letter-spacing: 1.4px;
   text-transform: uppercase;
@@ -600,8 +484,6 @@
   fill: rgba(198, 245, 225, 0.3);
 }
 
-/* The points each state carries forward — the only green in the clouds, and
-   what makes the convergence legible before a label is read. */
 .figure-dot.is-shared {
   fill: var(--color-bio-green);
   opacity: 0.85;
@@ -631,8 +513,6 @@
 .figure-node.is-primary {
   fill: var(--color-bio-green);
 }
-
-/* ── Footer (§38, §39) ───────────────────────────────────────────────────── */
 
 .research-footer {
   position: relative;
@@ -667,8 +547,6 @@
   max-width: 460px;
 }
 
-/* The first mark of section 07 (§39). At 6% it is a shape in the paper rather
-   than a number being announced — Impact is where it acquires a meaning. */
 .research-footer-marker {
   position: absolute;
   right: 0;
@@ -684,14 +562,11 @@
   transform-origin: 100% 100%;
 }
 
-/* ── Laptop (§42) ────────────────────────────────────────────────────────── */
-
 @media (max-width: 1366px) {
   .research-inner {
     padding-left: 48px;
     padding-right: 48px;
   }
-  /* §42 — 10–15% less vertical spacing, image prominence unchanged. */
   .research-study--lead {
     margin-top: clamp(76px, 11.5vh, 116px);
   }
@@ -708,10 +583,6 @@
     max-width: 340px;
   }
 }
-
-/* ── Tablet landscape (§43) ──────────────────────────────────────────────
-   Two columns survive; the lead image gives up a little width so the text
-   column keeps a readable measure, and one readout goes.                    */
 
 @media (max-width: 1100px) {
   .study-annotation[data-annotation='1'] {
@@ -746,11 +617,6 @@
   }
 }
 
-/* ── Tablet portrait (§44) ───────────────────────────────────────────────
-   Stacked. DOM order is already the reading order the brief asks for — image
-   then text for study 01, text then image for study 02, figure then text for
-   study 03 — so nothing is reordered here.                                   */
-
 @media (max-width: 900px) {
   .research-inner {
     padding-left: 32px;
@@ -776,8 +642,6 @@
   .research-label-meta {
     display: none;
   }
-  /* The frame is too small to carry instrumentation, and the spotlight is
-     already gone with the pointer (§43, §47). */
   .study-annotations {
     display: none;
   }
@@ -800,32 +664,24 @@
   }
 }
 
-/* ── Mobile (§45–§47) ────────────────────────────────────────────────────── */
-
 @media (max-width: 700px) {
   .research-inner {
     padding: clamp(64px, 11vh, 104px) 20px clamp(72px, 12vh, 116px);
   }
   .research-headline {
-    /* §46 — 46–54px. */
     font-size: clamp(2.85rem, 12vw, 3.4rem);
   }
   .research-lead,
   .study-summary {
-    /* §46 — 16–17px. */
     font-size: 1.02rem;
   }
   .study-title {
-    /* §46 — 28–34px. */
     font-size: clamp(1.75rem, 8vw, 2.1rem);
   }
   .study-frame {
-    /* §47 — 18–24px. */
     border-radius: 20px;
     box-shadow: 0 18px 40px rgba(7, 17, 15, 0.06);
   }
-  /* Native ratio of each source, so a phone gets the whole field rather than a
-     tighter crop of it (§47). */
   .study-frame--lead,
   .study-frame--second {
     aspect-ratio: 3 / 2;
@@ -834,8 +690,6 @@
     border-radius: 18px;
     padding: 16px;
   }
-  /* The viewBox is drawn at roughly half scale here, so 11 user units would
-     render at five pixels. */
   .figure-state-label,
   .figure-shared-label {
     font-size: 19px;
@@ -846,15 +700,11 @@
   }
 }
 
-/* ── Small mobile (§48) ──────────────────────────────────────────────────── */
-
 @media (max-width: 380px) {
   .research-inner {
     padding-left: 18px;
     padding-right: 18px;
   }
-  /* Two mono columns in 324px leaves the longer values one glyph of room, so
-     they stack rather than wrap mid-word. */
   .study-meta-row {
     grid-template-columns: minmax(0, 1fr);
     row-gap: 3px;
@@ -866,12 +716,6 @@
     font-size: 4rem;
   }
 }
-
-/* ── Reduced motion (§49) ────────────────────────────────────────────────
-   No timelines are built at all, so every element is already in its final
-   state: images uncovered, rules at full width, figure complete. What is left
-   is to silence the transitions CSS owns — the spotlight is never attached in
-   the first place, so nothing is lost by removing its fades.                 */
 
 @media (prefers-reduced-motion: reduce) {
   .study-annotation,

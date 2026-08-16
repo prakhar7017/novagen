@@ -1,6 +1,4 @@
 // @vitest-environment jsdom
-// The constants module reaches for `window` through progressRef's dev-only
-// debug handle, so this suite needs a DOM even though nothing it tests uses one.
 import { describe, expect, it } from 'vitest'
 import {
   CELL_POINTS,
@@ -47,8 +45,6 @@ describe('closing formation', () => {
   })
 
   it('resolves the membrane before the detail inside it (§7)', () => {
-    // The point becomes a boundary, and only then acquires an interior. The
-    // reverse order draws filaments in open space.
     expect(CTA_MILESTONE.membraneIn).toBeLessThan(CTA_MILESTONE.interiorIn)
     expect(CTA_MILESTONE.membraneOn).toBeLessThan(CTA_MILESTONE.interiorOn)
     expect(ctaForm(0.5)).toBeGreaterThan(ctaInterior(0.5))
@@ -59,8 +55,6 @@ describe('the cell', () => {
   it('keeps every interior point inside the membrane (§22)', () => {
     const points = buildCellPoints()
     expect(points).toHaveLength(CELL_POINTS)
-    // §20 caps the interior at 50 points; anything denser stops reading as
-    // "one preserved biological possibility" and starts reading as a scene.
     expect(CELL_POINTS).toBeGreaterThanOrEqual(20)
     expect(CELL_POINTS).toBeLessThanOrEqual(50)
 
@@ -78,7 +72,6 @@ describe('the cell', () => {
 
   it('drifts slowly enough that no orbit reads as a loop (§23)', () => {
     for (const p of buildCellPoints()) {
-      // Under one full turn per three minutes.
       expect(Math.abs(p.speed)).toBeLessThan(0.04)
       expect(Math.abs(p.speed)).toBeGreaterThan(0)
     }
@@ -94,7 +87,6 @@ describe('the cell', () => {
     expect(cellDiameterPx(1024)).toBeGreaterThanOrEqual(260)
     expect(cellDiameterPx(1024)).toBeLessThanOrEqual(320)
 
-    // Monotonic: a narrower window must never receive a larger cell.
     let last = 0
     for (const w of [768, 1024, 1101, 1367, 1600, 1920]) {
       expect(cellDiameterPx(w)).toBeGreaterThanOrEqual(last)
@@ -107,8 +99,6 @@ describe('the cell', () => {
     expect(CELL_POSITION.to.x).toBeLessThanOrEqual(0.77)
     expect(CELL_POSITION.to.y).toBeGreaterThanOrEqual(0.42)
     expect(CELL_POSITION.to.y).toBeLessThanOrEqual(0.5)
-    // Impact's scene sits at 17% of the frame width right of centre and 3%
-    // above it; the handoff is only continuous if this agrees with that.
     expect(CELL_POSITION.from.x).toBeCloseTo(0.5 + 0.17, 5)
     expect(CELL_POSITION.from.y).toBeCloseTo(0.5 - 0.03, 5)
     expect(CELL_RADIUS).toBeGreaterThan(0)
@@ -120,7 +110,6 @@ describe('closing copy', () => {
   it('states §13 as two authored lines and §46 as three', () => {
     expect(CTA_HEADLINE.join(' ')).toBe('From biological complexity to human possibility.')
     expect(CTA_HEADLINE_COMPACT.join(' ')).toBe(CTA_HEADLINE.join(' '))
-    // §46 — no one-word orphan lines.
     for (const line of [...CTA_HEADLINE, ...CTA_HEADLINE_COMPACT]) {
       expect(line.trim().split(/\s+/).length).toBeGreaterThan(1)
     }

@@ -9,14 +9,6 @@ import {
   stageIndex,
 } from './journey.constants'
 
-/**
- * The whole Journey is a pure function of one number. These tests guard the
- * properties that makes that safe — determinism, monotonicity, and the rest
- * windows where each arrangement is fully formed — because a regression in any
- * of them shows up as a state that never resolves or a scrub that desyncs when
- * the user scrolls back up.
- */
-
 describe('math helpers', () => {
   it('clamps to the unit range', () => {
     expect(clamp01(-3)).toBe(0)
@@ -35,7 +27,6 @@ describe('math helpers', () => {
     expect(smoothstep(0, 1, 0)).toBe(0)
     expect(smoothstep(0, 1, 1)).toBe(1)
     expect(smoothstep(0, 1, 0.5)).toBeCloseTo(0.5)
-    // Ease-in: below the midpoint the curve trails the linear ramp
     expect(smoothstep(0, 1, 0.25)).toBeLessThan(0.25)
     expect(smoothstep(0, 1, 0.75)).toBeGreaterThan(0.75)
   })
@@ -64,8 +55,6 @@ describe('morphIndex', () => {
     for (let i = 200; i >= 0; i--) expect(morphIndex(i / 200)).toBe(forward[i])
   })
 
-  // Each arrangement needs a window where the morph rests on a whole step;
-  // that is where the shader's stagger settles to zero and the shape resolves.
   it.each([
     ['particle field', 1, MILESTONE.shatterEnd, MILESTONE.signalStart],
     ['genetic signal', 2, MILESTONE.signalEnd, MILESTONE.networkStart],
@@ -94,9 +83,6 @@ describe('story states', () => {
     }
   })
 
-  // The timeline's OUT duration is 0.02, so an exit that is not exactly 0.02
-  // before the next enter either leaves a gap with no copy on screen or
-  // overlaps two blocks and reads as ghosting.
   it('spaces each exit exactly one OUT before the next enter', () => {
     for (let i = 0; i < JOURNEY_STATES.length - 1; i++) {
       expect(JOURNEY_STATES[i + 1].enter - JOURNEY_STATES[i].exit).toBeCloseTo(0.02, 6)

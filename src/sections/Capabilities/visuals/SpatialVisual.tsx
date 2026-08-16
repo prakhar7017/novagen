@@ -5,22 +5,9 @@ import { ease, setOpacity, setText, setTransform } from '../attr'
 import { useVisualDriver, type VisualFrame } from '../useVisualDriver'
 
 interface Props {
-  /** Marker count — reduced on small screens (§45) */
   markers: number
 }
 
-/**
- * 01 · Spatial Biology — microscopy field with procedural cell markers.
- *
- * The image alone is a photograph; the overlay is what makes it a measurement.
- * Markers sit dark until the pointer comes within range, then the *local*
- * ones brighten and the short links between them appear — so what the visitor
- * discovers is not "the picture lights up" but "these cells are related to
- * each other", which is the capability the copy is describing.
- *
- * §16 caps that: the scan area is a soft field, never a magnifier, and at no
- * pointer position is more than a neighbourhood lit.
- */
 export default function SpatialVisual({ markers }: Props) {
   const field = useMemo(() => buildSpatialField(markers), [markers])
 
@@ -30,8 +17,6 @@ export default function SpatialVisual({ markers }: Props) {
   const scanEl = useRef<HTMLDivElement>(null)
   const countEl = useRef<HTMLSpanElement>(null)
 
-  // Reused between frames: allocating a 34-entry array 60 times a second is
-  // work the garbage collector does not need.
   const activation = useRef<number[]>([])
 
   const onFrame = useCallback(
@@ -42,8 +27,6 @@ export default function SpatialVisual({ markers }: Props) {
       const act = activation.current
       act.length = field.markers.length
 
-      // Range is a CSS-pixel radius (§15), not a fraction of the module, so the
-      // scan feels the same size on a 620px module and a 420px one.
       const radius = SPATIAL_RADIUS
       let lit = 0
 
@@ -54,22 +37,16 @@ export default function SpatialVisual({ markers }: Props) {
         const near = ease(1 - d / radius) * f.focus
         act[i] = near
 
-        // A slow, tiny breath keeps the resting field alive without reading as
-        // motion; the pointer response is an order of magnitude larger.
         const idle = 0.17 + 0.04 * Math.sin(f.time * 0.7 + m.phase)
         const a = idle + near * 0.82
         if (near > 0.25) lit++
 
         setOpacity(markerEls.current[i], a)
         setTransform(markerEls.current[i], mx, my, 1 + near * 0.55)
-        // The core brightens faster than the halo, which is what makes a marker
-        // read as a signal rather than as a dot getting bigger.
         setOpacity(coreEls.current[i], 0.25 + near * 0.75)
       })
 
       field.edges.forEach((e, i) => {
-        // Both ends have to be in range: a pathway with one end outside the
-        // neighbourhood is not a local relationship.
         const strength = Math.min(act[e.a], act[e.b]) * (1 - e.d * 0.45)
         setOpacity(edgeEls.current[i], strength * 0.72)
       })
@@ -80,7 +57,6 @@ export default function SpatialVisual({ markers }: Props) {
         scan.style.opacity = (f.focus * 0.85).toFixed(3)
       }
 
-      // The one "tiny metadata change" §16 asks for — a count, not a dashboard.
       setText(countEl.current, String(lit).padStart(2, '0'))
     },
     [field],
@@ -98,8 +74,6 @@ export default function SpatialVisual({ markers }: Props) {
         decoding="async"
       />
 
-      {/* The field rests dark so that "few visible signals" is the default
-          state the copy describes; the shade is what the scan lifts. */}
       <div className="cap-spatial-shade" aria-hidden="true" />
 
       <div

@@ -16,23 +16,8 @@ import ProteinVisual from './visuals/ProteinVisual'
 import SpatialVisual from './visuals/SpatialVisual'
 import { CAPABILITIES, CAPABILITIES_EXIT, DENSITY } from './capabilities.constants'
 
-/**
- * Section 05 — Capabilities.
- *
- * Technology explained how the platform works; this shows what it enables. The
- * shift is deliberate — from one pinned 280vh sequence to a normally-scrolling
- * layout of about 170vh, from a single instrument to four, from WebGL to SVG
- * (§50, §51). After two cinematic sections the page has earned the right to
- * simply *show* things, and the modules carry enough activity of their own.
- *
- * Nothing here mounts a canvas. The shared one is stopped while this section
- * owns the viewport, so four simultaneous visuals never share a frame budget
- * with a WebGL platform that has nothing left to draw.
- */
 export default function Capabilities() {
   const reduced = useReducedMotion()
-  // The density switch, not a layout switch: the grid is handled entirely in
-  // CSS, and this only decides how many elements each visual draws (§45).
   const compact = useMediaQuery('(max-width: 768px)')
   const setCanvasActive = useExperienceStore((s) => s.setCanvasActive)
 
@@ -77,12 +62,9 @@ export default function Capabilities() {
       className="capabilities"
       aria-labelledby="capabilities-title"
     >
-      {/* Softer and deeper than Technology's environment: the same world, one
-          step away from the instrument panel (§4, §34). */}
       <div className="capabilities-bg" aria-hidden="true" />
       <div className="capabilities-grain" aria-hidden="true" />
 
-      {/* What the validated candidate leaves behind (§53). */}
       <div ref={signal} className="capabilities-signal" aria-hidden="true" />
 
       <div className="capabilities-inner">

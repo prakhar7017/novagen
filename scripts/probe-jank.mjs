@@ -1,14 +1,3 @@
-/**
- * Frame-health probe.
- *
- * Measures what the main thread is actually doing rather than what it looks
- * like it is doing: per-frame deltas from a rAF loop inside the page, long
- * tasks from PerformanceObserver, and React render counts from a dev-only
- * counter. Reports the loader window and a scripted full-page scroll
- * separately, because they starve for different reasons.
- *
- *   node scripts/probe-jank.mjs [--url ...] [--label baseline] [--gpu]
- */
 import { chromium } from '@playwright/test'
 import { readdir, access } from 'node:fs/promises'
 import { join } from 'node:path'
@@ -26,11 +15,9 @@ async function findLocalChromium() {
         await access(exe)
         return exe
       } catch {
-        /* next */
       }
     }
   } catch {
-    /* default */
   }
   return undefined
 }
@@ -43,7 +30,6 @@ const argOf = (f, d) => {
 const URL = argOf('--url', 'http://localhost:5180')
 const LABEL = argOf('--label', 'run')
 
-/** Installed before any app code runs, so the loader window is covered too. */
 const RECORDER = `
   window.__frames = []
   window.__long = []
@@ -77,10 +63,6 @@ const RECORDER = `
 `
 
 const executablePath = await findLocalChromium()
-// Software rasterisation is opt-in. Forcing SwiftShader makes every frame
-// GPU-bound in a way no reader's machine is, which buries the costs that are
-// actually worth finding; `--swiftshader` puts it back for a machine with no
-// usable GPU.
 const GPU_ARGS = process.argv.includes('--swiftshader')
   ? ['--enable-unsafe-swiftshader', '--use-gl=angle', '--use-angle=swiftshader', '--disable-lcd-text']
   : ['--disable-lcd-text']
@@ -101,14 +83,10 @@ page.on('pageerror', (e) => errors.push(e.message))
 
 await page.goto(URL, { waitUntil: 'domcontentloaded', timeout: 60000 })
 
-// ── Window 1: the loader ────────────────────────────────────────────────────
 await page.waitForTimeout(2400)
 const loader = await page.evaluate(() => window.__slice(0))
 const mountMark = await page.evaluate(() => window.__frames.length)
 
-// ── Window 2: a scripted scroll through the whole page ──────────────────────
-// Driven by real wheel deltas rather than scrollTo, so Lenis, ScrollTrigger and
-// every scrubbed timeline run the way they do for a reader.
 await page.mouse.move(720, 450)
 const height = await page.evaluate(() => document.documentElement.scrollHeight)
 const steps = Math.ceil(height / 110)

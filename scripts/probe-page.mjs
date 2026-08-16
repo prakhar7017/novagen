@@ -7,10 +7,6 @@ const exe = join(
   'AppData/Local/ms-playwright/chromium-1217/chrome-win64/chrome.exe',
 )
 
-// Software rasterisation is opt-in. Forcing SwiftShader makes every frame
-// GPU-bound in a way no reader's machine is, which buries the costs that are
-// actually worth finding; `--swiftshader` puts it back for a machine with no
-// usable GPU.
 const GPU_ARGS = process.argv.includes('--swiftshader')
   ? ['--enable-unsafe-swiftshader', '--use-gl=angle', '--use-angle=swiftshader', '--disable-lcd-text']
   : ['--disable-lcd-text']
@@ -56,7 +52,6 @@ const info = await page.evaluate(() => {
 })
 console.log(JSON.stringify(info, null, 2))
 
-// Measure how long a single frame actually takes
 const frameMs = await page.evaluate(
   () =>
     new Promise((res) => {

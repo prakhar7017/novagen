@@ -21,14 +21,11 @@ const VERT = /* glsl */`
 
   void main() {
     vec3 pos = position;
-    // Very slow independent drift per particle
     pos.x += sin(uTime * aSpeed * 0.18 + aPhi)           * 0.12;
     pos.y += cos(uTime * aSpeed * 0.14 + aPhi + 1.3)     * 0.09;
     pos.z += sin(uTime * aSpeed * 0.10 + aPhi + 2.6)     * 0.06;
 
     vec4 mv = modelViewMatrix * vec4(pos, 1.0);
-    // Small constant on purpose — see shaders.ts. These are sparse microscopic
-    // motes, not bokeh; a large multiplier reads as blurred green blobs.
     gl_PointSize = aSize * uPixelRatio * (8.0 / -mv.z);
 
     vColor = aColor;
@@ -44,13 +41,11 @@ const FRAG = /* glsl */`
   void main() {
     float d = length(gl_PointCoord - 0.5) * 2.0;
     if (d > 1.0) discard;
-    // Soft gaussian dot — microscopic particle look
     float a = exp(-d * d * 5.0) * vAlpha * 0.55;
     gl_FragColor = vec4(vColor, a);
   }
 `
 
-// Bio Green (80%) and Signal Mint (20%)
 const BIO_GREEN   = new THREE.Color('#a6ff6a')
 const SIGNAL_MINT = new THREE.Color('#c6f5e1')
 
@@ -65,8 +60,7 @@ export default function HeroParticles({ count }: Props) {
     const colors = new Float32Array(count * 3)
 
     for (let i = 0; i < count; i++) {
-      // Right-biased distribution: organism lives at x ≈ 1.8 world units
-      const bias    = Math.random() < 0.72  // 72% in organism area
+      const bias    = Math.random() < 0.72
       const xRange  = bias ? [0.2, 3.8] : [-2.0, 4.5]
       const yRange  = bias ? [-1.8, 1.8] : [-2.2, 2.2]
       const zRange  = bias ? [-0.8, 0.8] : [-1.2, 1.2]
@@ -75,11 +69,10 @@ export default function HeroParticles({ count }: Props) {
       pos[i*3+1] = yRange[0] + Math.random() * (yRange[1] - yRange[0])
       pos[i*3+2] = zRange[0] + Math.random() * (zRange[1] - zRange[0])
 
-      sizes[i]  = 0.8 + Math.random() * 1.8   // ≈1.3–4 CSS px on screen
+      sizes[i]  = 0.8 + Math.random() * 1.8
       phis[i]   = Math.random() * Math.PI * 2
       speeds[i] = 0.3 + Math.random() * 0.7
 
-      // 80% Bio Green, 20% Signal Mint
       const col = Math.random() < 0.8 ? BIO_GREEN : SIGNAL_MINT
       colors[i*3]   = col.r
       colors[i*3+1] = col.g
@@ -116,8 +109,6 @@ export default function HeroParticles({ count }: Props) {
     if (!matRef.current) return
     matRef.current.uniforms.uTime.value = clock.elapsedTime
     matRef.current.uniforms.uPixelRatio.value = gl.getPixelRatio()
-    // Atmosphere belongs to the Hero: it recedes once the Journey's own
-    // particle population takes over the stage.
     matRef.current.uniforms.uFade.value = 1 - smoothstep(0.0, 0.14, scrollProgress.journey)
   })
 

@@ -7,16 +7,6 @@ import {
   seedScale,
 } from './aperture.geometry'
 
-/**
- * The handoff's one hard requirement: when the aperture finishes, the Bone disc
- * must own every pixel of the viewport. If it does not, the Journey's sticky
- * stage releases with a wedge of dark still showing and the two sections meet
- * as a visible seam — which is exactly what a wrong radial-gradient reference
- * (farthest-corner instead of closest-side) produced, silently, while the
- * animation itself still looked correct.
- */
-
-/** Every viewport the section is specified for, plus a couple of extremes. */
 const VIEWPORTS: [number, number][] = [
   [1920, 1080],
   [1600, 1000],
@@ -26,11 +16,10 @@ const VIEWPORTS: [number, number][] = [
   [768, 1024],
   [390, 844],
   [360, 800],
-  [320, 1180], // very tall and narrow
-  [2560, 700], // very wide and short
+  [320, 1180],
+  [2560, 700],
 ]
 
-/** 0.63 on desktop matches the Journey's right-of-centre candidate offset. */
 const ORIGINS = [0.5, 0.63]
 
 describe('coverScale', () => {
@@ -47,8 +36,6 @@ describe('coverScale', () => {
   })
 
   it('leaves no coverage at a scale below the computed one', () => {
-    // Guards the margin from growing until the value stops meaning anything:
-    // 6% under the answer must genuinely fail to cover.
     for (const [vw, vh] of VIEWPORTS) {
       const s = coverScale(vw, vh, 0.63)
       expect(coversViewport(vw, vh, 0.63, s * 0.9)).toBe(false)

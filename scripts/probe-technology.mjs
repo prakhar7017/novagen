@@ -1,14 +1,3 @@
-/**
- * Visual verification harness for Section 04 — Technology.
- *
- * Drives a real Chromium at each required viewport, jumps to exact pipeline
- * progress values, screenshots every stage plus the Innovation handoff, and
- * reports console errors and the layout facts the acceptance criteria care
- * about. Run with the dev server already listening.
- *
- *   node scripts/probe-technology.mjs [--url http://localhost:5180] [--out screens/tech]
- *                                     [--only 1440x900] [--reverse]
- */
 import { chromium } from '@playwright/test'
 import { mkdir, readdir, access } from 'node:fs/promises'
 import { join } from 'node:path'
@@ -26,11 +15,9 @@ async function findLocalChromium() {
         await access(exe)
         return exe
       } catch {
-        /* try the next build */
       }
     }
   } catch {
-    /* no local cache — let Playwright decide */
   }
   return undefined
 }
@@ -76,7 +63,6 @@ const VIEWPORTS = [
   { label: '360x800', width: 360, height: 800 },
 ]
 
-/** Pipeline progress values worth inspecting — one per stage, plus the ends. */
 const STOPS = [
   ['00-sample', 0.06],
   ['01-map', 0.28],
@@ -86,7 +72,6 @@ const STOPS = [
   ['05-exit', 0.99],
 ]
 
-/** Ingress positions, as a fraction of the ingress scroll window. */
 const INGRESS_STOPS = [
   ['i0-approach', -0.55],
   ['i1-open', 0.3],
@@ -98,10 +83,6 @@ await mkdir(OUT, { recursive: true })
 const executablePath = await findLocalChromium()
 console.log(`chromium: ${executablePath ?? '(playwright default)'}\n`)
 
-// Software rasterisation is opt-in. Forcing SwiftShader makes every frame
-// GPU-bound in a way no reader's machine is, which buries the costs that are
-// actually worth finding; `--swiftshader` puts it back for a machine with no
-// usable GPU.
 const GPU_ARGS = process.argv.includes('--swiftshader')
   ? ['--enable-unsafe-swiftshader', '--use-gl=angle', '--use-angle=swiftshader', '--disable-lcd-text']
   : ['--disable-lcd-text']
@@ -152,8 +133,6 @@ for (const vp of VIEWPORTS) {
     continue
   }
 
-  // Mirrors technologyTimeline: the story starts 65% into the ingress and ends
-  // when the section's bottom reaches the viewport's.
   const ingressPx = (geo.vh * 36) / 100
   const startY = geo.top + ingressPx * 0.65
   const endY = geo.top + geo.height - geo.vh

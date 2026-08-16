@@ -8,19 +8,6 @@ interface Props {
   nodesRef: React.RefObject<(HTMLElement | null)[]>
 }
 
-/**
- * Technology as a normally-scrolling document.
- *
- * Used below 769px and under reduced motion. The five stages become five short
- * blocks, each with the drawn state of the platform above its copy, and the
- * pipeline is not a separate widget here — it runs down the left gutter as the
- * spine the blocks hang from, which is the vertical progress §48 asks for and
- * costs nothing extra to read.
- *
- * Nothing is pinned and nothing is scrubbed, so there is no way to be trapped
- * inside it and no long animation to sit through, but the process, the order
- * and every word of the copy are identical to the pinned version.
- */
 export default function TechnologyFlow({ copiesRef, nodesRef }: Props) {
   const targets = useDiagramTargets()
 

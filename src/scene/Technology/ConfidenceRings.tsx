@@ -16,24 +16,11 @@ interface Props {
   targets: TechTargets
 }
 
-/** Enough for a 40px arc to stay smooth; a circle is cheap, so this is generous. */
 const SEGMENTS = 72
 
 const RING_COLOR = new THREE.Color('#c6f5e1')
 const RING_ACTIVE = new THREE.Color('#a6ff6a')
 
-/**
- * Confidence, drawn as arc length.
- *
- * §30 rules out progress bars, and an arc is the honest instrument form: the
- * reader compares four dials at a glance and the strongest is visibly the
- * longest, with the exact figures carried in the metadata rather than stamped
- * over the visual.
- *
- * All four rings are one geometry and one draw call — the anchor, radius and
- * confidence ride as attributes, and the winner's migration to the centre is a
- * uniform, so nothing is rebuilt when the stage changes.
- */
 export default function ConfidenceRings({ targets }: Props) {
   const geo = useMemo(() => {
     const rings = targets.candidates.length / 3
@@ -49,8 +36,6 @@ export default function ConfidenceRings({ targets }: Props) {
     let v = 0
     for (let r = 0; r < rings; r++) {
       const c = CANDIDATE_CONFIDENCE[r] ?? 0.5
-      // Higher confidence reads as a slightly larger dial as well as a longer
-      // arc, so the hierarchy survives even at small sizes.
       const rad = 0.22 + c * 0.14
       const isWinner = r === WINNER ? 1 : 0
 
@@ -116,8 +101,6 @@ export default function ConfidenceRings({ targets }: Props) {
     const p = scrollProgress.technology
     const M = TECH_MILESTONE
 
-    // The arcs sweep in slightly behind the clusters contracting, so the
-    // reading follows the filtering rather than announcing it.
     const appear = smoothstep(M.predictStart + 0.03, M.predictEnd + 0.04, p)
     const validate = smoothstep(M.validateStart, M.validateEnd, p)
     const exit = smoothstep(M.exitStart, 1.0, p)

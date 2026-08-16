@@ -1,12 +1,3 @@
-/**
- * Descender / nav probe.
- *
- * Scrolls to a given normalised position inside #journey, then reports the
- * geometry of whichever copy block is currently revealed and crops a shot of
- * the copy column so the glyphs can be inspected directly.
- *
- *   node scripts/probe-clip.mjs --url http://localhost:5181 --w 1440 --h 900 --p 0.99
- */
 import { chromium } from '@playwright/test'
 import { join } from 'node:path'
 import { homedir } from 'node:os'
@@ -37,10 +28,6 @@ const outDir = arg('out', 'screens/probe')
 
 mkdirSync(outDir, { recursive: true })
 
-// Software rasterisation is opt-in. Forcing SwiftShader makes every frame
-// GPU-bound in a way no reader's machine is, which buries the costs that are
-// actually worth finding; `--swiftshader` puts it back for a machine with no
-// usable GPU.
 const GPU_ARGS = process.argv.includes('--swiftshader')
   ? ['--enable-unsafe-swiftshader', '--use-gl=angle', '--use-angle=swiftshader', '--disable-lcd-text']
   : ['--disable-lcd-text']
@@ -57,9 +44,6 @@ page.on('pageerror', (e) => errors.push(String(e)))
 await page.goto(url, { waitUntil: 'domcontentloaded' })
 await page.waitForTimeout(3500)
 
-// Scroll to `p` through the journey's scroll range. Lenis intercepts wheel
-// input but not programmatic scrollTo on window, which ScrollTrigger still
-// observes, so drive the raw scroll position and let a few frames settle.
 await page.evaluate((frac) => {
   const s = document.querySelector('#journey')
   if (!s) return
@@ -94,7 +78,6 @@ const out = await page.evaluate(() => {
         fontSize: hs.fontSize,
         lineHeight: hs.lineHeight,
         padBottom: cs.paddingBottom,
-        // room between the inner line box bottom and the clipping (padding) edge
         slackPx: (cb.bottom - ib.bottom).toFixed(1),
         transform: getComputedStyle(inner).transform,
       })

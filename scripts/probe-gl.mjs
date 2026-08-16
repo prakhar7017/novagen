@@ -1,12 +1,3 @@
-/**
- * WebGL churn counter.
- *
- * Hooks the GL context before any app code runs and counts the operations that
- * should happen once per session but were showing up in the scroll profile:
- * program links, shader compiles, buffer uploads and drawing-buffer resizes.
- *
- *   node scripts/probe-gl.mjs [--url ...]
- */
 import { chromium } from '@playwright/test'
 import { readdir, access } from 'node:fs/promises'
 import { join } from 'node:path'
@@ -24,11 +15,9 @@ async function findLocalChromium() {
         await access(exe)
         return exe
       } catch {
-        /* next */
       }
     }
   } catch {
-    /* default */
   }
   return undefined
 }
@@ -78,10 +67,6 @@ const HOOK = `
   }
 `
 
-// Software rasterisation is opt-in. Forcing SwiftShader makes every frame
-// GPU-bound in a way no reader's machine is, which buries the costs that are
-// actually worth finding; `--swiftshader` puts it back for a machine with no
-// usable GPU.
 const GPU_ARGS = process.argv.includes('--swiftshader')
   ? ['--enable-unsafe-swiftshader', '--use-gl=angle', '--use-angle=swiftshader', '--disable-lcd-text']
   : ['--disable-lcd-text']

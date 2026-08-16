@@ -1,11 +1,3 @@
-/**
- * Scroll-return probe.
- *
- * Reproduces "scroll down to the Journey, scroll back to the top" and reports
- * whether the Hero restores to the same state it had on first paint.
- *
- *   node scripts/probe-return.mjs --url http://localhost:5181
- */
 import { chromium } from '@playwright/test'
 import { join } from 'node:path'
 import { homedir } from 'node:os'
@@ -59,7 +51,6 @@ const SNAPSHOT = () => {
       pick('[data-organism-wrap]'),
       pick('[data-organism-wrap] img'),
     ],
-    // ScrollTrigger pin state
     pinSpacer: document.querySelectorAll('.pin-spacer').length,
     triggers: (window.ScrollTrigger?.getAll() ?? []).map((t) => ({
       id: t.vars.trigger?.id ?? t.trigger?.id ?? '?',
@@ -99,10 +90,6 @@ const SNAPSHOT = () => {
   }
 }
 
-// Software rasterisation is opt-in. Forcing SwiftShader makes every frame
-// GPU-bound in a way no reader's machine is, which buries the costs that are
-// actually worth finding; `--swiftshader` puts it back for a machine with no
-// usable GPU.
 const GPU_ARGS = process.argv.includes('--swiftshader')
   ? ['--enable-unsafe-swiftshader', '--use-gl=angle', '--use-angle=swiftshader', '--disable-lcd-text']
   : ['--disable-lcd-text']
@@ -124,7 +111,6 @@ await page.waitForTimeout(4000)
 const before = await page.evaluate(SNAPSHOT)
 await page.screenshot({ path: join(outDir, '1-initial.png'), timeout: 120000 })
 
-// Scroll down into the Journey the way a user would, then all the way back.
 async function lenisTo(y, immediate) {
   await page.evaluate(
     ([target, imm]) => {

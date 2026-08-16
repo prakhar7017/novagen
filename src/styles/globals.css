@@ -13,11 +13,8 @@
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-html { scroll-behavior: auto; } /* Lenis handles smooth scroll */
+html { scroll-behavior: auto; }
 
-/* Set while a full-screen overlay owns the viewport. Lenis is stopped at the
-   same time — this is the native fallback, for the case where Lenis never
-   registered, and it also stops iOS rubber-banding the page behind the menu. */
 html.is-scroll-locked,
 html.is-scroll-locked body {
   overflow: hidden;
@@ -32,31 +29,21 @@ body {
   overflow-x: hidden;
 }
 
-/* Keyboard focus — visible but restrained */
 :focus-visible {
   outline: 1.5px solid var(--color-bio-green);
   outline-offset: 3px;
   border-radius: 2px;
 }
 
-/* Thin scrollbar */
 ::-webkit-scrollbar { width: 3px; }
 ::-webkit-scrollbar-track { background: var(--color-abyss); }
 ::-webkit-scrollbar-thumb { background: rgba(166,255,106,0.2); border-radius: 2px; }
 
-/* Headline reveal clip — wraps each line.
-   overflow:hidden is what makes the yPercent reveal work, but it also cuts
-   descenders, since a tight line-height leaves the tail of "y"/"g"/"p" below
-   the content box. Padding extends the box (overflow clips at the padding
-   edge, so the tail is inside it) and a matching negative margin cancels the
-   extra space, keeping the original line rhythm. */
 .line-clip {
   overflow: hidden;
   display: block;
 }
 
-/* Text for assistive technology only — used where a drawn diagram carries
-   photographic content that the surrounding copy does not describe. */
 .sr-only {
   position: absolute;
   width: 1px;
@@ -75,11 +62,6 @@ body {
   margin-bottom: -0.16em;
 }
 
-/* ── Hero copy column ──────────────────────────────────────────────────────
-   The headline contains one unbreakable 13-glyph word ("programmable.")
-   measuring ~7em. Because .line-clip is overflow:hidden, the column must
-   always be wider than 7em x font-size or the word is silently cut off.
-   Each breakpoint below keeps >= 25% headroom over that figure.          */
 .hero-copy {
   position: relative;
   z-index: 10;
@@ -103,18 +85,14 @@ body {
   max-width: 460px;
 }
 
-/* Tablet landscape — organism narrows, copy column takes more room */
 @media (max-width: 1024px) {
   .hero-copy { max-width: min(58%, 560px); }
 }
 
-/* Tablet portrait */
 @media (max-width: 900px) {
   .hero-copy { max-width: 78%; }
 }
 
-/* Mobile — copy spans the viewport; percentage widths would starve the
-   headline and reintroduce the clip. */
 @media (max-width: 768px) {
   .hero-copy {
     max-width: 100%;

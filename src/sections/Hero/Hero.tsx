@@ -19,14 +19,8 @@ gsap.registerPlugin(ScrollTrigger)
 
 export default function Hero() {
   const reduced = useReducedMotion()
-  // The entrance is held until the loader starts opening (§16). Building it on
-  // mount instead would play the whole arrival behind the cover, and the Hero
-  // would be revealed already finished.
   const booted = useExperienceStore((s) => s.booted)
 
-  // ── Refs ─────────────────────────────────────────────────────────────────
-  // Each useRef is stable, but the object literal wrapping them is not; it is
-  // memoised so effects can depend on `refs` without re-running every render.
   const section       = useRef<HTMLElement>(null)
   const eyebrow       = useRef<HTMLSpanElement>(null)
   const headlineLines = useRef<(HTMLSpanElement | null)[]>([])
@@ -46,15 +40,11 @@ export default function Hero() {
     [],
   )
 
-  // ── GSAP entrance + exit ──────────────────────────────────────────────────
   useGSAP(
     () => {
       if (!booted) return
       const entranceTl = buildEntranceTimeline(refs, reduced)
 
-      // Idle breathing and the scroll exit both start from the Hero's settled
-      // state, so neither may be built while the entrance is still running —
-      // see the note on buildScrollExit.
       let stopBreathing: (() => void) | undefined
       let exitTl: gsap.core.Timeline | undefined
       const settle = () => {
@@ -65,8 +55,6 @@ export default function Hero() {
       if (entranceTl) entranceTl.eventCallback('onComplete', settle)
       else settle()
 
-      // Anything created inside the onComplete lands outside useGSAP's context,
-      // so it has to be torn down by hand.
       return () => {
         entranceTl?.eventCallback('onComplete', null)
         stopBreathing?.()
@@ -77,22 +65,17 @@ export default function Hero() {
     { dependencies: [reduced, booted], revertOnUpdate: true },
   )
 
-  // ── Cursor parallax (outside GSAP context — needs mousemove listener) ────
   useEffect(() => {
     return initCursorParallax(refs, reduced)
   }, [refs, reduced])
 
   return (
     <>
-      {/* ── Hero section ─────────────────────────────────────────────────── */}
       <section
         id="hero"
         ref={refs.section}
         style={{
           position: 'relative',
-          // Above the fixed ExperienceCanvas (z:1). The section is transparent
-          // so the shared canvas shows through; the page's base colour comes
-          // from <body>, not from an opaque layer here.
           zIndex: 2,
           width: '100%',
           height: '100svh',
@@ -100,8 +83,6 @@ export default function Hero() {
           overflow: 'hidden',
         }}
       >
-        {/* ── Background layers ────────────────────────────────────────── */}
-        {/* z:1 Radial glow — Bio Green at 72% x, 44% y (per spec §8) */}
         <div
           style={{
             position: 'absolute', inset: 0, zIndex: 1, pointerEvents: 'none',
@@ -112,7 +93,6 @@ export default function Hero() {
           }}
         />
 
-        {/* z:2 Grid + grain */}
         <div
           style={{
             position: 'absolute', inset: 0, zIndex: 2, pointerEvents: 'none',
@@ -123,7 +103,6 @@ export default function Hero() {
             backgroundSize: '80px 80px',
           }}
         />
-        {/* Procedural grain via SVG filter */}
         <svg style={{ position: 'absolute', width: 0, height: 0 }} aria-hidden="true">
           <defs>
             <filter id="hero-grain">
@@ -141,14 +120,12 @@ export default function Hero() {
           }}
         />
 
-        {/* z:3–4 Particles + organism */}
         <HeroVisual
           breathRef={refs.breathWrap}
           breathInnerRef={refs.breathInner}
           organismRef={refs.organism}
         />
 
-        {/* z:10 Hero copy */}
         <HeroContent
           eyebrowRef={refs.eyebrow}
           headlineLinesRef={refs.headlineLines}
@@ -157,10 +134,8 @@ export default function Hero() {
           primaryCtaRef={refs.primaryCta}
         />
 
-        {/* z:5 Scientific metadata */}
         <HeroMetadata metaRef={refs.meta} />
 
-        {/* Scroll indicator */}
         <div
           aria-hidden="true"
           style={{
@@ -194,18 +169,10 @@ export default function Hero() {
         `}</style>
       </section>
 
-      {/* ── Mobile responsive overrides ──────────────────────────────────── */}
       <style>{`
         @media (max-width: 768px) {
           #hero { min-height: 100svh; }
 
-          /* Stack organism above copy on mobile.
-             These values are mirrored in heroGeometry.ts (MOBILE_W /
-             MOBILE_BLEED / MOBILE_TOP) so the Journey's WebGL organism lands
-             on the same rectangle — keep the two in sync. */
-          /* No transform override here: GSAP animates this element's
-             transform, and an !important rule would beat its inline style and
-             freeze the breathing and exit motion on mobile. */
           [data-organism-wrap] {
             position: relative !important;
             right: auto !important;

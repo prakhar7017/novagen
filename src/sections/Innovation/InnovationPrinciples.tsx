@@ -4,14 +4,6 @@ interface Props {
   rowsRef: React.RefObject<(HTMLDivElement | null)[]>
 }
 
-/**
- * The three principles, as editorial rows rather than cards.
- *
- * A number, a title, one sentence and a hairline rule — no surface, no border
- * box, no icon. ACCEPTANCE_CRITERIA §27 fails the section outright if this
- * reads as a feature grid, and the rule is the only decoration that earns its
- * place: it is also what the reveal animates.
- */
 export default function InnovationPrinciples({ rowsRef }: Props) {
   return (
     <ul className="innovation-principles">

@@ -1,12 +1,3 @@
-/**
- * Where the long frames are.
- *
- * Records every frame delta with the scroll position it happened at, then
- * buckets them by section. "It feels rough between sections" is a statement
- * about a place on the page, and an aggregate median cannot answer it.
- *
- *   node scripts/probe-where.mjs [--url ...]
- */
 import { chromium } from '@playwright/test'
 import { readdir, access } from 'node:fs/promises'
 import { join } from 'node:path'
@@ -24,11 +15,9 @@ async function findLocalChromium() {
         await access(exe)
         return exe
       } catch {
-        /* next */
       }
     }
   } catch {
-    /* default */
   }
   return undefined
 }
@@ -52,10 +41,6 @@ const RECORDER = `
   window.__reset = () => { window.__s = [] }
 `
 
-// Software rasterisation is opt-in. Forcing SwiftShader makes every frame
-// GPU-bound in a way no reader's machine is, which buries the costs that are
-// actually worth finding; `--swiftshader` puts it back for a machine with no
-// usable GPU.
 const GPU_ARGS = process.argv.includes('--swiftshader')
   ? ['--enable-unsafe-swiftshader', '--use-gl=angle', '--use-angle=swiftshader', '--disable-lcd-text']
   : ['--disable-lcd-text']
@@ -113,7 +98,6 @@ for (const id of IDS) {
   )
 }
 
-// The transitions themselves: a window either side of each section boundary.
 console.log('\nboundary                    frames   med   worst  >100ms')
 for (let i = 1; i < bounds.length; i++) {
   const edge = bounds[i].top

@@ -2,7 +2,6 @@ interface Props {
   metaRef: React.RefObject<HTMLDivElement | null>
 }
 
-/** Minimal scientific HUD labels — 2 items only, per spec §19 */
 export default function HeroMetadata({ metaRef }: Props) {
   const labelStyle: React.CSSProperties = {
     fontFamily: 'var(--font-mono)',
@@ -39,7 +38,6 @@ export default function HeroMetadata({ metaRef }: Props) {
         style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 5, opacity: 0 }}
         aria-hidden="true"
       >
-        {/* Bottom-left: system label */}
         <div
           style={{
             position: 'absolute',
@@ -53,7 +51,6 @@ export default function HeroMetadata({ metaRef }: Props) {
           </div>
         </div>
 
-        {/* Bottom-right: signal label */}
         <div
           style={{
             position: 'absolute',

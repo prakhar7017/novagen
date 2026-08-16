@@ -11,33 +11,14 @@ interface Props {
   annotationsRef: React.RefObject<HTMLDivElement | null>
 }
 
-/** Lens diameter in px — the restrained end of the 120–180px band in the brief. */
 const LENS_SIZE = 150
-/** Magnification inside the lens. Any more and it stops reading as inspection. */
 const LENS_ZOOM = 1.08
 
-/**
- * The microscopy field.
- *
- * The dark, high-contrast specimen against Bone is what keeps this section
- * recognisably NOVA/GEN while the background inverts (prompt §46). The frame is
- * masked in code — a wide arch above, tight corners below, closer to a specimen
- * window than to a rounded card.
- *
- * The inspection lens duplicates the image subtree rather than magnifying a
- * background copy. Both copies carry the same `innovation-visual-parallax` and
- * `innovation-visual-img` classes, and the scroll timeline animates every match
- * at once, so the magnified view can never drift out of register with the
- * surrounding frame no matter where the parallax or the reveal has got to.
- */
 export default function InnovationVisual({ frameRef, revealRef, annotationsRef }: Props) {
   const reduced = useReducedMotion()
   const finePointer = useMediaQuery('(pointer: fine)')
   const wideEnough = useMediaQuery('(min-width: 1025px)')
 
-  // Below tablet landscape the frame is too small for a 150px lens to be an
-  // inspection rather than an obstruction, and a coarse pointer cannot aim it
-  // (prompt §22, §34, §39).
   const lensEnabled = finePointer && wideEnough && !reduced
 
   const lens = useRef<HTMLDivElement>(null)
@@ -67,8 +48,6 @@ export default function InnovationVisual({ frameRef, revealRef, annotationsRef }
     const paint = () => {
       queued = false
       lensEl.style.transform = `translate3d(${px - r}px, ${py - r}px, 0)`
-      // The inner copy is a 1:1 replica of the frame scaled about its own
-      // origin, so the point under the cursor lands at the lens centre.
       innerEl.style.transform = `translate3d(${r - px * LENS_ZOOM}px, ${r - py * LENS_ZOOM}px, 0) scale(${LENS_ZOOM})`
     }
 
@@ -124,8 +103,6 @@ export default function InnovationVisual({ frameRef, revealRef, annotationsRef }
           </div>
         </div>
 
-        {/* Internal vignette only — no drop shadow heavy enough to read as a
-            card sitting on the page (prompt §19). */}
         <div className="innovation-visual-vignette" aria-hidden="true" />
 
         <MicroscopyAnnotations containerRef={annotationsRef} />

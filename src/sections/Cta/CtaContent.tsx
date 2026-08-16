@@ -19,30 +19,11 @@ interface Props {
   leadRef: React.RefObject<HTMLParagraphElement | null>
   actionsRef: React.RefObject<HTMLDivElement | null>
   brandRef: React.RefObject<HTMLDivElement | null>
-  /** Three authored lines instead of two, below 769px (§46) */
   compact: boolean
   reduced: boolean
-  /** Magnetism is a desktop-pointer affordance and nothing else (§18, §47) */
   magnetic: boolean
 }
 
-/**
- * Everything section 08 says (§12–§19, §29).
- *
- * Deliberately short. By this point the page has spent seven sections
- * explaining itself, and §4's target feeling — *silence after complexity* — is
- * mostly a matter of how little is left on screen: a label, two lines, one
- * sentence, one action, one link and the wordmark. §28 removes the scientific
- * readouts entirely; the single System / Resolved pair is the one exception it
- * allows, and it is there for continuity with the seven label rows above it
- * rather than to state a fact.
- *
- * The headline is Bone. §15 allows the closing phrase to take Bio Green and
- * then argues against it, and the argument is right: a hundred-pixel neon
- * headline is the loudest thing this page would ever have done, in the section
- * that exists to be quiet. Only the full stop is green — the last mark on the
- * page, and the smallest possible one.
- */
 export default function CtaContent({
   labelRef,
   linesRef,
@@ -87,7 +68,6 @@ export default function CtaContent({
               }}
               style={{ display: 'block' }}
             >
-              {/* The closing full stop, and nothing else, takes the accent. */}
               {i === lines.length - 1 ? (
                 <>
                   {line.slice(0, -1)}
@@ -112,7 +92,6 @@ export default function CtaContent({
         className="cta-actions"
         style={reduced ? undefined : { opacity: 0 }}
       >
-        {/* §54 — a real anchor to a section that exists, not a dead button. */}
         <a
           ref={primary}
           className="cta-action"
@@ -125,8 +104,6 @@ export default function CtaContent({
           </span>
         </a>
 
-        {/* §19 — a plain link, not a second button. The primary has to stay
-            obviously primary. */}
         <a
           className="cta-link"
           href={`#${CTA_SECONDARY.target}`}

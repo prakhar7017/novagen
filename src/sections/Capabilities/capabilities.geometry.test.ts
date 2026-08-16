@@ -9,15 +9,6 @@ import {
   nearestCluster,
 } from './capabilities.geometry'
 
-/**
- * The visuals draw whatever these functions return, so a bad arrangement is
- * not a crash — it is a module that quietly looks wrong at one breakpoint.
- * These assert the properties the visuals actually depend on: bounds (nothing
- * drawn under the module's own border), determinism (the same field across
- * reloads and across a resize) and referential integrity (no edge pointing at
- * a node that is not there).
- */
-
 describe('buildSpatialField', () => {
   const field = buildSpatialField(34)
 
@@ -39,8 +30,6 @@ describe('buildSpatialField', () => {
       expect(e.a).not.toBe(e.b)
       expect(field.markers[e.a]).toBeDefined()
       expect(field.markers[e.b]).toBeDefined()
-      // Normalized against the link cutoff, so the visuals can fade long
-      // relationships without knowing what the cutoff is.
       expect(e.d).toBeGreaterThanOrEqual(0)
       expect(e.d).toBeLessThanOrEqual(1)
     }
@@ -58,8 +47,6 @@ describe('buildSpatialField', () => {
   })
 
   it('has local structure rather than one connected mesh', () => {
-    // Two links per marker at most: past that the neighbourhoods stop reading
-    // as neighbourhoods, which is the whole point of the visual.
     expect(field.edges.length).toBeLessThanOrEqual(field.markers.length * 2)
   })
 })
@@ -97,8 +84,6 @@ describe('buildNetwork', () => {
   })
 
   it('keeps some signal outside the clusters', () => {
-    // §22: without weak unaffiliated signal the network resolves into four
-    // tidy blobs, which is exactly the diagram the brief rules out.
     expect(net.nodes.some((n) => n.cluster === -1)).toBe(true)
   })
 

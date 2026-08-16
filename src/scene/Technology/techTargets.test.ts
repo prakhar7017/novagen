@@ -1,8 +1,4 @@
 // @vitest-environment jsdom
-//
-// The progress map lives beside the section's WebGL gate, which registers a
-// dev-only handle on `window` at import time — so these otherwise pure numbers
-// need a document to be imported at all.
 import { describe, it, expect } from 'vitest'
 import { buildTechTargets, FRAME } from './techTargets'
 import {
@@ -11,14 +7,6 @@ import {
   techMorph,
   techStageIndex,
 } from '@/sections/Technology/technology.constants'
-
-/**
- * These buffers are built once and thereafter only read by the GPU, so a bad
- * value is invisible in code and shows up as a smear of geometry on screen.
- * The tests below pin the invariants the shaders and the drawn diagrams rely
- * on — above all the derivation chain, since the section's whole argument is
- * that each arrangement comes from the previous one.
- */
 
 const COUNT = 218
 const targets = buildTechTargets(COUNT)
@@ -45,8 +33,6 @@ describe('buildTechTargets', () => {
   })
 
   it('produces only finite, bounded coordinates', () => {
-    // Scanned in plain JS with one assertion: an expect() per coordinate is
-    // thousands of calls and slow enough to matter.
     const bad: string[] = []
     for (const key of ARRANGEMENTS) {
       const buf = targets[key]
@@ -61,9 +47,6 @@ describe('buildTechTargets', () => {
   })
 
   it('folds the sample out of the map rather than scattering it', () => {
-    // The transition only reads as "the specimen's interior unfolding" if the
-    // sample really is the map contracted: same relative arrangement, same
-    // ordering, just smaller.
     let mismatched = 0
     for (let i = 0; i < COUNT; i++) {
       const dx = targets.sample[i * 3] - targets.map[i * 3] * 0.36
@@ -72,14 +55,12 @@ describe('buildTechTargets', () => {
     }
     expect(mismatched).toBe(0)
 
-    // And it has to actually fit inside the specimen plane it sits in.
     for (let i = 0; i < COUNT; i++) {
       expect(Math.abs(targets.sample[i * 3])).toBeLessThan(FRAME.x * 0.4)
     }
   })
 
   it('keeps the interpretation network on the mapped cells', () => {
-    // §24: interpretation must reuse the map's nodes, not replace them.
     let moved = 0
     for (let i = 0; i < COUNT; i++) {
       const d = Math.hypot(
@@ -93,24 +74,17 @@ describe('buildTechTargets', () => {
 
   it('connects nodes into a readable, clustered network', () => {
     const segments = (targets.lineIndices.length + targets.bridgeIndices.length) / 2
-    // §25's band, which is a limit of legibility rather than of performance.
     expect(segments).toBeGreaterThanOrEqual(150)
     expect(segments).toBeLessThanOrEqual(400)
 
     for (const idx of targets.lineIndices) expect(idx).toBeLessThan(COUNT)
     for (const idx of targets.bridgeIndices) expect(idx).toBeLessThan(COUNT)
 
-    // Bridges are the exception, not the structure: a handful of routes
-    // between adjacent regions, never a second network.
     expect(targets.bridgeIndices.length / 2).toBeLessThan(targets.lineIndices.length / 20)
 
-    // Not every node is connected: a fully-linked population reads as the
-    // generic mesh the manifest rules out.
     const linked = new Set(Array.from(targets.lineIndices))
     expect(linked.size).toBeLessThan(COUNT)
 
-    // Connections are local — a link across the frame would draw a line
-    // through the middle of the composition.
     let longest = 0
     const all = [...targets.lineIndices, ...targets.bridgeIndices]
     for (let i = 0; i < all.length / 2; i++) {
@@ -134,7 +108,6 @@ describe('buildTechTargets', () => {
     expect(winners).toBeGreaterThan(4)
     expect(winners).toBeLessThan(COUNT / 2)
 
-    // The surviving evidence forms a ring around the target at the centre.
     for (let i = 0; i < COUNT; i++) {
       if (targets.winner[i] < 0.5) continue
       const r = Math.hypot(targets.validate[i * 3], targets.validate[i * 3 + 1])
@@ -149,8 +122,6 @@ describe('technology progress map', () => {
     expect(techMorph(0)).toBe(0)
     expect(techMorph(1)).toBeCloseTo(4, 5)
 
-    // Every stage has a plateau: the morph must rest on a whole number while
-    // its copy is on screen, or no arrangement is ever actually formed.
     expect(techMorph(TECH_MILESTONE.sampleOn)).toBeCloseTo(0, 5)
     expect(techMorph(0.28)).toBeCloseTo(1, 5)
     expect(techMorph(0.48)).toBeCloseTo(2, 5)
@@ -175,8 +146,6 @@ describe('technology progress map', () => {
 
   it('leaves no gap between one stage leaving and the next arriving', () => {
     for (let i = 0; i < TECHNOLOGY_STAGES.length - 1; i++) {
-      // Exits land before the next enter, so two copy blocks are never visible
-      // at once, but the gap stays small enough that the slot is not empty.
       expect(TECHNOLOGY_STAGES[i].exit).toBeLessThan(TECHNOLOGY_STAGES[i + 1].enter)
       expect(TECHNOLOGY_STAGES[i + 1].enter - TECHNOLOGY_STAGES[i].exit).toBeLessThan(0.06)
     }

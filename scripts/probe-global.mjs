@@ -1,13 +1,3 @@
-/**
- * Global experience verification harness.
- *
- * Walks the whole page rather than one section: loader, then each section
- * boundary, checking navigation state, the surface the header sits on,
- * horizontal overflow and console health at every required viewport.
- *
- *   node scripts/probe-global.mjs [--url ...] [--out screens/global]
- *        [--only 1440x900] [--reduced] [--menu] [--back]
- */
 import { chromium } from '@playwright/test'
 import { mkdir, readdir, access } from 'node:fs/promises'
 import { join } from 'node:path'
@@ -25,11 +15,9 @@ async function findLocalChromium() {
         await access(exe)
         return exe
       } catch {
-        /* next build */
       }
     }
   } catch {
-    /* fall through to the Playwright default */
   }
   return undefined
 }
@@ -72,10 +60,6 @@ const SECTIONS = [
 
 await mkdir(OUT, { recursive: true })
 const executablePath = await findLocalChromium()
-// Software rasterisation is opt-in. Forcing SwiftShader makes every frame
-// GPU-bound in a way no reader's machine is, which buries the costs that are
-// actually worth finding; `--swiftshader` puts it back for a machine with no
-// usable GPU.
 const GPU_ARGS = process.argv.includes('--swiftshader')
   ? ['--enable-unsafe-swiftshader', '--use-gl=angle', '--use-angle=swiftshader', '--disable-lcd-text']
   : ['--disable-lcd-text']
@@ -91,7 +75,6 @@ const shot = async (page, path) => {
   try {
     await page.screenshot({ path, timeout: 60000 })
   } catch {
-    /* the compositor occasionally never returns one; not worth failing over */
   }
 }
 

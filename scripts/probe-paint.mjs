@@ -1,15 +1,3 @@
-/**
- * Paint-cost A/B.
- *
- * Runs the same scripted scroll several times in one browser session, each time
- * with a different CSS override switched on, and reports frame health for each.
- * Everything expensive on this page that is *not* WebGL is a compositing cost —
- * a blur, a blend mode, an SVG filter — and those are invisible to a JS
- * profiler, so the only way to attribute them is to take them away and measure
- * again. Same session for every variant, so machine load cancels out.
- *
- *   node scripts/probe-paint.mjs [--url ...] [--passes 1]
- */
 import { chromium } from '@playwright/test'
 import { readdir, access } from 'node:fs/promises'
 import { join } from 'node:path'
@@ -27,11 +15,9 @@ async function findLocalChromium() {
         await access(exe)
         return exe
       } catch {
-        /* next */
       }
     }
   } catch {
-    /* default */
   }
   return undefined
 }
@@ -43,9 +29,6 @@ const argOf = (f, d) => {
 }
 const URL = argOf('--url', 'http://localhost:4180')
 const PASSES = Number(argOf('--passes', 1))
-// Optional: confine the pass to one region of the page. A whole-page traversal
-// takes minutes on a software rasteriser, and when the question is about one
-// section that time buys nothing but noise from the other seven.
 const FROM = argOf('--from', null)
 const TO = argOf('--to', null)
 
@@ -79,10 +62,6 @@ const RECORDER = `
   }
 `
 
-// Software rasterisation is opt-in. Forcing SwiftShader makes every frame
-// GPU-bound in a way no reader's machine is, which buries the costs that are
-// actually worth finding; `--swiftshader` puts it back for a machine with no
-// usable GPU.
 const GPU_ARGS = process.argv.includes('--swiftshader')
   ? ['--enable-unsafe-swiftshader', '--use-gl=angle', '--use-angle=swiftshader', '--disable-lcd-text']
   : ['--disable-lcd-text']
@@ -130,7 +109,6 @@ const scrollPass = async () => {
   return page.evaluate(() => window.__stats())
 }
 
-// One warm pass first, so no variant pays for the page's first traversal.
 await scrollPass()
 
 console.log('\nvariant              med   p90   p99  >50ms  longtasks')

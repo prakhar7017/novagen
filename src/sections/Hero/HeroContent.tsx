@@ -16,7 +16,6 @@ export default function HeroContent({
   const reduced = useReducedMotion()
   const lineRefs = useRef<(HTMLSpanElement | null)[]>([])
 
-  // Wire line refs into the shared array
   const setLineRef = (i: number) => (el: HTMLSpanElement | null) => {
     lineRefs.current[i] = el
     if (headlineLinesRef.current) headlineLinesRef.current[i] = el
@@ -30,12 +29,10 @@ export default function HeroContent({
     <div
       className="hero-copy"
       style={{
-        // Vertically centered but slightly low (per spec §16)
         top: '47%',
         transform: 'translateY(-45%)',
       }}
     >
-      {/* Eyebrow */}
       <span
         ref={eyebrowRef}
         style={{
@@ -45,14 +42,13 @@ export default function HeroContent({
           letterSpacing: '0.12em',
           textTransform: 'uppercase',
           color: 'var(--color-signal-mint)',
-          opacity: 0,               // hidden until GSAP entrance
+          opacity: 0,
           marginBottom: '1.75rem',
         }}
       >
         Computational Biology
       </span>
 
-      {/* Headline — each line in its own clip wrapper */}
       <h1 className="hero-headline">
         {['Biology,', 'made programmable.'].map((line, i) => (
           <span key={line} className="line-clip" style={{ display: 'block' }}>
@@ -68,7 +64,6 @@ export default function HeroContent({
         ))}
       </h1>
 
-      {/* Supporting copy */}
       <p
         ref={bodyRef}
         className="hero-body"
@@ -85,7 +80,6 @@ export default function HeroContent({
         for human health.
       </p>
 
-      {/* CTAs */}
       <div
         ref={ctaWrapRef}
         style={{
@@ -95,7 +89,6 @@ export default function HeroContent({
           opacity: 0,
         }}
       >
-        {/* Primary */}
         <a
           ref={primaryCtaRef}
           href="#technology"
@@ -124,7 +117,6 @@ export default function HeroContent({
           <span style={{ display: 'inline-block', transition: 'transform 0.2s' }}>→</span>
         </a>
 
-        {/* Secondary — text link treatment */}
         <a
           href="#research"
           style={{

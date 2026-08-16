@@ -1,26 +1,11 @@
-/* ── Site footer (§31–§34) ────────────────────────────────────────────────
-   The page's last surface. §32 asks for the same Abyss or slightly darker, and
-   darker is the right answer: #040B09 under #07110F is the one place on this
-   site where the background steps down rather than up, and it reads as the
-   lights going off rather than as a separate component being appended.
-
-   It is also the only opaque full-width surface below Impact, which is what
-   hides the shared canvas once the closing cell has travelled past it.        */
-
 .site-footer {
   position: relative;
-  /* Above the closing stage it rises over, below the fixed header. */
   z-index: 6;
   width: 100%;
   background: #040b09;
   border-top: 1px solid rgba(198, 245, 225, 0.1);
 }
 
-/* §33 — 260–380px on a desktop. The padding above sets the height from the
-   content, which lands a little under the floor at the narrower desktop tiers
-   where the type is smaller; this holds the band without inflating the wide
-   ones. §33 also warns against unnecessary whitespace, so there is no maximum
-   here — the content never reaches one. */
 @media (min-width: 769px) {
   .site-footer {
     min-height: 268px;
@@ -34,8 +19,6 @@
   gap: clamp(32px, 6vw, 96px);
   max-width: 1560px;
   margin: 0 auto;
-  /* §33 — 260–380px on a desktop, and the padding is what sets it: two short
-     rows of type is all the content there is. */
   padding: clamp(56px, 7vh, 76px) 64px clamp(36px, 4.5vh, 48px);
 }
 
@@ -67,8 +50,6 @@
   color: var(--color-muted);
 }
 
-/* ── Links (§55) ────────────────────────────────────────────────────────── */
-
 .site-footer-list {
   display: flex;
   flex-wrap: wrap;
@@ -81,7 +62,6 @@
 .site-footer-link {
   position: relative;
   display: inline-block;
-  /* The link's own box is the touch target; 14px of type is not one. */
   padding: 8px 0;
   font-family: var(--font-sans);
   font-size: clamp(13.5px, 1vw, 15px);
@@ -113,8 +93,6 @@
   transform: scaleX(1);
 }
 
-/* ── Base row (§31, §34) ────────────────────────────────────────────────── */
-
 .site-footer-base {
   display: flex;
   align-items: baseline;
@@ -126,8 +104,6 @@
   border-top: 1px solid rgba(198, 245, 225, 0.07);
 }
 
-/* §31 — no copyright claim. This is a portfolio piece and says so, which is
-   both more honest and more interesting than a fabricated © line. */
 .site-footer-note {
   font-family: var(--font-mono);
   font-size: 10.5px;
@@ -137,8 +113,6 @@
   max-width: 560px;
 }
 
-/* §34 — one small technical detail. Any more and the footer turns back into
-   the HUD the closing section just finished dismantling. */
 .site-footer-meta {
   display: flex;
   gap: 10px;
@@ -149,8 +123,6 @@
   text-transform: uppercase;
   color: rgba(198, 245, 225, 0.4);
 }
-
-/* ── Laptop ──────────────────────────────────────────────────────────────── */
 
 @media (max-width: 1366px) {
   .site-footer-inner,
@@ -176,11 +148,6 @@
   }
 }
 
-/* ── Mobile (§48) ────────────────────────────────────────────────────────
-   §48 rules out squeezing the desktop row into a tiny horizontal layout. The
-   order §48 asks for is brand, links, tagline, concept line — so the tagline
-   moves below the links rather than staying attached to the wordmark.         */
-
 @media (max-width: 768px) {
   .site-footer-inner {
     flex-direction: column;
@@ -193,8 +160,6 @@
     gap: 0;
   }
   .site-footer-tagline {
-    /* Below the links, per §48's order, without leaving the brand block — the
-       two belong to each other semantically even when they are not adjacent. */
     order: 3;
     margin-top: -6px;
   }
@@ -203,8 +168,6 @@
     width: 100%;
   }
   .site-footer-list {
-    /* Two columns rather than one long stack: four short words in a single
-       column is 200px of near-empty footer. */
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 4px 20px;
@@ -224,11 +187,6 @@
   }
 }
 
-/* The tagline is inside .site-footer-brand, so the reorder above needs the
-   brand block to participate in the parent's flex ordering. Splitting it into
-   two elements in the markup would put the wordmark and its own tagline in
-   different containers, which is worse for the document than this is for the
-   stylesheet. */
 @media (max-width: 768px) {
   .site-footer-brand {
     display: contents;

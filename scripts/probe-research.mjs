@@ -1,16 +1,3 @@
-/**
- * Visual verification harness for Section 06 — Research.
- *
- * Drives a real Chromium at each required viewport, walks the
- * Capabilities → Research handoff, screenshots each study, optionally sweeps
- * the lead study's pointer spotlight, and reports the layout facts the
- * acceptance criteria care about (section height in vh, image share of the
- * row, type sizes, overflow, console errors). Run with the dev server already
- * listening.
- *
- *   node scripts/probe-research.mjs [--url http://localhost:5180]
- *        [--out screens/res] [--only 1440x900] [--reduced] [--hover] [--touch]
- */
 import { chromium } from '@playwright/test'
 import { mkdir, readdir, access } from 'node:fs/promises'
 import { join } from 'node:path'
@@ -28,11 +15,9 @@ async function findLocalChromium() {
         await access(exe)
         return exe
       } catch {
-        /* try the next build */
       }
     }
   } catch {
-    /* no local cache — let Playwright decide */
   }
   return undefined
 }
@@ -84,10 +69,6 @@ await mkdir(OUT, { recursive: true })
 const executablePath = await findLocalChromium()
 console.log(`chromium: ${executablePath ?? '(playwright default)'}\n`)
 
-// Software rasterisation is opt-in. Forcing SwiftShader makes every frame
-// GPU-bound in a way no reader's machine is, which buries the costs that are
-// actually worth finding; `--swiftshader` puts it back for a machine with no
-// usable GPU.
 const GPU_ARGS = process.argv.includes('--swiftshader')
   ? ['--enable-unsafe-swiftshader', '--use-gl=angle', '--use-angle=swiftshader', '--disable-lcd-text']
   : ['--disable-lcd-text']
@@ -148,7 +129,6 @@ for (const vp of VIEWPORTS) {
     await page.waitForTimeout(settle)
   }
 
-  // ── The Capabilities → Research handoff, sampled where it happens ────────
   await goto(geo.top - geo.vh * 1.5)
   await safeShot(page, join(dir, '00a-modules.png'), `${vp.label}/modules`)
 
@@ -160,11 +140,8 @@ for (const vp of VIEWPORTS) {
 
   await goto(geo.top - geo.vh * 0.42)
   await safeShot(page, join(dir, '00d-bone.png'), `${vp.label}/bone`)
-  // The header's treatment has to have flipped by here: this is Bone under the
-  // fixed header, and Bone type on Bone is invisible.
   const surfaceAtBone = await page.evaluate(() => document.documentElement.dataset.surface)
 
-  // ── The section itself ───────────────────────────────────────────────────
   const anchors = await page.evaluate((top) => {
     const at = (sel) => {
       const el = document.querySelector(sel)
@@ -189,19 +166,13 @@ for (const vp of VIEWPORTS) {
     ['05-footer', anchors.footer],
   ]) {
     if (y == null) continue
-    // Centre each block rather than align its top edge: what matters is
-    // whether the whole study composes, not where it starts. The settle is
-    // generous because each study's entrance runs for about 1.1s and a shot
-    // taken during it reports a half-drawn rule as a layout fault.
     await goto(Math.max(0, y - geo.vh * 0.16), 1600)
     await safeShot(page, join(dir, `${name}.png`), `${vp.label}/${name}`)
   }
 
-  // Reverse pass — nothing may be left half-revealed going back up.
   await goto(geo.top - geo.vh * 0.5)
   await safeShot(page, join(dir, '06-reverse.png'), `${vp.label}/reverse`)
 
-  // ── Spotlight sweep ──────────────────────────────────────────────────────
   if (HOVER && !REDUCED) {
     if (anchors.lead != null) await goto(anchors.lead - geo.vh * 0.16)
     const box = await page.evaluate(() => {
@@ -211,8 +182,6 @@ for (const vp of VIEWPORTS) {
       return { x: r.x, y: r.y, w: r.width, h: r.height }
     })
     if (box) {
-      // Two positions on the readouts and one on bare biology: the region has
-      // to work where there is nothing to activate as well.
       for (const [name, fx, fy] of [
         ['a', 0.62, 0.26],
         ['b', 0.44, 0.62],
@@ -222,14 +191,12 @@ for (const vp of VIEWPORTS) {
         await page.waitForTimeout(520)
         await safeShot(page, join(dir, `spot-${name}.png`), `${vp.label}/spot-${name}`)
       }
-      // Fast exit — the state must not stick.
       await page.mouse.move(box.x - 240, box.y - 240, { steps: 2 })
       await page.waitForTimeout(600)
       await safeShot(page, join(dir, 'spot-off.png'), `${vp.label}/spot-off`)
     }
   }
 
-  // ── Measurements ─────────────────────────────────────────────────────────
   const metrics = await page.evaluate(() => {
     const box = (sel) => {
       const el = document.querySelector(sel)
@@ -257,7 +224,6 @@ for (const vp of VIEWPORTS) {
       overflowX: document.documentElement.scrollWidth > window.innerWidth + 1,
       canvasInSection: document.querySelectorAll('#research canvas').length,
       surface: document.documentElement.dataset.surface,
-      // Any title line wider than the clip box that hides its overflow
       clipped: [...document.querySelectorAll('.research .line-clip')].filter(
         (el) => el.scrollWidth > el.clientWidth + 1,
       ).length,

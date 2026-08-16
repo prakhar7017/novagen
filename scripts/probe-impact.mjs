@@ -1,16 +1,3 @@
-/**
- * Visual verification harness for Section 07 — Impact / Outcomes.
- *
- * Drives a real Chromium at each required viewport, walks the Research → Impact
- * handoff, samples the four states the acceptance criteria name (14.8M, 72×,
- * 91%, exit), scrubs backward through all three, and reports the layout facts
- * that matter (section height in vh, metric type size, overflow, which metric
- * is actually legible at each anchor, console errors). Run with the dev server
- * already listening.
- *
- *   node scripts/probe-impact.mjs [--url http://localhost:5180]
- *        [--out screens/imp] [--only 1440x900] [--reduced] [--reverse]
- */
 import { chromium } from '@playwright/test'
 import { mkdir, readdir, access } from 'node:fs/promises'
 import { join } from 'node:path'
@@ -28,11 +15,9 @@ async function findLocalChromium() {
         await access(exe)
         return exe
       } catch {
-        /* try the next build */
       }
     }
   } catch {
-    /* no local cache — let Playwright decide */
   }
   return undefined
 }
@@ -79,7 +64,6 @@ const VIEWPORTS = [
   { label: '360x800', width: 360, height: 800 },
 ]
 
-/** The four states §56 asks for screenshots of, as section progress. */
 const STATES = [
   ['14.8M', 0.2],
   ['72x', 0.46],
@@ -92,10 +76,6 @@ await mkdir(OUT, { recursive: true })
 const executablePath = await findLocalChromium()
 console.log(`chromium: ${executablePath ?? '(playwright default)'}\n`)
 
-// Software rasterisation is opt-in. Forcing SwiftShader makes every frame
-// GPU-bound in a way no reader's machine is, which buries the costs that are
-// actually worth finding; `--swiftshader` puts it back for a machine with no
-// usable GPU.
 const GPU_ARGS = process.argv.includes('--swiftshader')
   ? ['--enable-unsafe-swiftshader', '--use-gl=angle', '--use-angle=swiftshader', '--disable-lcd-text']
   : ['--disable-lcd-text']
@@ -157,7 +137,6 @@ for (const vp of VIEWPORTS) {
     await page.waitForTimeout(settle)
   }
 
-  // ── The Research → Impact handoff, sampled where it happens ─────────────
   await goto(geo.top - geo.vh * 1.15)
   await safeShot(page, join(dir, '00a-research.png'), `${vp.label}/research`)
 
@@ -170,15 +149,11 @@ for (const vp of VIEWPORTS) {
     () => document.documentElement.dataset.surface,
   )
 
-  // ── The section itself ──────────────────────────────────────────────────
-  // The pinned stage's story spine starts partway through the ingress; the
-  // ingress itself is 36vh, so progress p sits at top + ingress + p * story.
   const IN_VH = 36
   const STORY_VH = geo.height / geo.vh - 100 / 100 - IN_VH / 100
   const at = (p) => geo.top + geo.vh * (IN_VH / 100) + geo.vh * STORY_VH * p
 
   if (geo.flowing) {
-    // Flowing layout: anchor on the blocks themselves.
     const anchors = await page.evaluate(() => {
       const blocks = [...document.querySelectorAll('.impact-metric--flow')]
       const human = document.querySelector('.impact-human')
@@ -206,19 +181,16 @@ for (const vp of VIEWPORTS) {
       await safeShot(page, join(dir, `0${STATES.findIndex((s) => s[0] === name) + 2}-${name}.png`), `${vp.label}/${name}`)
     }
 
-    // ── Reverse pass — every state must be valid going back up (§57) ──────
     if (REVERSE) {
       for (const [name, p] of [...STATES].reverse()) {
         await goto(at(p), 1400)
         await safeShot(page, join(dir, `rev-${name}.png`), `${vp.label}/rev-${name}`)
       }
-      // Paused between states: nothing may be half-formed.
       await goto(at(0.57), 1400)
       await safeShot(page, join(dir, 'rev-between.png'), `${vp.label}/between`)
     }
   }
 
-  // ── Measurements ────────────────────────────────────────────────────────
   const metrics = await page.evaluate(() => {
     const box = (sel) => {
       const el = document.querySelector(sel)
@@ -231,7 +203,6 @@ for (const vp of VIEWPORTS) {
       return el ? Math.round(parseFloat(getComputedStyle(el).fontSize)) : null
     }
     const s = document.getElementById('impact')
-    // Which metric is actually painted right now.
     const visible = [...document.querySelectorAll('.impact-metric')]
       .map((el, i) => ({ i, o: parseFloat(getComputedStyle(el).opacity) }))
       .filter((m) => m.o > 0.5)
@@ -256,7 +227,6 @@ for (const vp of VIEWPORTS) {
             e: +window.__scrollProgress.impactExit.toFixed(3),
           }
         : null,
-      // Any figure wider than the box that clips it
       clipped: [...document.querySelectorAll('.impact .line-clip')].filter(
         (el) => el.scrollWidth > el.clientWidth + 1,
       ).length,

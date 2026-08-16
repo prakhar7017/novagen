@@ -13,7 +13,6 @@ const [dense, prioritized, validated] = buildDiagramSet({
   maxLines: 90,
 })
 
-/** Bounding box of everything a diagram draws. */
 function bounds(d: Diagram) {
   const pts: DiagramPoint[] = [...d.signals, ...d.nodes]
   const xs = pts.map((p) => p.x)
@@ -38,9 +37,6 @@ describe('buildDiagramSet', () => {
     expect(validated.edges.length).toBeGreaterThan(0)
   })
 
-  // The projection zooms as the field reduces. Too little and the last state is
-  // a speck in an empty box; too much and it is cropped by the viewBox — and an
-  // SVG has no overflow to fall back on here.
   it('keeps every state inside its viewBox', () => {
     for (const d of [dense, prioritized, validated]) {
       const b = bounds(d)
@@ -59,8 +55,6 @@ describe('buildDiagramSet', () => {
     }
   })
 
-  // The arc that frames this state is centred on its own box in CSS, so a
-  // target drawn off to one side would sit outside the ring it belongs to.
   it('centres the validated target, which the confidence arc is drawn around', () => {
     const b = bounds(validated)
     expect(Math.abs(b.cx - DIAGRAM_VIEWBOX.width / 2)).toBeLessThan(

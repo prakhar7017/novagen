@@ -1,37 +1,16 @@
-/* ── Section 05 · Capabilities ─────────────────────────────────────────────
-   Still the dark world Technology established, but a step back from the
-   instrument panel: warmer, deeper green, more air, and no pin. Technology
-   was one machine explained; this is four applications shown, so the section
-   scrolls normally and the activity lives inside the modules rather than in
-   the environment around them (§4, §34).
-
-   Every scientific visual here is SVG and CSS. §50 rules out four WebGL
-   canvases, and the shared one is stopped for the whole section — there is
-   nothing behind this to draw.                                              */
-
-/* 0 while the section is being read, 1 by the time Research's Bone panel is
-   rising over it. Every part of the stand-down below is a function of it, so
-   the whole Capabilities → Research settle is one scrubbed tween and one
-   number (§5, §6 of the Research brief). */
 .capabilities {
   --cap-settle: 0;
   position: relative;
-  z-index: 2; /* above the fixed ExperienceCanvas */
+  z-index: 2;
   width: 100%;
-  /* Opaque: the canvas behind is halted here, so this section owns its pixels
-     rather than compositing over a stopped render. */
   background: #0e1d17;
   overflow: hidden;
 }
 
-/* Deeper toward the edges, so the grid sits in the lit part of the section
-   and the boundaries with Technology above and Research below are soft. */
 .capabilities-bg {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  /* Fades toward the flat surface colour underneath as the section stands
-     down: the environment's green wash is the first thing to go. */
   opacity: calc(1 - 0.62 * var(--cap-settle));
   background:
     radial-gradient(ellipse 76% 44% at 50% 30%, rgba(166, 255, 106, 0.045) 0%, transparent 70%),
@@ -39,9 +18,6 @@
     linear-gradient(180deg, #0b1a15 0%, #0e1d17 22%, #0e1d17 74%, #0a1712 100%);
 }
 
-/* Biological noise rather than a shipped texture (ASSET_MANIFEST §17). Kept
-   near the edge of visible: at 3.5% it reads as grain in the surface, and one
-   step higher it reads as a filter over the photograph inside module 01. */
 .capabilities-grain {
   position: absolute;
   inset: 0;
@@ -51,16 +27,8 @@
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
-/* The signal the validated candidate leaves behind (§53). It arrives from the
-   upper right, where the candidate went, and is gone before the grid is
-   legible — a handoff, not a light. Position is anchored to where module 01
-   will be, so the section opens on the capability the candidate became. */
 .capabilities-signal {
   position: absolute;
-  /* Anchored where the candidate left the previous section, near the top of
-     this one: the whole handoff plays out while the section's first viewport
-     is arriving, and anything further down is still below the fold when the
-     window closes. */
   top: clamp(40px, 7vh, 120px);
   right: clamp(40px, 14vw, 300px);
   width: clamp(300px, 36vw, 560px);
@@ -80,11 +48,8 @@
   z-index: 2;
   max-width: 1500px;
   margin: 0 auto;
-  /* §35: 64px gutters, 130–160 top, 140–180 bottom. */
   padding: clamp(80px, 13.6vh, 148px) 64px clamp(88px, 14.6vh, 168px);
 }
-
-/* ── Header ─────────────────────────────────────────────────────────────── */
 
 .capabilities-label {
   display: flex;
@@ -134,16 +99,11 @@
 
 .capabilities-headline {
   font-family: var(--font-sans);
-  /* §9: strong, but under both the Hero and Technology — this section is the
-     platform's consequence, not a second introduction to it. */
   font-size: clamp(3.8rem, 5.4vw, 5rem);
   font-weight: 700;
   line-height: 0.95;
   letter-spacing: -0.028em;
   color: var(--color-bone);
-  /* Wide enough for the longer authored line to stay on one line: a browser
-     wrap here turns a two-line headline into three and adds 8vh to the
-     section for nothing. */
   max-width: min(100%, 1180px);
 }
 
@@ -154,22 +114,15 @@
 
 .capabilities-lead {
   margin-top: clamp(18px, 2.8vh, 30px);
-  /* §8 — 480–560px. */
   max-width: 530px;
   font-size: clamp(0.98rem, 1.1vw, 1.06rem);
   line-height: 1.62;
   color: var(--color-muted);
 }
 
-/* ── Grid ────────────────────────────────────────────────────────────────
-   Five columns, so the modules can be 3/2 and 2/3 without four equal cards
-   (§11). The asymmetry alternates between the rows, which is what stops the
-   layout reading as a sidebar next to a stack.                             */
-
 .capabilities-grid {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
-  /* §36 — modest gutters; 40–60px would turn the grid into four islands. */
   gap: 20px;
   margin-top: clamp(58px, 10.2vh, 104px);
 }
@@ -187,9 +140,6 @@
   grid-column: span 3;
 }
 
-/* §37 — the two lead modules run 520–620px, the two below 360–430px. Held in
-   vh so the proportions survive a taller or shorter window rather than
-   pinning the section to one screen size. */
 .cap-module--spatial,
 .cap-module--protein {
   min-height: clamp(460px, 58vh, 536px);
@@ -199,21 +149,12 @@
   min-height: clamp(366px, 41vh, 400px);
 }
 
-/* ── Module shell ────────────────────────────────────────────────────────
-   Thin border, dark green-black surface, one soft interior glow. §12 fails
-   this section for glass blur, heavy shadows or neon outlines, so the surface
-   does its work with two rgba values and a radius.                          */
-
 .cap-module {
   position: relative;
   display: flex;
   flex-direction: column;
   overflow: hidden;
   border-radius: 28px;
-  /* Both the border and the interior glow are written against the settle, so
-     the modules flatten into thin outlines rather than being faded out
-     wholesale — the instruments are still there, they are simply no longer
-     lit. */
   border: 1px solid rgb(198 245 225 / calc(0.1 - 0.072 * var(--cap-settle)));
   background:
     radial-gradient(
@@ -222,8 +163,6 @@
       transparent 74%
     ),
     rgba(7, 17, 15, 0.72);
-  /* §28 — the container is allowed 1–2px and no more. The interaction belongs
-     inside the instrument, not to the card holding it. */
   transform: translateY(0);
   transition:
     border-color 0.32s var(--ease-out-expo),
@@ -237,13 +176,8 @@
 }
 
 .cap-module-visual {
-  /* The science steps back with the surface it sits on. Not to zero: a module
-     that empties as it leaves reads as a loading failure rather than as an
-     instrument standing down. */
   opacity: calc(1 - 0.48 * var(--cap-settle));
   position: relative;
-  /* §13 — the visual takes 50–65% of the module; the body below takes what it
-     needs and this absorbs the rest. */
   flex: 1 1 auto;
   min-height: 0;
 }
@@ -259,8 +193,6 @@
   inset: 0;
   display: block;
 }
-
-/* ── Module body ─────────────────────────────────────────────────────────── */
 
 .cap-module-body {
   position: relative;
@@ -282,8 +214,6 @@
   opacity: 0.85;
 }
 
-/* §30's "small marker" — a rule that extends, rather than an arrow, because
-   the module is not a link and an arrow would promise one. */
 .cap-module-marker {
   display: block;
   width: 22px;
@@ -332,23 +262,13 @@
   text-transform: uppercase;
 }
 
-/* Deliberately not uppercased: text-transform maps the micro sign to Greek
-   capital Mu, which would print "8 MM" instead of "8 µm". */
 .cap-module-meta-val {
   color: var(--color-signal-mint);
 }
 
-/* ── In-visual readouts ──────────────────────────────────────────────────
-   One line each, inside the instrument rather than under it — the "tiny
-   metadata change" §16 asks for, at a size that cannot compete with the
-   module's own metadata.                                                    */
-
 .cap-readout {
   position: absolute;
   left: clamp(18px, 1.8vw, 26px);
-  /* Annotation at the top of the instrument rather than the foot of it: at the
-     bottom it sat a few pixels above the index line and read as a fourth line
-     of module copy instead of as part of the visual. */
   top: 16px;
   display: flex;
   align-items: baseline;
@@ -368,11 +288,8 @@
 .cap-readout-val {
   color: var(--color-bio-green);
   opacity: 0.85;
-  /* Fixed-width so a changing count cannot shift the label beside it. */
   font-variant-numeric: tabular-nums;
 }
-
-/* ── 01 · Spatial Biology ────────────────────────────────────────────────── */
 
 .cap-spatial-img {
   position: absolute;
@@ -380,8 +297,6 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  /* The field rests dark, which is what makes "few visible signals" the
-     default state the copy describes (§16). */
   filter: brightness(0.56) saturate(0.88) contrast(1.05);
 }
 
@@ -399,7 +314,6 @@
     );
 }
 
-/* The scan area: a soft field, never a magnifier (§16). */
 .cap-spatial-scan {
   position: absolute;
   left: 0;
@@ -429,8 +343,6 @@
   stroke: rgba(198, 245, 225, 0.8);
   stroke-width: 1;
 }
-
-/* ── 02 · Protein Engineering ────────────────────────────────────────────── */
 
 .cap-protein-glow {
   position: absolute;
@@ -472,8 +384,6 @@
   fill: rgba(198, 245, 225, 0.9);
 }
 
-/* The selected region: present but nearly silent at rest, stepping clear of
-   the structure and lighting its interior pathway while engaged (§20). */
 .cap-protein-region {
   opacity: 0;
   transform: translate(0, 0);
@@ -523,11 +433,6 @@
   opacity: 1;
 }
 
-/* ── 03 · AI Discovery ───────────────────────────────────────────────────
-   Selection is a data attribute and every brightening is a transition off it,
-   so changing cluster costs one attribute write rather than a rewrite of
-   every line in the network.                                                */
-
 .cap-network-svg {
   transition: none;
 }
@@ -561,8 +466,6 @@
   transition: opacity 0.38s var(--ease-out-expo);
 }
 
-/* Active cluster: its own connections brighten, its nodes fill with Bio Green
-   and its candidate takes the ring — the shortlist narrowing to one (§24). */
 .cap-network-svg[data-active='0'] .cap-network-edges line[data-cluster='0'],
 .cap-network-svg[data-active='1'] .cap-network-edges line[data-cluster='1'],
 .cap-network-svg[data-active='2'] .cap-network-edges line[data-cluster='2'],
@@ -598,8 +501,6 @@
   }
 }
 
-/* ── 04 · Genomic Intelligence ───────────────────────────────────────────── */
-
 .cap-genomic-axis {
   stroke: rgba(198, 245, 225, 0.16);
   stroke-width: 1;
@@ -627,8 +528,6 @@
   stroke-dasharray: 2 4;
 }
 
-/* ── Exit toward 06 / Research (§54) ─────────────────────────────────────── */
-
 .capabilities-exit {
   display: flex;
   align-items: center;
@@ -653,18 +552,14 @@
   opacity: 0.72;
 }
 
-/* ── Laptop (§39) ────────────────────────────────────────────────────────── */
-
 @media (max-width: 1366px) {
   .capabilities-inner {
     padding-left: 48px;
     padding-right: 48px;
   }
   .capabilities-headline {
-    /* §39 wants 58–68px here; 5.1vw lands at 65px on a 1280 viewport. */
     font-size: clamp(3.3rem, 5.1vw, 4.3rem);
   }
-  /* §39 — roughly 10–15% shorter modules, without crowding the descriptions. */
   .cap-module--spatial,
   .cap-module--protein {
     min-height: clamp(440px, 56vh, 560px);
@@ -674,11 +569,6 @@
     min-height: clamp(358px, 44vh, 396px);
   }
 }
-
-/* ── Tablet landscape (§40) ──────────────────────────────────────────────
-   Two balanced columns. The module asymmetry goes, because at this width a
-   3/2 split leaves the narrow module too tight for its description — the
-   visual differences inside the modules carry the hierarchy instead.       */
 
 @media (max-width: 1024px) {
   .capabilities-inner {
@@ -701,8 +591,6 @@
   }
 }
 
-/* ── Tablet portrait (§41) ───────────────────────────────────────────────── */
-
 @media (max-width: 900px) {
   .capabilities-inner {
     padding-left: 32px;
@@ -724,11 +612,6 @@
     min-height: clamp(340px, 40vh, 420px);
   }
 }
-
-/* ── Mobile (§42, §43) ───────────────────────────────────────────────────
-   One column, normal scrolling, no carousel. Heights are fixed rather than
-   viewport-relative here: a 100svh card on a phone is a slideshow, and §43
-   asks for modules the reader scrolls through.                              */
 
 @media (max-width: 700px) {
   .capabilities-inner {
@@ -771,8 +654,6 @@
   }
 }
 
-/* ── Small mobile (§46) ──────────────────────────────────────────────────── */
-
 @media (max-width: 380px) {
   .cap-module-body {
     padding-left: 18px;
@@ -793,11 +674,6 @@
     min-height: 386px;
   }
 }
-
-/* ── Reduced motion (§47) ────────────────────────────────────────────────
-   No timelines are built at all, so the modules are already in their final
-   state; what remains is to silence the two loops CSS owns and leave every
-   visual on a static, complete scientific state.                            */
 
 @media (prefers-reduced-motion: reduce) {
   .cap-module,

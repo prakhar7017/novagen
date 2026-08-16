@@ -5,18 +5,6 @@ import { useReducedMotion } from '@/hooks/useReducedMotion'
 import StudyBody from './StudyBody'
 import { SECOND_STUDY } from './research.constants'
 
-/**
- * Study 02 — the compact reversed row (§23, §24).
- *
- * Text left, image right: the mirror of the lead study, and the reason the two
- * read as a sequence rather than a repeated template. It is also deliberately
- * smaller — the second study supports the first, and giving it the same weight
- * would flatten the section into two equal features.
- *
- * No spotlight and no readouts here. The interaction belongs to the lead study
- * alone; a second image that behaves the same way turns a considered detail
- * into a component (§56).
- */
 export default function ResearchStudy() {
   const reduced = useReducedMotion()
 

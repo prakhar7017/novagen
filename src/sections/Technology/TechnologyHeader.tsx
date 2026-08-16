@@ -5,17 +5,8 @@ interface Props {
   leadRef?: React.RefObject<HTMLParagraphElement | null>
 }
 
-/** The headline is two authored lines — a browser wrap would strand "discovery." */
 const HEADLINE = ['From sample', 'to discovery.'] as const
 
-/**
- * Section label, headline and the one paragraph of supporting copy.
- *
- * Sized under the Hero on purpose (§12): the Hero introduces the company, this
- * introduces a process, and the platform visual — not the type — is the top of
- * this section's hierarchy (§62). Each line sits in its own clip box so it can
- * rise into place rather than fading up as a block.
- */
 export default function TechnologyHeader({ rootRef, labelRef, linesRef, leadRef }: Props) {
   return (
     <div ref={rootRef} className="technology-header">

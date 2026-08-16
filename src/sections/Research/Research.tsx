@@ -14,23 +14,6 @@ import ResearchFooter from './ResearchFooter'
 import ResearchHeader from './ResearchHeader'
 import ResearchStudy from './ResearchStudy'
 
-/**
- * Section 06 — Research.
- *
- * Capabilities said what the platform can do; this shows what that science
- * looks like. It is the quietest section on the page and the only one asked to
- * earn credibility rather than attention: no pin, no canvas, no cinematic
- * handoff, and a single interaction on a single image (§3, §35).
- *
- * The layout is an editorial spread — three studies with three different
- * presentations, separated by whitespace and hairlines rather than enclosed in
- * cards. §56 fails this section outright if it reads as a blog, a news list or
- * a resources grid, which is why nothing here has a border around a title and a
- * summary together.
- *
- * The section deliberately does not clip its own overflow: the Bone panel that
- * hands over from Capabilities sits above its top edge, outside its box.
- */
 export default function Research() {
   const reduced = useReducedMotion()
   const setCanvasActive = useExperienceStore((s) => s.setCanvasActive)
@@ -49,8 +32,6 @@ export default function Research() {
     { dependencies: [reduced], revertOnUpdate: true, scope: section },
   )
 
-  // Independent of reduced motion: the fixed header still has to leave its dark
-  // treatment behind, and the shared canvas still has nothing to draw.
   useEffect(() => {
     const el = section.current
     if (!el) return
@@ -59,13 +40,7 @@ export default function Research() {
 
   return (
     <section id="research" ref={section} className="research" aria-labelledby="research-title">
-      {/* The Capabilities → Research handoff (§5, §6).
 
-          A Bone panel that lives *above* this section's top edge and paints
-          over the end of the previous one, rather than a transition owned by
-          Capabilities: the two sections stay independent, and the reveal cannot
-          be left half-played if the reader jumps past it. Purely decorative —
-          document order already conveys the section change. */}
       <div
         ref={ingress}
         className="research-ingress"
@@ -85,9 +60,6 @@ export default function Research() {
 
         <LeadStudy />
 
-        {/* Hairlines between studies rather than borders around them: the
-            editorial device that keeps three studies from becoming three
-            cards (§32). */}
         <span className="research-rule" aria-hidden="true" />
 
         <ResearchStudy />

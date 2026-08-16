@@ -12,17 +12,6 @@ import InnovationPrinciples from './InnovationPrinciples'
 import InnovationScale from './InnovationScale'
 import InnovationVisual from './InnovationVisual'
 
-/**
- * Section 03 — Innovation / Our Approach.
- *
- * The rhythm change after the Journey: Bone instead of Abyss, HTML and CSS
- * instead of WebGL, one editorial statement instead of seven scripted states.
- * The Journey earned attention; this section spends it on the argument.
- *
- * No canvas of its own, and the shared one is stopped while this is on screen
- * (see buildSurfaceSwitch) — PAGE_STRUCTURE §13 asks for a quiet beat here, and
- * that has to be true of the GPU as well as the composition.
- */
 export default function Innovation() {
   const reduced = useReducedMotion()
   const setCanvasActive = useExperienceStore((s) => s.setCanvasActive)
@@ -59,8 +48,6 @@ export default function Innovation() {
     revertOnUpdate: true,
   })
 
-  // Independent of reduced motion: the header still has to stay legible and the
-  // canvas still has nothing to draw once this section covers it.
   useEffect(() => {
     const el = section.current
     if (!el) return
@@ -99,9 +86,6 @@ export default function Innovation() {
             </p>
           </div>
 
-          {/* DOM order is the single-column reading order — copy, specimen,
-              principles. The desktop grid places these explicitly, so the two
-              layouts share one source order (see innovation.css). */}
           <InnovationVisual
             frameRef={frame}
             revealRef={reveal}

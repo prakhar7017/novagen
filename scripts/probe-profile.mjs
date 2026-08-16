@@ -1,11 +1,3 @@
-/**
- * CPU attribution for the scroll pass.
- *
- * Runs V8's sampling profiler over a scripted full-page scroll and aggregates
- * self time by function, so the expensive work is named rather than guessed at.
- *
- *   node scripts/probe-profile.mjs [--url ...] [--top 24]
- */
 import { chromium } from '@playwright/test'
 import { readdir, access } from 'node:fs/promises'
 import { join } from 'node:path'
@@ -23,11 +15,9 @@ async function findLocalChromium() {
         await access(exe)
         return exe
       } catch {
-        /* next */
       }
     }
   } catch {
-    /* default */
   }
   return undefined
 }
@@ -40,10 +30,6 @@ const argOf = (f, d) => {
 const URL = argOf('--url', 'http://localhost:5180')
 const TOP = Number(argOf('--top', 24))
 
-// Software rasterisation is opt-in. Forcing SwiftShader makes every frame
-// GPU-bound in a way no reader's machine is, which buries the costs that are
-// actually worth finding; `--swiftshader` puts it back for a machine with no
-// usable GPU.
 const GPU_ARGS = process.argv.includes('--swiftshader')
   ? ['--enable-unsafe-swiftshader', '--use-gl=angle', '--use-angle=swiftshader', '--disable-lcd-text']
   : ['--disable-lcd-text']
@@ -72,7 +58,6 @@ await page.waitForTimeout(400)
 
 const { profile } = await cdp.send('Profiler.stop')
 
-// ── Aggregate self time per node ────────────────────────────────────────────
 const byId = new Map(profile.nodes.map((n) => [n.id, n]))
 const self = new Map()
 const total = profile.timeDeltas.reduce((a, b) => a + Math.max(0, b), 0)

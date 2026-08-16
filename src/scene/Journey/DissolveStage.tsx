@@ -9,22 +9,13 @@ import { HERO_ORGANISM } from '@/sections/Hero/heroGeometry'
 
 const EDGE_COLOR = new THREE.Color('#a6ff6a')
 
-/**
- * The dominant cell the camera selects inside the cluster, in texture UV.
- * Matches the large bright-nucleus cell right of centre in 02-cell-cluster.
- */
 const FOCUS_CELL = new THREE.Vector2(0.58, 0.55)
 
-/**
- * three types `Texture.image` loosely, so read the intrinsic size defensively —
- * it is also genuinely absent for a frame if a texture is still decoding.
- */
 function textureAspect(tex: THREE.Texture, fallback: number): number {
   const img = tex.image as { width?: number; height?: number } | undefined
   return img?.width && img?.height ? img.width / img.height : fallback
 }
 
-/** Cover-fit: fill the plane, crop the overflow. */
 function coverScale(texAspect: number, planeAspect: number, out: THREE.Vector2) {
   if (planeAspect > texAspect) out.set(1, texAspect / planeAspect)
   else out.set(planeAspect / texAspect, 1)
@@ -90,9 +81,6 @@ export default function DissolveStage() {
 
   const organismRef = useRef<THREE.Mesh>(null)
 
-  // ── Geometry that mirrors the Hero's DOM organism ────────────────────────
-  // Reproducing the CSS box in world units is what makes the handoff from the
-  // Hero's <img> to WebGL invisible: both occupy the same screen rectangle.
   const organismBox = useMemo(() => {
     const vw = size.width
     const vh = size.height
@@ -105,7 +93,6 @@ export default function DissolveStage() {
     return {
       width: scaled * worldPerPx,
       height: scaled * worldPerPx,
-      // CSS px (origin top-left, y down) → world units (origin centre, y up)
       x: (centerXPx - vw / 2) * worldPerPx,
       y: -(rect.centerY - vh / 2) * worldPerPx,
     }
@@ -113,7 +100,6 @@ export default function DissolveStage() {
 
   const planeAspect = viewport.width / viewport.height
 
-  // Scratch vectors — reused every frame so useFrame allocates nothing
   const tmp = useMemo(
     () => ({
       scaleA: new THREE.Vector2(),
@@ -127,8 +113,6 @@ export default function DissolveStage() {
     const j = scrollProgress.journey
     const t = state.clock.elapsedTime
 
-    // ── Organism plane ─────────────────────────────────────────────────────
-    // Fades in as the Hero's DOM organism fades out, settles, then erodes.
     const handoff = smoothstep(0.86, 1.0, scrollProgress.hero)
     const eroded = remap(j, MILESTONE.dissolveStart, MILESTONE.dissolveEnd)
 
@@ -139,13 +123,10 @@ export default function DissolveStage() {
     ou.uAlpha.value = handoff
     ou.uTime.value = t
 
-    // The organism is square with a transparent margin, so it is placed
-    // directly rather than cover-fitted.
     ou.uScaleA.value.set(1, 1)
     ou.uOffsetA.value.set(0, 0)
 
     if (organismRef.current) {
-      // §11: settle toward centre-right and ease back in scale before dissolving
       const settle = smoothstep(0.0, 0.12, j)
       const s = 1 - settle * 0.08
       organismRef.current.scale.setScalar(s)
@@ -153,7 +134,6 @@ export default function DissolveStage() {
       organismRef.current.visible = handoff > 0.001 && eroded < 0.999
     }
 
-    // ── Stage plane: cell cluster → nucleus ────────────────────────────────
     const su = stageMat.uniforms
     su.uTime.value = t
 
@@ -164,20 +144,15 @@ export default function DissolveStage() {
     su.uTexB.value = nucleusTex
 
     if (j < MILESTONE.dissolveEnd) {
-      // Materialise: run the same erosion backward so the cluster resolves
-      // out of the noise instead of cross-fading in.
       su.uHasB.value = 0
       su.uProgress.value = 1 - eroded
     } else {
-      // Cross-dissolve into the nucleus under a camera push
       su.uHasB.value = 1
       su.uProgress.value = remap(j, MILESTONE.pushStart, MILESTONE.pushEnd)
     }
 
-    // Camera push: the cluster zooms toward the selected cell while the
-    // nucleus arrives already close and settles back to its natural framing.
     const push = smoothstep(MILESTONE.dissolveEnd, MILESTONE.pushEnd, j)
-    const zoomA = 1 + push * 1.95 // 1 → 2.95
+    const zoomA = 1 + push * 1.95
     const zoomB = 1.45 - push * 0.45
 
     coverScale(cellsAspect, planeAspect, tmp.cover)
@@ -188,8 +163,6 @@ export default function DissolveStage() {
     su.uScaleB.value.set(tmp.cover.x / zoomB, tmp.cover.y / zoomB)
     su.uOffsetB.value.set(0, 0)
 
-    // Visible from the moment the organism starts breaking up until the
-    // nucleus has fully shattered into particles.
     const fadeIn = smoothstep(MILESTONE.dissolveStart, MILESTONE.dissolveStart + 0.02, j)
     const fadeOut = 1 - smoothstep(MILESTONE.shatterStart, MILESTONE.shatterEnd, j)
     su.uAlpha.value = clamp01(fadeIn * fadeOut)
@@ -197,13 +170,11 @@ export default function DissolveStage() {
 
   return (
     <group>
-      {/* Cell cluster → nucleus, full-bleed */}
       <mesh renderOrder={1} frustumCulled={false}>
         <planeGeometry args={[viewport.width, viewport.height]} />
         <primitive object={stageMat} attach="material" />
       </mesh>
 
-      {/* Organism, matched to the Hero's on-screen rectangle */}
       <mesh
         ref={organismRef}
         renderOrder={2}

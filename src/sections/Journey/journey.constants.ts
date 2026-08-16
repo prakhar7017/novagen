@@ -1,22 +1,10 @@
-/**
- * The Biological Journey — story definition and progress map.
- *
- * A single normalized 0–1 value drives every visual and textual state, so all
- * timing lives here rather than being scattered across components. Because
- * every derived value is a pure function of that number, scrubbing backward
- * reverses the whole sequence exactly (ACCEPTANCE_CRITERIA §9).
- */
-
 export interface JourneyState {
   id: string
-  /** Two-digit step number shown in the indicator */
   index: string
   label: string
   headline: [string, string]
   body: string
-  /** Mono metadata pairs rendered in the HUD while this state is active */
   meta: [string, string][]
-  /** Copy visibility window in global journey progress */
   enter: number
   exit: number
 }
@@ -42,8 +30,6 @@ export const JOURNEY_STATES: JourneyState[] = [
     headline: ['From organism', 'to cell.'],
     body: 'We move from whole biological systems to individual cellular behavior.',
     meta: [
-      // Avoid the micro sign here: the HUD is uppercased in CSS, and
-      // text-transform maps U+00B5 to Greek capital Mu, rendering "20 MM".
       ['SCALE', '20 MICRON'],
       ['POPULATION', '11 CELLS'],
     ],
@@ -120,52 +106,34 @@ export const JOURNEY_STATES: JourneyState[] = [
   },
 ]
 
-// ── Visual milestones ───────────────────────────────────────────────────────
-// These drive WebGL only; copy windows above overlap them deliberately so text
-// leads the visual slightly rather than landing on the same frame.
-
 export const MILESTONE = {
-  /** organism holds, then dissolves into the cell cluster */
   dissolveStart: 0.14,
   dissolveEnd: 0.29,
-  /** camera pushes through the cluster into one selected cell */
   pushStart: 0.35,
   pushEnd: 0.50,
-  /** nucleus breaks apart; particles inherit its volume */
   shatterStart: 0.50,
   shatterEnd: 0.62,
-  /** particle field reorganizes into a genetic signal */
   signalStart: 0.66,
   signalEnd: 0.76,
-  /** signal detaches into a research network */
   networkStart: 0.78,
   networkEnd: 0.88,
-  /** network contracts onto the molecular candidate */
   candidateStart: 0.90,
   candidateEnd: 0.99,
 } as const
-
-// ── Math helpers ────────────────────────────────────────────────────────────
 
 export function clamp01(v: number): number {
   return v < 0 ? 0 : v > 1 ? 1 : v
 }
 
-/** Linear remap of `v` from [a,b] to [0,1], clamped. */
 export function remap(v: number, a: number, b: number): number {
   return clamp01((v - a) / (b - a))
 }
 
-/** Hermite ease — identical curve to GLSL smoothstep so CPU and GPU agree. */
 export function smoothstep(a: number, b: number, v: number): number {
   const t = remap(v, a, b)
   return t * t * (3 - 2 * t)
 }
 
-/**
- * Continuous 0→4 morph index across the four procedural particle states:
- * 0 nucleus shell · 1 particle field · 2 genetic signal · 3 network · 4 candidate
- */
 export function morphIndex(p: number): number {
   return (
     smoothstep(MILESTONE.shatterStart, MILESTONE.shatterEnd, p) +
@@ -175,7 +143,6 @@ export function morphIndex(p: number): number {
   )
 }
 
-/** Index of the story state whose copy window contains `p`. */
 export function stageIndex(p: number): number {
   for (let i = JOURNEY_STATES.length - 1; i >= 0; i--) {
     if (p >= JOURNEY_STATES[i].enter) return i

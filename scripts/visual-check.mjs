@@ -1,22 +1,8 @@
-/**
- * Visual verification harness for the Biological Journey.
- *
- * Drives a real Chromium at each required viewport, jumps to exact journey
- * progress values, screenshots each biological state, and reports console
- * errors. Run with the dev server already listening.
- *
- *   node scripts/visual-check.mjs [--url http://localhost:5180] [--out dir]
- */
 import { chromium } from '@playwright/test'
 import { mkdir, readdir, access } from 'node:fs/promises'
 import { join } from 'node:path'
 import { homedir } from 'node:os'
 
-/**
- * Playwright pins one browser build; this machine has other builds already
- * downloaded. Reuse the newest local Chromium rather than pulling another
- * ~150MB, falling back to Playwright's own resolution if none is found.
- */
 async function findLocalChromium() {
   const root = join(homedir(), 'AppData', 'Local', 'ms-playwright')
   try {
@@ -29,11 +15,9 @@ async function findLocalChromium() {
         await access(exe)
         return exe
       } catch {
-        /* try the next build */
       }
     }
   } catch {
-    /* no local cache — let Playwright decide */
   }
   return undefined
 }
@@ -46,17 +30,10 @@ const argOf = (flag, dflt) => {
 
 const URL = argOf('--url', 'http://localhost:5180')
 const OUT = argOf('--out', 'screens')
-const ONLY = argOf('--only', null) // viewport label filter
+const ONLY = argOf('--only', null)
 
-// Headless WebGL runs on SwiftShader here, so frames are ~10x slower than on a
-// real GPU and the compositor needs a generous window to hand back a frame.
 const SHOT_TIMEOUT = 90000
 
-/**
- * A screenshot that fails is a harness problem, not a page problem: SwiftShader
- * occasionally cannot hand back a composited frame at the larger viewports.
- * Record it and keep sweeping rather than aborting the whole run.
- */
 const missedShots = []
 async function safeShot(page, path, label) {
   for (let attempt = 1; attempt <= 2; attempt++) {
@@ -83,7 +60,6 @@ const VIEWPORTS = [
   { label: '360x800', width: 360, height: 800 },
 ]
 
-/** Journey progress values worth inspecting — one per biological state. */
 const STOPS = [
   ['00-organism', 0.04],
   ['01-destabilise', 0.2],
@@ -103,7 +79,6 @@ console.log(`chromium: ${executablePath ?? '(playwright default)'}\n`)
 
 const browser = await chromium.launch({
   executablePath,
-  // Headless Chromium needs SwiftShader to expose a WebGL context
   args: [
     '--enable-unsafe-swiftshader',
     '--use-gl=angle',
@@ -128,9 +103,7 @@ for (const vp of VIEWPORTS) {
   })
   page.on('pageerror', (e) => errors.push(`UNCAUGHT: ${e.message}`))
 
-  // Vite's HMR socket means the page never reaches networkidle
   await page.goto(URL, { waitUntil: 'domcontentloaded', timeout: 60000 })
-  // Let fonts, textures and the entrance timeline settle
   await page.waitForTimeout(3500)
 
   const dir = join(OUT, vp.label)
@@ -138,7 +111,6 @@ for (const vp of VIEWPORTS) {
 
   await safeShot(page, join(dir, 'hero.png'), `${vp.label}/hero`)
 
-  // Measure the layout facts that the acceptance criteria care about
   const metrics = await page.evaluate(() => {
     const h1 = document.querySelector('.hero-headline')
     const green = h1?.querySelector('span[style*="bio-green"]')
@@ -148,7 +120,6 @@ for (const vp of VIEWPORTS) {
       scrollWidth: document.documentElement.scrollWidth,
       innerWidth: window.innerWidth,
       headlineWidth: h1 ? Math.round(h1.getBoundingClientRect().width) : null,
-      // Does the widest headline line actually fit inside its clip box?
       lineScrollW: clip ? clip.scrollWidth : null,
       lineClientW: clip ? clip.clientWidth : null,
       greenWordRight: green ? Math.round(green.getBoundingClientRect().right) : null,
@@ -156,7 +127,6 @@ for (const vp of VIEWPORTS) {
     }
   })
 
-  // Walk the journey
   const journeyTop = await page.evaluate(() => {
     const s = document.getElementById('journey')
     return s ? s.getBoundingClientRect().top + window.scrollY : null
@@ -181,7 +151,6 @@ for (const vp of VIEWPORTS) {
       await safeShot(page, join(dir, `${name}.png`), `${vp.label}/${name}`)
     }
 
-    // Reverse scrub — states must rebuild correctly going backward
     for (const [name, p] of [...STOPS].reverse().slice(0, 4)) {
       await page.evaluate(
         ([top, height, prog]) => {

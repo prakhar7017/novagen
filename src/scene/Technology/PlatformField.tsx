@@ -14,14 +14,6 @@ interface Props {
 const LINE_COLOR = new THREE.Color('#c6f5e1')
 const LINE_ACTIVE = new THREE.Color('#a6ff6a')
 
-/**
- * The cells, and the relationships between them.
- *
- * Points and lines are separate draws but share one set of buffers and one
- * morph function, so a connection can never drift off the nodes it joins. The
- * whole stage — sample, map, network, shortlist, validated target — is this one
- * population reorganising; nothing is created or destroyed between stages.
- */
 export default function PlatformField({ targets }: Props) {
   const attributes = useMemo(
     () => ({
@@ -39,8 +31,6 @@ export default function PlatformField({ targets }: Props) {
 
   const pointsGeo = useMemo(() => {
     const g = new THREE.BufferGeometry()
-    // `position` is never read by the shader — the morph computes it — but
-    // three's bounding-sphere machinery requires the attribute to exist.
     g.setAttribute('position', new THREE.BufferAttribute(targets.map, 3))
     for (const [name, attr] of Object.entries(attributes)) g.setAttribute(name, attr)
     g.setAttribute('aColor', new THREE.BufferAttribute(targets.color, 3))
@@ -48,8 +38,6 @@ export default function PlatformField({ targets }: Props) {
     return g
   }, [targets, attributes])
 
-  // Both line sets share the node buffers and differ only in their index, so
-  // the connections track their nodes exactly through every arrangement.
   const [linesGeo, bridgesGeo] = useMemo(() => {
     const build = (index: Uint16Array) => {
       const g = new THREE.BufferGeometry()
@@ -72,9 +60,6 @@ export default function PlatformField({ targets }: Props) {
         depthTest: false,
         uniforms: {
           uMorph: { value: 0 },
-          // A fifth of the Journey's desync: the platform reorganises in a
-          // measured way, and a wide stagger would smear the map into a cloud
-          // exactly when its structure is the thing being explained.
           uStagger: { value: 0.11 },
           uTime: { value: 0 },
           uReveal: { value: 0 },
@@ -98,9 +83,6 @@ export default function PlatformField({ targets }: Props) {
         depthTest: false,
         uniforms: {
           uMorph: { value: 0 },
-          // Tighter still for lines: with a wide stagger the two ends of a
-          // connection sit at different morph values and the line spans the
-          // whole frame instead of joining its neighbours.
           uStagger: { value: 0.04 },
           uTime: { value: 0 },
           uDraw: { value: 0 },
@@ -114,8 +96,6 @@ export default function PlatformField({ targets }: Props) {
     [],
   )
 
-  // Same program, its own uniforms: bridges are drawn like every other
-  // connection but retire on their own schedule.
   const bridgesMat = useMemo(() => linesMat.clone(), [linesMat])
 
   useEffect(
@@ -142,8 +122,6 @@ export default function PlatformField({ targets }: Props) {
     const M = TECH_MILESTONE
 
     const morph = techMorph(p)
-    // Nodes resolve alongside the specimen, so the sample already contains
-    // visible internal signals before the map draws them apart.
     const reveal = smoothstep(M.sampleIn, M.sampleOn + 0.08, p)
     const draw = smoothstep(M.interpretStart, M.interpretEnd, p)
     const select = smoothstep(M.predictStart, M.predictEnd, p)
@@ -157,7 +135,6 @@ export default function PlatformField({ targets }: Props) {
     pu.uSelect.value = select
     pu.uValidate.value = validate
     pu.uExit.value = exit
-    // Tracks adaptive DPR so apparent size is resolution-independent
     pu.uSizeScale.value = state.gl.getPixelRatio()
 
     const lu = linesMat.uniforms
@@ -166,14 +143,8 @@ export default function PlatformField({ targets }: Props) {
     lu.uDraw.value = draw
     lu.uSelect.value = select
     lu.uValidate.value = validate
-    // Low enough that ~340 additive segments still read as thin instrument
-    // lines rather than a glowing mesh (§26).
     lu.uOpacity.value = 0.4 * draw * (1 - exit)
 
-    // Bridges run the same program but retire as soon as filtering begins: the
-    // clusters they join are about to move apart, and a link between a
-    // shortlisted region and one that stayed behind stops being a pathway the
-    // moment that happens.
     const bu = bridgesMat.uniforms
     bu.uMorph.value = morph
     bu.uTime.value = t

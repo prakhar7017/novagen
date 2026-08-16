@@ -1,14 +1,3 @@
-/**
- * React commit counter.
- *
- * Installs a minimal DevTools hook before React boots and records every commit
- * with the component names that actually re-rendered in it. Unlike frame timing
- * this is deterministic — the same scroll produces the same counts on any
- * machine — so it is the right instrument for "is something re-rendering that
- * should not be".
- *
- *   node scripts/probe-renders.mjs [--url ...]
- */
 import { chromium } from '@playwright/test'
 import { readdir, access } from 'node:fs/promises'
 import { join } from 'node:path'
@@ -26,11 +15,9 @@ async function findLocalChromium() {
         await access(exe)
         return exe
       } catch {
-        /* next */
       }
     }
   } catch {
-    /* default */
   }
   return undefined
 }
@@ -89,10 +76,6 @@ const HOOK = `
   }
 `
 
-// Software rasterisation is opt-in. Forcing SwiftShader makes every frame
-// GPU-bound in a way no reader's machine is, which buries the costs that are
-// actually worth finding; `--swiftshader` puts it back for a machine with no
-// usable GPU.
 const GPU_ARGS = process.argv.includes('--swiftshader')
   ? ['--enable-unsafe-swiftshader', '--use-gl=angle', '--use-angle=swiftshader', '--disable-lcd-text']
   : ['--disable-lcd-text']

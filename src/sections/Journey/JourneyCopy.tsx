@@ -5,13 +5,6 @@ interface Props {
   linesRef: React.RefObject<(HTMLSpanElement | null)[][]>
 }
 
-/**
- * The seven story states as real, permanent HTML.
- *
- * All seven exist in the document at once and are revealed by opacity, so the
- * narrative is complete for screen readers and remains readable if animation
- * never runs (ACCEPTANCE_CRITERIA §17 — no essential text inside Canvas).
- */
 export default function JourneyCopy({ copyRef, linesRef }: Props) {
   return (
     <div className="journey-copy-col">

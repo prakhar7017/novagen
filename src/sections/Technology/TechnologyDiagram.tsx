@@ -8,21 +8,6 @@ import {
   type TechnologyStageId,
 } from './technology.constants'
 
-/**
- * The drawn stage visuals.
- *
- * These are the same arrangements the WebGL platform morphs between — the same
- * builder, the same seed, the same cluster positions — projected flat and drawn
- * as SVG. That is why the flowing layout still tells one continuous story
- * rather than five unrelated pictures: the map really is the sample's interior,
- * and the network really does connect the mapped cells, because both are the
- * same numbers the shader reads.
- *
- * Used below 769px and under reduced motion, where a pinned scrub is either
- * unwelcome or unavailable (§49, §54).
- */
-
-/** Half-height of the projection in viewBox units; width follows FRAME's aspect. */
 const H = 46
 const SCALE = H / FRAME.y
 const CX = FRAME.x * SCALE
@@ -58,8 +43,6 @@ export default function TechnologyDiagram({ stage, targets }: Props) {
   return (
     <div className="technology-diagram">
       <svg viewBox={VIEWBOX} className="technology-diagram-svg" aria-hidden="true">
-        {/* The measurement grid firms up while space is being resolved, exactly
-            as the environment does in the animated version (§38). */}
         {(stage === 'map' || stage === 'interpret') && (
           <g stroke="#a6ff6a" strokeWidth="0.2" opacity={stage === 'map' ? 0.14 : 0.07}>
             {[0, 1, 2, 3, 4].map((i) => (
@@ -98,9 +81,6 @@ export default function TechnologyDiagram({ stage, targets }: Props) {
               const a = targets.lineIndices[i * 2]
               const b = targets.lineIndices[i * 2 + 1]
               const strength = Math.min(targets.strength[a], targets.strength[b])
-              // The predict stage is the filter: weak pathways drop out of the
-              // drawing entirely, which is the same thing the shader does with
-              // opacity.
               if (stage === 'predict' && strength < 0.55) return null
               return (
                 <line
@@ -130,8 +110,6 @@ export default function TechnologyDiagram({ stage, targets }: Props) {
 
             return (
               <g key={r} transform={`rotate(-90 ${cx} ${cy})`}>
-                {/* Track, then the confidence arc over it — arc length is the
-                    reading, so there is no bar anywhere in this section (§30). */}
                 <circle
                   cx={cx}
                   cy={cy}
@@ -186,9 +164,6 @@ export default function TechnologyDiagram({ stage, targets }: Props) {
                 key={i}
                 cx={px(positions[i * 3])}
                 cy={py(positions[i * 3 + 1])}
-                // Small enough that a cluster's connections still show
-                // between its cells: at diagram scale the links are only a few
-                // pixels longer than the nodes they join.
                 r={0.5 + targets.size[i] * 0.3}
                 fill={strength > 0.82 ? '#a6ff6a' : '#c6f5e1'}
                 opacity={(0.34 + strength * 0.5) * dim}
@@ -198,8 +173,6 @@ export default function TechnologyDiagram({ stage, targets }: Props) {
         </g>
       </svg>
 
-      {/* The one diagram carrying real photographic content describes itself;
-          the rest are abstractions of copy that is already on the page. */}
       {stage === 'sample' && <span className="sr-only">{SPECIMEN_ALT}</span>}
     </div>
   )

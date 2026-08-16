@@ -5,23 +5,9 @@ import { setOpacity, setTransform } from '../attr'
 import { useVisualDriver, type VisualFrame } from '../useVisualDriver'
 
 interface Props {
-  /** Floating structural points — reduced on small screens (§45) */
   points: number
 }
 
-/**
- * 02 · Protein Engineering — the rendered structure, lightly instrumented.
- *
- * The asset does the science; everything added here is measurement around it.
- * §19 is specific about what must *not* happen: the card never tilts. The
- * transform is on the structure alone, capped at ±5° horizontally and ±2.6°
- * vertically, so the visitor perceives themselves moving around a specimen
- * rather than hovering a product card.
- *
- * Engagement is a class rather than a per-frame value: the separated region,
- * the glowing interior pathway and the fold-confidence readout all cross-fade
- * in CSS, which keeps the frame loop down to one transform and nine points.
- */
 export default function ProteinVisual({ points }: Props) {
   const structure = useMemo(() => buildStructurePoints(points), [points])
 
@@ -34,13 +20,9 @@ export default function ProteinVisual({ points }: Props) {
     const { w, h } = f
     if (!w || !h) return
 
-    // −1…1 from the module centre. Clamped, because a pointer that leaves via
-    // a corner reports coordinates outside the box for one frame.
     const nx = Math.max(-1, Math.min(1, (f.x / w) * 2 - 1))
     const ny = Math.max(-1, Math.min(1, (f.y / h) * 2 - 1))
 
-    // Idle: a slow drift and a breath, both far below the pointer's authority,
-    // so a resting module is alive but not animated at the reader.
     const driftY = Math.sin(f.time * 0.31) * 1.5
     const driftX = Math.sin(f.time * 0.24 + 2.1) * 0.7
     const breath = 1 + Math.sin(f.time * 0.55) * 0.012
@@ -55,8 +37,6 @@ export default function ProteinVisual({ points }: Props) {
     }
 
     structure.forEach((p, i) => {
-      // Points orbit their own anchor by a couple of pixels — enough to read as
-      // structural noise, never enough to look like a particle system.
       const px = p.x * w + Math.sin(f.time * 0.6 + p.phase) * 3.2
       const py = p.y * h + Math.cos(f.time * 0.47 + p.phase) * 2.6
       setTransform(pointEls.current[i], px, py, 1 + f.focus * 0.25)
@@ -65,8 +45,6 @@ export default function ProteinVisual({ points }: Props) {
 
     setOpacity(rimEl.current, 0.16 + f.focus * 0.34)
 
-    // Hysteresis: without a gap between the thresholds, a pointer resting on
-    // the boundary flickers the whole engaged state on and off.
     const root = stage?.parentElement
     if (root) {
       if (!engaged.current && f.focus > 0.38) {
@@ -102,8 +80,6 @@ export default function ProteinVisual({ points }: Props) {
             height={size.h}
             aria-hidden="true"
           >
-            {/* Rim illumination — one ring, sized to the structure, not a halo
-                around the whole module. */}
             <circle
               ref={rimEl}
               className="cap-protein-rim"
@@ -113,8 +89,6 @@ export default function ProteinVisual({ points }: Props) {
               opacity={0.16}
             />
 
-            {/* The selected region: a bracket over the active site that steps
-                a few pixels clear of the structure while engaged. */}
             <g className="cap-protein-region">
               <circle
                 cx={size.w * 0.545}
@@ -131,7 +105,6 @@ export default function ProteinVisual({ points }: Props) {
               />
             </g>
 
-            {/* Leader line to the confidence readout, drawn only while engaged */}
             <line
               className="cap-protein-lead"
               x1={size.w * 0.63}
@@ -156,8 +129,6 @@ export default function ProteinVisual({ points }: Props) {
         )}
       </div>
 
-      {/* Fictional portfolio figure, and labelled as a model output rather than
-          a company result (§20). */}
       <div className="cap-readout cap-readout--protein" aria-hidden="true">
         <span className="cap-readout-key">Fold confidence</span>
         <span className="cap-readout-val">94.2%</span>

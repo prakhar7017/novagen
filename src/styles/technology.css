@@ -1,16 +1,6 @@
-/* ── Section 04 · Technology / Platform ───────────────────────────────────
-   Back to the dark environment after Innovation's Bone, and back to WebGL —
-   but a lighter instrument than the Journey. The stage is held by
-   position:sticky rather than a GSAP pin, matching section 02: the section
-   contributes its own scroll length and needs no pin-spacer under Lenis.
-
-   Every layer here is either transparent or semi-transparent. The shared
-   canvas is fixed *behind* the document, so an opaque section background would
-   simply hide the platform it exists to show.                                */
-
 .technology {
   position: relative;
-  z-index: 2; /* above the fixed ExperienceCanvas */
+  z-index: 2;
   width: 100%;
 }
 
@@ -22,11 +12,6 @@
   overflow: hidden;
 }
 
-/* ── Environment ─────────────────────────────────────────────────────────
-   Base wash, measurement grid and a soft glow under the platform. §37 caps
-   the grid at 3% and the section fails outright if any of this starts
-   reading as a HUD, so all three are deliberately at the edge of visible. */
-
 .technology-bg {
   position: absolute;
   inset: 0;
@@ -36,9 +21,6 @@
     linear-gradient(180deg, rgba(6, 16, 15, 0.32) 0%, rgba(6, 16, 15, 0.58) 100%);
 }
 
-/* Opacity is owned by GSAP — it lifts while the spatial map is being
-   established and settles back afterwards (§38), which is the environment's
-   only piece of narrative behaviour. */
 .technology-grid {
   position: absolute;
   inset: 0;
@@ -49,8 +31,6 @@
   background-size: 88px 88px;
 }
 
-/* Minor divisions — the difference between a grid and an instrument's scale.
-   Nested inside the parent's opacity, so at the map's 4% these are under 1%. */
 .technology-grid::after {
   content: '';
   position: absolute;
@@ -75,7 +55,6 @@
   );
 }
 
-/* Keeps the copy column legible where the platform overlaps it */
 .technology-scrim {
   position: absolute;
   inset: 0;
@@ -88,11 +67,6 @@
     transparent 68%
   );
 }
-
-/* ── Layout ──────────────────────────────────────────────────────────────
-   Header top-left with its instrumentation opposite, the active stage at the
-   bottom of the copy column, the rail along the bottom edge. The platform
-   occupies the right two thirds and is free to overlap the container (§44). */
 
 .technology-inner {
   position: absolute;
@@ -107,11 +81,8 @@
     'rail rail';
   gap: clamp(16px, 3vh, 32px) 32px;
   padding: clamp(30px, 5.5vh, 58px) clamp(24px, 4.4vw, 64px) clamp(28px, 4.5vh, 46px);
-  /* The stage is a backdrop; only the rail takes pointer events. */
   pointer-events: none;
 }
-
-/* ── Header ──────────────────────────────────────────────────────────────── */
 
 .technology-header {
   grid-area: head;
@@ -141,7 +112,6 @@
 
 .technology-headline {
   font-family: var(--font-sans);
-  /* Under the Hero, over everything else on the page (§12). */
   font-size: clamp(2.6rem, 5.8vw, 5.6rem);
   font-weight: 700;
   line-height: 0.94;
@@ -163,10 +133,6 @@
   line-height: 1.6;
   color: var(--color-muted);
 }
-
-/* ── Stage copy ──────────────────────────────────────────────────────────
-   All five occupy one box at the bottom of the column; only opacity separates
-   them, so the platform above never reflows as the stage changes.          */
 
 .technology-stage-slot {
   grid-area: copy;
@@ -222,10 +188,6 @@
   max-width: 400px;
 }
 
-/* ── Metadata ────────────────────────────────────────────────────────────
-   Thin mono readouts, never more than three groups — a fourth is the point at
-   which this becomes a dashboard (§22, §62).                               */
-
 .technology-meta-slot {
   grid-area: meta;
   position: relative;
@@ -259,13 +221,9 @@
   text-transform: uppercase;
 }
 
-/* Deliberately not uppercased: text-transform maps the micro sign to Greek
-   capital Mu, which would print "8 MM" instead of "8 µm". */
 .technology-meta-value {
   color: var(--color-signal-mint);
 }
-
-/* ── Pipeline rail ───────────────────────────────────────────────────────── */
 
 .technology-pipeline {
   grid-area: rail;
@@ -320,8 +278,6 @@
   text-align: center;
 }
 
-/* Shape as well as colour: the active step is a filled dot in a ring, the
-   completed ones are filled, the rest are outlines (§55). */
 .technology-pipeline-dot {
   width: 9px;
   height: 9px;
@@ -381,12 +337,6 @@
   opacity: 0.9;
 }
 
-/* ── Ingress ─────────────────────────────────────────────────────────────
-   Innovation's own microscopy field, opening from a small window to full
-   bleed while the Bone veil recedes behind it (§5). The veil is flat Bone so
-   that, while this section is rising into view, the entire viewport is still
-   the colour Innovation was — there is no seam to see.                     */
-
 .technology-ingress {
   position: absolute;
   inset: 0;
@@ -404,13 +354,9 @@
 .technology-ingress-plate {
   position: absolute;
   inset: 0;
-  /* Matches the clip the timeline animates from, so the plate is already a
-     window rather than a full-bleed image on the first frame. */
   clip-path: inset(26% 33% 24% 33%);
 }
 
-/* Holds the plate's contents so its arrival fade and its dissolve can be
-   animated independently — see TechnologyIngress. */
 .technology-ingress-plate-in {
   position: absolute;
   inset: 0;
@@ -420,8 +366,6 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  /* Pulling back from a slight magnification is what makes the expansion read
-     as the specimen opening rather than an image sliding into place. */
   transform: scale(1.04);
 }
 
@@ -432,8 +376,6 @@
     radial-gradient(ellipse 70% 60% at 50% 46%, rgba(7, 17, 15, 0.45) 0%, rgba(7, 17, 15, 0.92) 78%),
     linear-gradient(180deg, rgba(7, 17, 15, 0.5) 0%, rgba(7, 17, 15, 0.86) 100%);
 }
-
-/* ── Flowing layout (≤768px and reduced motion) ──────────────────────────── */
 
 .technology--flow {
   background: var(--color-abyss);
@@ -457,8 +399,6 @@
   );
 }
 
-/* The same specimen field carries the transition here as in the pinned
-   version — the section should not change what it is made of by breakpoint. */
 .technology-ingress-band::after {
   content: '';
   position: absolute;
@@ -494,8 +434,6 @@
   margin-top: clamp(36px, 6vh, 60px);
 }
 
-/* The rail is the gutter these hang from — §48's vertical progress, without a
-   second widget to keep in sync. */
 .technology-flow-item {
   position: relative;
   padding-left: 26px;
@@ -561,13 +499,8 @@
   gap: 10px;
 }
 
-/* ── Drawn stage diagrams ───────────────────────────────────────────────── */
-
 .technology-diagram {
   position: relative;
-  /* Wide enough that a cluster's connections are longer than the cells they
-     join — below about 400px the nearest-neighbour links disappear inside
-     their own nodes and the network stops reading as one. */
   max-width: 420px;
   margin: 0 0 18px;
   border: 1px solid rgba(198, 245, 225, 0.07);
@@ -582,11 +515,8 @@
   height: auto;
 }
 
-/* ── Laptop ──────────────────────────────────────────────────────────────── */
-
 @media (max-width: 1366px) {
   .technology-headline {
-    /* §46 wants 62–72px here; 5.2vw lands at 66px on a 1280 viewport. */
     font-size: clamp(2.6rem, 5.2vw, 4.6rem);
   }
   .technology-inner {
@@ -594,8 +524,6 @@
     padding-right: clamp(24px, 3.8vw, 48px);
   }
 }
-
-/* ── Tablet landscape ────────────────────────────────────────────────────── */
 
 @media (max-width: 1024px) {
   .technology-header {
@@ -615,8 +543,6 @@
   .technology-meta {
     font-size: 9.5px;
   }
-  /* The rail stays horizontal — it is still readable at this width (§47) —
-     but the labels tighten so five of them fit without wrapping. */
   .technology-pipeline-label {
     font-size: 10px;
     letter-spacing: 0.08em;
@@ -626,9 +552,6 @@
   }
 }
 
-/* Genuinely short windows only — 800px-tall laptops have room for the full
-   headline, and §46 asks for 62–72px there. Below this the copy column and the
-   rail need the space more than the type does. */
 @media (max-height: 760px) and (min-width: 769px) {
   .technology-headline {
     font-size: clamp(2.4rem, 4.6vw, 3.9rem);
@@ -641,8 +564,6 @@
   }
 }
 
-/* ── Mobile ──────────────────────────────────────────────────────────────── */
-
 @media (max-width: 768px) {
   .technology-flow {
     padding-top: 20vh;
@@ -652,8 +573,6 @@
   }
 }
 
-/* On a phone the column itself is the constraint, and five 250px-tall
-   diagrams would turn a five-stage read into a long scroll. */
 @media (max-width: 480px) {
   .technology-diagram {
     max-width: 300px;

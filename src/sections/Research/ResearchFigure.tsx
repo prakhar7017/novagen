@@ -12,25 +12,11 @@ import {
   buildResearchFigure,
 } from './research.figure'
 
-/** Dots per state. Fewer on a phone, where the same cloud is a smudge (§27). */
 const DENSITY = {
   desktop: [26, 22, 18],
   mobile: [16, 13, 11],
 } as const
 
-/**
- * Study 03 — the procedural research figure (§26–§29).
- *
- * §26 rules out a third photograph, and the reason is editorial rather than
- * technical: two microscopy fields and a third would make Research a gallery.
- * What the section needs at this point is the other half of the argument —
- * what is done with the observations — so the third study is a drawing of an
- * interpretation, and the only dark surface in the section.
- *
- * Everything is SVG. §50 rules out new WebGL here, and a canvas would buy
- * nothing: ~70 dots, three curves and a six-node graph, none of which move
- * after they arrive.
- */
 export default function ResearchFigure() {
   const reduced = useReducedMotion()
   const compact = useMediaQuery('(max-width: 700px)')
@@ -47,9 +33,6 @@ export default function ResearchFigure() {
       if (reduced) return
       if (root.current) buildFigureReveal(root.current)
     },
-    // The model is a dependency because a resize across the mobile breakpoint
-    // rebuilds the SVG: without this the timeline would hold references to
-    // circles that are no longer in the document.
     { dependencies: [reduced, model], revertOnUpdate: true, scope: root },
   )
 
@@ -87,9 +70,6 @@ export default function ResearchFigure() {
             </g>
           ))}
 
-          {/* The stems cross the divider rather than stopping at it: the
-              convergence is one movement, and a gap here would read as three
-              separate diagrams stacked. */}
           {model.states.map((state) => (
             <path key={state.id} className="figure-stem" d={state.stem} />
           ))}
@@ -128,8 +108,6 @@ export default function ResearchFigure() {
           </g>
         </svg>
 
-        {/* The figure carries an argument the surrounding copy only summarises,
-            so it gets a full textual equivalent rather than a label (§52). */}
         <p className="sr-only">{FIGURE_DESCRIPTION}</p>
       </div>
 

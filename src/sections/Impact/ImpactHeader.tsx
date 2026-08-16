@@ -13,18 +13,6 @@ interface Props {
   leadRef: React.RefObject<HTMLParagraphElement | null>
 }
 
-/**
- * Section label, headline and supporting copy (§10, §11).
- *
- * Sized under the Hero and deliberately restrained for a headline this wide:
- * §11 caps the measure at ~900px specifically so the metrics below can be the
- * largest type on the page. If the headline wins that contest the section has
- * failed its own hierarchy.
- *
- * The metadata line states, in plain text, that the figures are concept data.
- * §50 permits that disclosure to live in the content, and a section whose whole
- * argument is three numbers is the last place to bury it in a comment.
- */
 export default function ImpactHeader({ rootRef, labelRef, linesRef, leadRef }: Props) {
   return (
     <div ref={rootRef} className="impact-header">

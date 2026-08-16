@@ -4,17 +4,6 @@ interface Props {
   containerRef: React.RefObject<HTMLDivElement | null>
 }
 
-/**
- * Instrumentation over the microscopy frame.
- *
- * Two readouts plus a third that drops below 1024px, each a small target marker
- * and a thin leader into mono type. Kept well under the density of a HUD: this
- * section's job is credibility, and prompt §47 puts annotations last in the
- * visual hierarchy, behind the headline, the visual and the copy.
- *
- * Decorative by construction — every fact implied here is stated in the body
- * copy, so the section loses nothing when these are hidden or unread.
- */
 export default function MicroscopyAnnotations({ containerRef }: Props) {
   return (
     <div ref={containerRef} className="innovation-annotations" aria-hidden="true">

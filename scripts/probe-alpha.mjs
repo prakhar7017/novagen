@@ -24,7 +24,6 @@ for (const f of files) {
     .toBuffer({ resolveWithObject: true })
 
   const ch = info.channels
-  // Sample the four corners + report how much of the image is fully transparent
   const corner = (x, y) => {
     const i = (y * info.width + x) * ch
     return `[${data[i]},${data[i + 1]},${data[i + 2]},a=${data[i + 3]}]`

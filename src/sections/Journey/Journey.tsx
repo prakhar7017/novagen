@@ -9,14 +9,6 @@ import JourneyCopy from './JourneyCopy'
 import JourneyHUD from './JourneyHUD'
 import JourneyStatic from './JourneyStatic'
 
-/**
- * Section 02 — The Biological Journey.
- *
- * A tall scroll space holds a sticky full-viewport stage. The stage itself is
- * almost empty DOM: the visual transformation is drawn by the shared
- * ExperienceCanvas underneath, and this layer contributes only the story copy,
- * the step rail and the metadata.
- */
 export default function Journey() {
   const reduced = useReducedMotion()
   const isMobile = useMediaQuery('(max-width: 768px)')
@@ -42,8 +34,6 @@ export default function Journey() {
 
   if (reduced) return <JourneyStatic />
 
-  // Mobile keeps the sequence but spends far less scroll on it, so the user is
-  // never held inside a long animation (prompt §40).
   const scrollLength = isMobile ? 300 : isTabletPortrait ? 360 : 460
 
   return (
@@ -52,25 +42,16 @@ export default function Journey() {
       ref={refs.section}
       className="journey"
       aria-label="The biological journey"
-      // The story owns `scrollLength`; the extra `handoffVh` is the tail where
-      // the stage is still stuck but the story has finished, which is where the
-      // Innovation aperture opens. The timeline's end is offset by the same
-      // amount, so the story's pacing is identical either way.
       style={{ height: `${scrollLength + handoffVh}vh` }}
     >
       <div className="journey-stage">
-        {/* Background: darker and more technical than the Hero, per
-            ASSET_MANIFEST §6 — faint grid, no large organic bokeh. */}
         <div className="journey-bg" aria-hidden="true" />
         <div className="journey-grid" aria-hidden="true" />
-        {/* Keeps the left copy column legible over the full-bleed imagery */}
         <div className="journey-scrim" aria-hidden="true" />
 
         <JourneyCopy copyRef={refs.copy} linesRef={refs.lines} />
         <JourneyHUD metaRef={refs.meta} stepsRef={refs.steps} />
 
-        {/* Section 03's arrival, staged from inside the Journey — see the
-            component for why it cannot live in the Innovation section. */}
         <InnovationAperture handoffVh={handoffVh} />
       </div>
     </section>

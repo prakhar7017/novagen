@@ -19,20 +19,6 @@ import TechnologyPipeline from './TechnologyPipeline'
 import TechnologyStageCopy from './TechnologyStageCopy'
 import { TECHNOLOGY_VH } from './technology.constants'
 
-/**
- * Section 04 — Technology / Platform.
- *
- * Where Innovation argued a philosophy, this explains a process: sample, map,
- * interpret, predict, validate. The section returns to the dark environment and
- * to WebGL, but it is deliberately a lighter instrument than the Journey — one
- * pinned sequence, ~220 nodes rather than 6,000 particles, and a visual language
- * that reorganises rather than transforms.
- *
- * Two presentations, one story. Above 768px the stage is pinned and the
- * platform is drawn into the shared canvas; below it, and whenever motion is
- * reduced, the same five stages become a normally-flowing document with drawn
- * diagrams built from the identical arrangements.
- */
 export default function Technology() {
   const reduced = useReducedMotion()
   const isMobile = useMediaQuery('(max-width: 768px)')
@@ -86,14 +72,9 @@ export default function Technology() {
     { dependencies: [flowing, reduced, refs, setTechnologyStage], revertOnUpdate: true },
   )
 
-  // Independent of which presentation is running: the fixed header has to leave
-  // its light treatment behind, and the shared canvas has to come back on — but
-  // only where there is actually a platform to draw.
   useEffect(() => {
     const el = section.current
     if (!el) return
-    // In the flowing layout there is no platform in the canvas to arm or draw,
-    // so only the surface switch is wired up.
     return buildTechnologySurface(
       el,
       flowing ? null : setCanvasActive,
@@ -132,9 +113,6 @@ export default function Technology() {
       style={{ height: `${TECHNOLOGY_VH}vh` }}
     >
       <div className="technology-stage">
-        {/* Environment: base wash, measurement grid, and a soft glow under the
-            platform. All three are restrained by design — §37 caps the grid at
-            3% and the section fails outright if it starts reading as a HUD. */}
         <div className="technology-bg" aria-hidden="true" />
         <div ref={grid} className="technology-grid" aria-hidden="true" style={{ opacity: 0 }} />
         <div ref={glow} className="technology-glow" aria-hidden="true" style={{ opacity: 0 }} />
@@ -158,8 +136,6 @@ export default function Technology() {
           />
         </div>
 
-        {/* Last in the stacking order: it covers the whole stage while the
-            section arrives, then dissolves into it. */}
         <TechnologyIngress
           veilRef={veil}
           plateRef={plate}

@@ -1,17 +1,3 @@
-/**
- * Visual verification harness for Section 08 — Final CTA / Closing Vision.
- *
- * Drives a real Chromium at each required viewport, walks the Impact → CTA
- * handoff, samples the four frames §58 names (Impact ending, transition
- * midpoint, resolved CTA, footer), scrubs backward, and reports the layout facts
- * that decide whether the section passes: headline size and overflow, whether
- * the CTA is above the fold, cell diameter, footer height, whether the Impact
- * network was actually released, and console errors. Run with the dev server
- * already listening.
- *
- *   node scripts/probe-cta.mjs [--url http://localhost:5180]
- *        [--out screens/cta] [--only 1440x900] [--reduced] [--reverse]
- */
 import { chromium } from '@playwright/test'
 import { mkdir, readdir, access } from 'node:fs/promises'
 import { join } from 'node:path'
@@ -29,11 +15,9 @@ async function findLocalChromium() {
         await access(exe)
         return exe
       } catch {
-        /* try the next build */
       }
     }
   } catch {
-    /* no local cache — let Playwright decide */
   }
   return undefined
 }
@@ -80,7 +64,6 @@ async function safeShot(page, path, label) {
   }
 }
 
-/** Jump to an absolute scroll position through Lenis, then let it settle. */
 async function goTo(page, y) {
   await page.evaluate((target) => {
     const l = window.__lenis
@@ -90,7 +73,6 @@ async function goTo(page, y) {
   await page.waitForTimeout(650)
 }
 
-/** Everything worth knowing about the closing frame, measured in the page. */
 async function measure(page) {
   return page.evaluate(() => {
     const px = (n) => Math.round(n * 10) / 10
@@ -118,10 +100,6 @@ async function measure(page) {
       }
     }
 
-    // Two separate failures, and the second is the one that actually happens.
-    // `lineOverflow` catches a line clipped by .line-clip's overflow:hidden;
-    // `wrapped` catches an authored line the browser broke into two, which is
-    // how "human" ends up alone on a line (§46) without overflowing anything.
     let lineOverflow = 0
     let widestLine = null
     let renderedLines = 0
@@ -163,7 +141,6 @@ async function measure(page) {
       brand: vis(brand),
       drawnCell: drawn ? px(drawn.getBoundingClientRect().width) : null,
 
-      // No scientific HUD may survive into this section (§28).
       hudLeaks: [...document.querySelectorAll('#cta *')]
         .map((el) => el.childElementCount === 0 && el.textContent?.trim())
         .filter((t) => t && /SIGNAL_|LOCUS|CONFIDENCE|CELL COUNT|\d{2,}%/.test(t)),
@@ -185,10 +162,6 @@ async function measure(page) {
 }
 
 const exe = await findLocalChromium()
-// Software rasterisation is opt-in. Forcing SwiftShader makes every frame
-// GPU-bound in a way no reader's machine is, which buries the costs that are
-// actually worth finding; `--swiftshader` puts it back for a machine with no
-// usable GPU.
 const GPU_ARGS = process.argv.includes('--swiftshader')
   ? ['--enable-unsafe-swiftshader', '--use-gl=angle', '--use-angle=swiftshader', '--disable-lcd-text']
   : ['--disable-lcd-text']
@@ -218,31 +191,19 @@ for (const vp of targets) {
   page.on('pageerror', (e) => logs.push(`[uncaught] ${e.message}`))
 
   await page.goto(URL, { waitUntil: 'domcontentloaded' })
-  // The Hero's pin-spacer is not created until the loader hands over, and it
-  // adds a viewport to the document. Measuring anchors before that puts every
-  // frame in this run a screen too high — and does it intermittently, which is
-  // worse than doing it always.
   await page.waitForTimeout(6500)
 
   const suffix = REDUCED ? '-reduced' : ''
   const tag = `${vp.label}${suffix}`
 
-  // Anchors are expressed relative to the closing section's own top and resolved
-  // against the live layout rather than against a position captured once:
-  // several sections above this one are pinned, and a pin-spacer created
-  // mid-run moves every absolute figure underneath it.
   const ANCHORS = [
-    // Impact's last resolved frame — 91%, before the collapse.
     ['impactEnd', -1.55],
-    // The handoff: `impact` reaches 1 and `ctaForm` leaves 0 on the same frame.
     ['handoff', -1.0],
     ['middle', -0.5],
     ['resolved', 0],
   ]
 
   const seek = async (offsetVh) => {
-    // Iterated rather than computed once: a jump of several thousand pixels can
-    // itself change the layout underneath, and the second pass lands exactly.
     for (let i = 0; i < 3; i++) {
       const y = await page.evaluate((off) => {
         const cta = document.getElementById('cta')
@@ -265,7 +226,6 @@ for (const vp of targets) {
     await safeShot(page, join(OUT, `${tag}-${name}.png`), `${tag}/${name}`)
   }
 
-  // The footer, at the very end of the document.
   await goTo(page, await page.evaluate(() => document.documentElement.scrollHeight))
   frames.push(['footer', await measure(page)])
   await safeShot(page, join(OUT, `${tag}-footer.png`), `${tag}/footer`)

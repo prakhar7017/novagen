@@ -4,26 +4,11 @@ import { setOpacity, setText, setTransform } from '../attr'
 import { useVisualDriver, type VisualFrame } from '../useVisualDriver'
 
 interface Props {
-  /** Node count — reduced on small screens (§45) */
   nodes: number
 }
 
-/** Frames between node-drift updates. */
 const DRIFT_EVERY = 2
 
-/**
- * 03 · AI Discovery — an irregular signal network that selects.
- *
- * The micro story is the site's story (§24): many weak relationships, one
- * cluster selected, a handful of high-confidence connections inside it, one
- * candidate emphasized. Which cluster is selected follows the pointer, so the
- * visitor performs the prioritisation rather than watching it.
- *
- * Selection is deliberately *not* a per-frame value. The active cluster is a
- * data attribute on the SVG and every brightening is a CSS transition off it,
- * which means changing selection costs one attribute write and the frame loop
- * only ever moves nodes.
- */
 export default function NetworkVisual({ nodes }: Props) {
   const net = useMemo(() => buildNetwork(nodes), [nodes])
 
@@ -39,8 +24,6 @@ export default function NetworkVisual({ nodes }: Props) {
       const { w, h } = f
       if (!w || !h) return
 
-      // Below the threshold the network is unaddressed and nothing is selected
-      // — the resting state §23 describes, where the whole field is weak.
       const next = f.focus > 0.22 ? nearestCluster(net.clusters, f.x / w, f.y / h) : -1
 
       if (next !== active.current) {
@@ -49,8 +32,6 @@ export default function NetworkVisual({ nodes }: Props) {
         setText(labelEl.current, next < 0 ? '—' : `C-${String(next + 1).padStart(2, '0')}`)
       }
 
-      // The drift is slow enough that halving its update rate is invisible, and
-      // this is the one visual where the per-frame write count is worth halving.
       if (frameNo.current++ % DRIFT_EVERY) return
 
       net.nodes.forEach((n, i) => {
@@ -59,8 +40,6 @@ export default function NetworkVisual({ nodes }: Props) {
         setTransform(nodeEls.current[i], nx, ny, 1)
       })
 
-      // Edges follow their endpoints. Redrawing them is what keeps a
-      // connection attached to the node it belongs to while both drift.
       net.edges.forEach((e, i) => {
         const el = edgeEls.current[i]
         if (!el) return
@@ -72,8 +51,6 @@ export default function NetworkVisual({ nodes }: Props) {
         setPoint(el, 'y2', b.y * h + Math.cos(f.time * 0.27 + b.phase * 1.3) * 3.8)
       })
 
-      // A whole-field lift while the pointer is present, under the cluster
-      // selection — the network noticing before it decides.
       setOpacity(svgEl.current, 0.86 + f.focus * 0.14)
     },
     [net],
@@ -140,14 +117,6 @@ export default function NetworkVisual({ nodes }: Props) {
   )
 }
 
-/**
- * Endpoint writes, cached per attribute on the element.
- *
- * A line has four coordinates that move independently, so the shared
- * setTransform guard does not apply; this is the same idea at attribute
- * granularity, with a full pixel of tolerance because a connection is drawn at
- * one-pixel width and cannot show less than that.
- */
 function setPoint(el: SVGLineElement & { __pt?: Record<string, number> }, name: string, v: number) {
   const cache = (el.__pt ??= {})
   if (cache[name] !== undefined && Math.abs(cache[name] - v) < 0.6) return

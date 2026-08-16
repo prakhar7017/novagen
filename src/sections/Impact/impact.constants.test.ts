@@ -1,6 +1,4 @@
 // @vitest-environment jsdom
-// The constants module reaches for `window` through progressRef's dev-only
-// debug handle, so this suite needs a DOM even though nothing it tests uses one.
 import { describe, expect, it } from 'vitest'
 import {
   CONFIDENCE,
@@ -27,8 +25,6 @@ describe('impact copy windows', () => {
   it('orders the three states and leaves the last one holding to the end', () => {
     for (let i = 1; i < IMPACT_METRICS.length; i++) {
       expect(IMPACT_METRICS[i].enter).toBeGreaterThan(IMPACT_METRICS[i - 1].enter)
-      // A gap between one metric leaving and the next arriving would leave the
-      // column empty mid-scroll.
       expect(IMPACT_METRICS[i].enter).toBeLessThanOrEqual(IMPACT_METRICS[i - 1].exit)
     }
     expect(IMPACT_METRICS.at(-1)!.exit).toBeGreaterThan(1)
@@ -62,9 +58,6 @@ describe('impactMorph', () => {
     }
   })
 
-  // §13 asks each state to be *established* on a plateau rather than passed
-  // through. If a milestone edit closes one of these gaps, the section stops
-  // holding still anywhere and the metrics never read as settled.
   it('holds each arrangement still while its metric is on screen', () => {
     expect(impactMorph(0.2)).toBe(impactMorph(0.28))
     expect(impactMorph(IMPACT_MILESTONE.filterEnd)).toBeCloseTo(
@@ -79,8 +72,6 @@ describe('impactCompress', () => {
   it('tightens inside PRIORITIZE and is fully released by VALIDATE', () => {
     expect(impactCompress(IMPACT_MILESTONE.compressStart)).toBe(0)
     expect(impactCompress(IMPACT_MILESTONE.compressEnd)).toBeGreaterThan(0.4)
-    // Stacking the squeeze on top of the validate arrangement would collapse
-    // the target to a dot.
     expect(impactCompress(IMPACT_MILESTONE.validateEnd)).toBeCloseTo(0, 6)
     expect(impactCompress(1)).toBeCloseTo(0, 6)
   })
@@ -107,8 +98,6 @@ describe('impactArc', () => {
 describe('impactExit', () => {
   it('is silent until the collapse and complete at the section end (§53)', () => {
     expect(impactExit(0)).toBe(0)
-    // §53's ordering: the photograph starts leaving before any of the
-    // scientific detail begins reducing, so the last frame has one subject.
     expect(IMPACT_MILESTONE.humanOut).toBeLessThan(IMPACT_MILESTONE.exitStart)
     expect(impactExit(IMPACT_MILESTONE.humanOut)).toBe(0)
     expect(impactExit(IMPACT_MILESTONE.exitStart)).toBe(0)
@@ -120,7 +109,6 @@ describe('scroll budget', () => {
   it('stays inside the 220–280vh band and holds the stage long enough (§8, §33)', () => {
     expect(IMPACT_VH).toBeGreaterThanOrEqual(220)
     expect(IMPACT_VH).toBeLessThanOrEqual(280)
-    // Sticky travel is the section height less the stage itself.
     expect(IMPACT_VH - 100).toBeGreaterThanOrEqual(140)
   })
 })

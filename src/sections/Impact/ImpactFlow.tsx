@@ -13,16 +13,6 @@ interface Props {
   density: ImpactDensity
 }
 
-/**
- * One arrangement, drawn flat (§41, §42, §49).
- *
- * The same three states the pinned stage morphs between, projected from the
- * identical typed arrays — so a phone and a reduced-motion desktop see the same
- * science, at the same coordinates, with visibly less in each successive
- * diagram. §42 rules out three heavy independent scenes, and three static SVGs
- * built once from one target set are lighter than the canvas it suggests
- * instead.
- */
 function FlowVisual({ diagram, arc }: { diagram: Diagram; arc?: React.ReactNode }) {
   return (
     <div className="impact-flow-visual">
@@ -69,20 +59,6 @@ function FlowVisual({ diagram, arc }: { diagram: Diagram; arc?: React.ReactNode 
   )
 }
 
-/**
- * The flowing presentation (§41).
- *
- * §41 is explicit that a phone must not be handed a stacked copy of the 260vh
- * pinned sequence, so this is a different composition rather than the same one
- * reflowed: three metric blocks in normal document flow, each with its own
- * static diagram directly beneath its number, then the human moment and the
- * closing statement.
- *
- * It is also the reduced-motion presentation at every width (§49). All three
- * scientific states are present as static pictures and all three figures are
- * present as text, so nothing in this section is communicated only through
- * animation.
- */
 export default function ImpactFlow({ refs, density }: Props) {
   const diagrams = useMemo(() => buildDiagramSet(density), [density])
 
@@ -108,8 +84,6 @@ export default function ImpactFlow({ refs, density }: Props) {
 
             <FlowVisual
               diagram={diagrams[i]}
-              // The arc belongs to the validated state only, and here it is
-              // simply drawn at its final length — §49 rules out sweeping it.
               arc={
                 i === 2 ? (
                   <ConfidenceArc rootRef={refs.arcRoot} arcRef={refs.arc} complete />

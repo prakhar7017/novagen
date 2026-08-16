@@ -4,17 +4,6 @@ interface Props {
   stagesRef: React.RefObject<(HTMLDivElement | null)[]>
 }
 
-/**
- * GENE — CELL — TISSUE — SYSTEM.
- *
- * The section's closing line: one thin rule stating that the platform's subject
- * spans scales, which is the whole argument the copy above makes. The active
- * marker shifts as the section scrolls, but the sequence is legible without it.
- *
- * Deliberately small and unstructured — the Technology pipeline (SAMPLE → MAP →
- * INTERPRET → PREDICT → VALIDATE) arrives in section 04 and has to look like
- * the more substantial of the two.
- */
 export default function InnovationScale({ stagesRef }: Props) {
   return (
     <div className="innovation-scale">

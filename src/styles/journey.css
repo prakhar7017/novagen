@@ -1,10 +1,6 @@
-/* ── Section 02 · Biological Journey ──────────────────────────────────────
-   The stage is held by position:sticky rather than a GSAP pin, so the section
-   contributes its own scroll length and needs no pin-spacer.                */
-
 .journey {
   position: relative;
-  z-index: 2; /* above the fixed ExperienceCanvas */
+  z-index: 2;
   width: 100%;
 }
 
@@ -16,15 +12,10 @@
   overflow: hidden;
 }
 
-/* ── Background ──────────────────────────────────────────────────────────── */
-
 .journey-bg {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  /* Deeper and cooler than the Hero so the sections do not read as identical.
-     Kept light: this layer sits *above* the WebGL stage, so heavy alpha here
-     mutes the imagery the section exists to show. */
   background:
     radial-gradient(ellipse 46% 40% at 68% 50%, rgba(166, 255, 106, 0.030) 0%, transparent 72%),
     linear-gradient(180deg, rgba(6, 16, 15, 0.10) 0%, rgba(6, 16, 15, 0.42) 100%);
@@ -41,7 +32,6 @@
   background-size: 96px 96px;
 }
 
-/* Guarantees copy contrast over the full-bleed cell/nucleus imagery */
 .journey-scrim {
   position: absolute;
   inset: 0;
@@ -55,8 +45,6 @@
   );
 }
 
-/* ── Story copy ──────────────────────────────────────────────────────────── */
-
 .journey-copy-col {
   position: absolute;
   inset: 0;
@@ -67,7 +55,6 @@
   pointer-events: none;
 }
 
-/* All seven states occupy the same box; only opacity separates them. */
 .journey-copy {
   position: absolute;
   max-width: clamp(320px, 34vw, 520px);
@@ -116,8 +103,6 @@
   max-width: 430px;
 }
 
-/* ── Step rail ───────────────────────────────────────────────────────────── */
-
 .journey-steps {
   position: absolute;
   left: clamp(20px, 4.6vw, 72px);
@@ -132,10 +117,8 @@
 }
 
 .journey-step {
-  transition: none; /* GSAP owns these values */
+  transition: none;
 }
-
-/* ── Metadata ────────────────────────────────────────────────────────────── */
 
 .journey-meta-slot {
   position: absolute;
@@ -170,7 +153,7 @@
 
 .journey-meta-key,
 .journey-meta-val {
-  white-space: nowrap; /* keys like "GENE EXPRESSION" must not wrap mid-label */
+  white-space: nowrap;
 }
 
 .journey-meta-key {
@@ -183,8 +166,6 @@
   opacity: 0.8;
 }
 
-/* ── Tablet landscape ────────────────────────────────────────────────────── */
-
 @media (max-width: 1024px) {
   .journey-copy {
     max-width: 38vw;
@@ -193,10 +174,6 @@
     font-size: clamp(1.8rem, 4vw, 2.6rem);
   }
 }
-
-/* ── Tablet portrait & mobile ────────────────────────────────────────────── */
-/* Visual occupies the upper area, copy sits beneath it — not the desktop
-   side-by-side proportions merely squeezed (prompt §39).                    */
 
 @media (max-width: 900px) {
   .journey-copy-col {
@@ -236,7 +213,6 @@
     min-height: 0;
   }
 
-  /* Two rows maximum on small screens — the rest is noise */
   .journey-meta-row:nth-child(n + 3) {
     display: none;
   }
@@ -254,8 +230,6 @@
     gap: 9px;
   }
 }
-
-/* ── Reduced motion: plain document ──────────────────────────────────────── */
 
 .journey-static {
   position: relative;

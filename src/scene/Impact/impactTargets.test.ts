@@ -11,12 +11,10 @@ const DENSITY: ImpactDensity = { signals: 900, nodes: 140, maxLines: 180 }
 
 const targets = buildImpactTargets(DENSITY)
 
-/** Every point's three positions, as flat triples. */
 function tripleAt(buf: Float32Array, i: number) {
   return [buf[i * 3], buf[i * 3 + 1], buf[i * 3 + 2]] as const
 }
 
-/** Mean distance of a population from the origin in one arrangement. */
 function spread(pop: ImpactPopulation, buf: Float32Array, only?: (i: number) => boolean) {
   let sum = 0
   let n = 0
@@ -61,9 +59,6 @@ describe('buildImpactTargets', () => {
     }
   })
 
-  // The section's entire argument: the visualization must become progressively
-  // simpler (§3). If a future change makes the validated state as busy as the
-  // dense one, this is what catches it.
   it('reduces what survives at each successive state', () => {
     const strong = (pop: ImpactPopulation) => (i: number) => pop.strength[i] > 0.46
     const winners = (pop: ImpactPopulation) => (i: number) => pop.winner[i] > 0.5
@@ -76,8 +71,6 @@ describe('buildImpactTargets', () => {
     expect(validated).toBeLessThan(surviving)
     expect(validated).toBeGreaterThan(4)
 
-    // …and geometrically, not only by count: the survivors group inward while
-    // the discarded material moves away (§19, §20).
     const scaleSpread = spread(targets.nodes, targets.nodes.scale, strong(targets.nodes))
     const prioritizeSpread = spread(
       targets.nodes,
@@ -104,7 +97,6 @@ describe('buildImpactTargets', () => {
       if (ix === 0 && iy === 0) continue
       checked++
       const [px, py] = tripleAt(targets.nodes.prioritize, i)
-      // Applying the contraction must move the point closer to its anchor.
       const before = Math.hypot(ix, iy)
       const after = Math.hypot(ix - ix * 0.42, iy - iy * 0.42)
       expect(after).toBeLessThan(before)
@@ -116,10 +108,7 @@ describe('buildImpactTargets', () => {
   it('builds a clustered graph rather than a uniform mesh', () => {
     expect(targets.lineIndices.length).toBeGreaterThan(0)
     expect(targets.lineIndices.length / 2).toBeLessThanOrEqual(DENSITY.maxLines + 2)
-    // Bridges are the minority — a graph where most links cross regions is the
-    // even network §16 rules out.
     expect(targets.bridgeIndices.length).toBeLessThan(targets.lineIndices.length)
-    // Evidence is a strict subset of the intra-region pairs (§24).
     const pairs = new Set<string>()
     for (let k = 0; k < targets.lineIndices.length; k += 2) {
       pairs.add(`${targets.lineIndices[k]}-${targets.lineIndices[k + 1]}`)
@@ -130,7 +119,6 @@ describe('buildImpactTargets', () => {
         true,
       )
     }
-    // Every index has to address a real node, or three.js draws garbage.
     for (const idx of [
       targets.lineIndices,
       targets.bridgeIndices,
