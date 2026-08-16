@@ -73,14 +73,33 @@ export function startIdleBreathing(refs: HeroRefs, reduced: boolean) {
 
   const { breathInner, organism } = refs
   const ctx = gsap.context(() => {
-    gsap.to(breathInner.current, {
-      scale: 1.008, duration: 9, ease: 'sine.inOut', repeat: -1, yoyo: true,
-    })
-    gsap.to(breathInner.current, {
-      y: 4, duration: 11, ease: 'sine.inOut', repeat: -1, yoyo: true, delay: 1.5,
-    })
-    gsap.to(organism.current, {
-      rotation: 0.4, duration: 8, ease: 'sine.inOut', repeat: -1, yoyo: true, delay: 3,
+    const idle = [
+      gsap.to(breathInner.current, {
+        scale: 1.008, duration: 9, ease: 'sine.inOut', repeat: -1, yoyo: true,
+      }),
+      gsap.to(breathInner.current, {
+        y: 4, duration: 11, ease: 'sine.inOut', repeat: -1, yoyo: true, delay: 1.5,
+      }),
+      gsap.to(organism.current, {
+        rotation: 0.4, duration: 8, ease: 'sine.inOut', repeat: -1, yoyo: true, delay: 3,
+      }),
+    ]
+
+    // The organism paints with `mix-blend-mode: lighten`, so it cannot sit on
+    // the compositor's fast path: every frame these tweens run re-blends that
+    // whole region against the grain layer and the canvas behind it. Worth
+    // paying while the organism is the thing you are looking at, pure jank once
+    // it has scrolled away — and on a phone it never stops being expensive.
+    ScrollTrigger.create({
+      trigger: refs.section.current,
+      start: 'top bottom',
+      end: 'bottom top',
+      onToggle: (self) => {
+        for (const tween of idle) {
+          if (self.isActive) tween.play()
+          else tween.pause()
+        }
+      },
     })
   })
   return () => ctx.revert()
@@ -131,14 +150,24 @@ export function buildScrollExit(refs: HeroRefs, reduced: boolean) {
     return
   }
 
+  const coarse = window.matchMedia('(pointer: coarse)').matches
+
   const tl = gsap.timeline({
     scrollTrigger: {
       trigger: section.current,
       start: 'top top',
       end: '+=100%',
-      scrub: 1.4,
+      // A 1.4s catch-up reads as luxury under a mouse wheel and as lag under a
+      // thumb: a flick outruns it, so the hero appears to stick for most of a
+      // second before it starts moving. Touch gets a scrub short enough to feel
+      // attached to the finger.
+      scrub: coarse ? 0.55 : 1.4,
       pin: true,
       pinSpacing: true,
+      // Pinning under a smooth scroller lands a frame late, which is the small
+      // hitch you feel the instant the hero starts to leave. Start pinning a
+      // touch early so the swap has already happened by the time it shows.
+      anticipatePin: 1,
       refreshPriority: 1,
       onUpdate: (self) => {
         scrollProgress.hero = self.progress
@@ -166,7 +195,13 @@ export function buildScrollExit(refs: HeroRefs, reduced: boolean) {
 
   tl.fromTo(breathWrap.current, { opacity: 1 }, { opacity: 0, duration: 0.14 }, 0.86)
 
-  ScrollTrigger.refresh()
+  // This runs when the entrance timeline finishes, roughly a second and a half
+  // after boot — by which time an impatient thumb is already moving. A global
+  // refresh re-measures every pin and trigger on the page, so landing one
+  // mid-gesture yanks the scroll position. Only settle the layout if nobody has
+  // started scrolling yet; if they have, the measurements taken at creation are
+  // the ones that match what they are looking at.
+  if (window.scrollY === 0) ScrollTrigger.refresh()
 
   if (tl.scrollTrigger) scrollProgress.hero = tl.scrollTrigger.progress
 

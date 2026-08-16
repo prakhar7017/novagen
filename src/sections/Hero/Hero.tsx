@@ -9,6 +9,7 @@ import {
   buildScrollExit,
 } from '@/animation/heroTimeline'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
+import { useMediaQuery } from '@/hooks/useMediaQuery'
 import { useExperienceStore } from '@/store/experienceStore'
 import type { HeroRefs } from './hero.types'
 import HeroContent from './HeroContent'
@@ -20,6 +21,7 @@ gsap.registerPlugin(ScrollTrigger)
 export default function Hero() {
   const reduced = useReducedMotion()
   const booted = useExperienceStore((s) => s.booted)
+  const coarse = useMediaQuery('(pointer: coarse)')
 
   const section       = useRef<HTMLElement>(null)
   const eyebrow       = useRef<HTMLSpanElement>(null)
@@ -103,22 +105,30 @@ export default function Hero() {
             backgroundSize: '80px 80px',
           }}
         />
-        <svg style={{ position: 'absolute', width: 0, height: 0 }} aria-hidden="true">
-          <defs>
-            <filter id="hero-grain">
-              <feTurbulence type="fractalNoise" baseFrequency="0.72" numOctaves="4" stitchTiles="stitch" result="noise" />
-              <feColorMatrix type="saturate" values="0" in="noise" />
-            </filter>
-          </defs>
-        </svg>
-        <div
-          style={{
-            position: 'absolute', inset: 0, zIndex: 2, pointerEvents: 'none',
-            opacity: 0.038,
-            filter: 'url(#hero-grain)',
-            background: '#fff',
-          }}
-        />
+        {/* A viewport-sized fractalNoise filter is one of the most expensive
+            things a phone GPU can be asked to composite, and it buys 3.8%
+            opacity of texture that a 400ppi screen held at arm's length cannot
+            resolve anyway. Desktop keeps the grain; touch keeps the frame rate. */}
+        {!coarse && (
+          <>
+            <svg style={{ position: 'absolute', width: 0, height: 0 }} aria-hidden="true">
+              <defs>
+                <filter id="hero-grain">
+                  <feTurbulence type="fractalNoise" baseFrequency="0.72" numOctaves="4" stitchTiles="stitch" result="noise" />
+                  <feColorMatrix type="saturate" values="0" in="noise" />
+                </filter>
+              </defs>
+            </svg>
+            <div
+              style={{
+                position: 'absolute', inset: 0, zIndex: 2, pointerEvents: 'none',
+                opacity: 0.038,
+                filter: 'url(#hero-grain)',
+                background: '#fff',
+              }}
+            />
+          </>
+        )}
 
         <HeroVisual
           breathRef={refs.breathWrap}
@@ -171,7 +181,12 @@ export default function Hero() {
 
       <style>{`
         @media (max-width: 768px) {
-          #hero { min-height: 100svh; }
+          /* The 720px floor is set inline, so a stylesheet rule loses to it no
+             matter how specific — this override has to shout to be heard. On a
+             phone shorter than 720px the floor otherwise stretches the hero past
+             one screen while the pin, the handoff and every sibling section are
+             still measuring in svh. */
+          #hero { min-height: 100svh !important; }
 
           [data-organism-wrap] {
             position: relative !important;
