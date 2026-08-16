@@ -48,7 +48,13 @@ export default function Header() {
   useEffect(() => {
     const st = ScrollTrigger.create({
       start: 64,
-      end: 'max',
+      // Deliberately past the furthest anyone can scroll rather than 'max'.
+      // A trigger that ends exactly at the maximum scroll position toggles
+      // itself inactive the moment the reader reaches the bottom of the page,
+      // and the bar lost its surface on the last screen — visible under
+      // reduced motion, where the page is short enough to actually reach it.
+      end: () => ScrollTrigger.maxScroll(window) + 200,
+      invalidateOnRefresh: true,
       onToggle: (self) => setScrolled(self.isActive),
     })
     return () => st.kill()

@@ -61,6 +61,10 @@ export default function HeroVisual({ breathRef, breathInnerRef, organismRef }: P
               src="/assets/story/01-organism.webp"
               alt=""
               draggable={false}
+              /* Already decoded by the time this is seen — the loader waits on
+                 exactly this file — so the decode is off the critical path
+                 either way, and async keeps it off the main thread. */
+              decoding="async"
               style={{
                 width: '100%',
                 height: '100%',

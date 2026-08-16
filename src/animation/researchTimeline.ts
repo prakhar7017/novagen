@@ -64,7 +64,13 @@ export function buildResearchIngress(panel: HTMLElement, fill: HTMLElement) {
     // compositor transform instead of a full-viewport repaint per frame — this
     // tween spans the whole Capabilities → Research boundary, which was the
     // roughest transition on the page before the change.
-    .fromTo(fill, { yPercent: 100 }, { yPercent: 0, duration: 0.78, ease: 'power2.inOut' }, 0)
+    // `y: 0` is not redundant. The resting position is set in CSS as
+    // translateY(100%) so the surface cannot flash over Capabilities before
+    // this timeline exists — but GSAP reads the *computed* matrix, where the
+    // percentage has already resolved to pixels, and records it as `y`. Setting
+    // yPercent alone then stacks on top of that and only half of the offset
+    // ever tweens back, leaving the surface stranded at 50%.
+    .fromTo(fill, { y: 0, yPercent: 100 }, { yPercent: 0, duration: 0.78, ease: 'power2.inOut' }, 0)
     // The leading edge now sits at the top of the surface and rides it, which
     // is what it was always imitating with a second tween of its own. All that
     // is left for it is the fade: in as the surface starts moving, out before

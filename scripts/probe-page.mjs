@@ -7,9 +7,17 @@ const exe = join(
   'AppData/Local/ms-playwright/chromium-1217/chrome-win64/chrome.exe',
 )
 
+// Software rasterisation is opt-in. Forcing SwiftShader makes every frame
+// GPU-bound in a way no reader's machine is, which buries the costs that are
+// actually worth finding; `--swiftshader` puts it back for a machine with no
+// usable GPU.
+const GPU_ARGS = process.argv.includes('--swiftshader')
+  ? ['--enable-unsafe-swiftshader', '--use-gl=angle', '--use-angle=swiftshader', '--disable-lcd-text']
+  : ['--disable-lcd-text']
+
 const browser = await chromium.launch({
   executablePath: exe,
-  args: ['--enable-unsafe-swiftshader', '--use-gl=angle', '--use-angle=swiftshader'],
+  args: GPU_ARGS,
 })
 
 const page = await browser.newPage({ viewport: { width: 1440, height: 900 } })

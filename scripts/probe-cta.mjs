@@ -185,9 +185,17 @@ async function measure(page) {
 }
 
 const exe = await findLocalChromium()
+// Software rasterisation is opt-in. Forcing SwiftShader makes every frame
+// GPU-bound in a way no reader's machine is, which buries the costs that are
+// actually worth finding; `--swiftshader` puts it back for a machine with no
+// usable GPU.
+const GPU_ARGS = process.argv.includes('--swiftshader')
+  ? ['--enable-unsafe-swiftshader', '--use-gl=angle', '--use-angle=swiftshader', '--disable-lcd-text']
+  : ['--disable-lcd-text']
+
 const browser = await chromium.launch({
   executablePath: exe,
-  args: ['--enable-unsafe-swiftshader', '--use-gl=angle', '--use-angle=swiftshader'],
+  args: GPU_ARGS,
 })
 
 await mkdir(OUT, { recursive: true })

@@ -51,12 +51,9 @@ const TO = argOf('--to', null)
 
 const VARIANTS = [
   { label: 'baseline', css: '' },
-  { label: 'no ingress panel', css: '.research-ingress{display:none!important}' },
-  {
-    label: 'no header surface',
-    css: '.site-header{transition:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}',
-  },
-  { label: 'no capabilities grain', css: '.capabilities-grain{display:none!important}' },
+  { label: 'no module clip', css: '.capability-module,.capability-frame{clip-path:none!important}' },
+  { label: 'no module images', css: '.capability-module img{display:none!important}' },
+  { label: 'no grain', css: '.capabilities-grain{display:none!important}' },
 ]
 
 const RECORDER = `
@@ -82,9 +79,17 @@ const RECORDER = `
   }
 `
 
+// Software rasterisation is opt-in. Forcing SwiftShader makes every frame
+// GPU-bound in a way no reader's machine is, which buries the costs that are
+// actually worth finding; `--swiftshader` puts it back for a machine with no
+// usable GPU.
+const GPU_ARGS = process.argv.includes('--swiftshader')
+  ? ['--enable-unsafe-swiftshader', '--use-gl=angle', '--use-angle=swiftshader', '--disable-lcd-text']
+  : ['--disable-lcd-text']
+
 const browser = await chromium.launch({
   executablePath: await findLocalChromium(),
-  args: ['--enable-unsafe-swiftshader', '--use-gl=angle', '--use-angle=swiftshader', '--disable-lcd-text'],
+  args: GPU_ARGS,
 })
 const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1 })
 await ctx.addInitScript(RECORDER)

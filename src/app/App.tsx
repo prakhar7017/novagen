@@ -33,7 +33,15 @@ export default function App() {
 
   useEffect(() => {
     const lenis = new Lenis({
-      duration: 1.15,
+      // Measured rather than chosen by feel. At the 1.15 this started on, the
+      // page coasted for 980ms after the wheel stopped and 27% of the travel
+      // arrived with no input at all — and because every scrubbed timeline
+      // then eases toward a position that is itself still easing, the two lags
+      // compound and the sections appear to drift into place rather than track
+      // the reader. At 0.7 the coast is 566ms and 18%, which still reads as
+      // smooth scrolling but stays attached to the input. Section `scrub`
+      // values are deliberately untouched; this is the shared half of the lag.
+      duration: 0.7,
       easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       touchMultiplier: 2,
     })
