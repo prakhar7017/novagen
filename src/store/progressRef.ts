@@ -29,6 +29,41 @@ export const scrollProgress = {
   techIngress: 0,
   /** 0–1 through the Technology pipeline: sample → map → interpret → predict → validate */
   technology: 0,
+  /**
+   * 0–1 through the Research → Impact handoff, where the Bone surface dims and
+   * the detaching signal points become the Impact network. Drives the WebGL
+   * gate: the impact scene draws nothing until this leaves 0.
+   */
+  impactIngress: 0,
+  /** 0–1 through Impact: 14.8M scale → 72x prioritization → 91% validation */
+  impact: 0,
+  /**
+   * 0–1 through Impact's closing collapse, where every scientific detail
+   * reduces toward the single soft point the Final CTA grows out of (§53).
+   *
+   * Derived from `impact` rather than from its own trigger, and kept here so
+   * section 08 can read the state this section ends on instead of re-deriving
+   * it — the seed has to be in the same place both sections agree on.
+   */
+  impactExit: 0,
+  /**
+   * 0–1 through the Final CTA's formation, run across the 100vh in which
+   * Impact's stage scrolls away (§6).
+   *
+   * Its zero is the exact scroll position at which `impact` reaches 1 — the
+   * Impact section's bottom meeting the viewport bottom is the CTA section's
+   * top meeting it — so the collapsed target and the biological cell it becomes
+   * are one continuous object rather than two that overlap.
+   */
+  ctaForm: 0,
+  /**
+   * 0–1 as the closing stage is released and the footer rises over it.
+   *
+   * The cell is drawn into a *fixed* canvas, so without this it would sit at
+   * 46% of the viewport forever and float over the footer. Scaled by viewport
+   * height it moves the cell exactly as if it had been painted into the stage.
+   */
+  ctaDepart: 0,
 }
 
 // Dev-only handle so the verification scripts can assert on the same numbers

@@ -2,15 +2,35 @@ import { useEffect } from 'react'
 import Lenis from 'lenis'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import Header from '@/components/Header/Header'
+import Loader from '@/components/Loader/Loader'
 import Hero from '@/sections/Hero/Hero'
 import Journey from '@/sections/Journey/Journey'
 import Innovation from '@/sections/Innovation/Innovation'
 import Technology from '@/sections/Technology/Technology'
 import Capabilities from '@/sections/Capabilities/Capabilities'
+import Research from '@/sections/Research/Research'
+import Impact from '@/sections/Impact/Impact'
+import Cta from '@/sections/Cta/Cta'
+import SiteFooter from '@/components/Footer/SiteFooter'
 import ExperienceCanvas from '@/scene/ExperienceCanvas'
 import { registerScroller } from '@/lib/scroller'
+import { useActiveSection } from '@/hooks/useActiveSection'
+import { resolveDeviceTier } from '@/lib/deviceTier'
+import { useExperienceStore } from '@/store/experienceStore'
 
 export default function App() {
+  const setDeviceTier = useExperienceStore((s) => s.setDeviceTier)
+
+  // Resolved once, before anything reads it: every scene sizes its buffers
+  // from this at mount, and a tier that arrived a frame later would build the
+  // whole page at the wrong budget and then rebuild it (§40).
+  useEffect(() => {
+    setDeviceTier(resolveDeviceTier())
+  }, [setDeviceTier])
+
+  useActiveSection()
+
   useEffect(() => {
     const lenis = new Lenis({
       duration: 1.15,
@@ -37,12 +57,21 @@ export default function App() {
     // rather than through window.scrollTo.
     const unregisterScroller = registerScroller(lenis)
 
-    const handleResize = () => ScrollTrigger.refresh()
+    // Debounced, because `resize` fires continuously while a window is being
+    // dragged and each refresh remeasures every trigger on the page — a
+    // hundred-millisecond job with this many pinned and sticky sections. The
+    // old undebounced handler turned a resize into a stall per frame (§43).
+    let resizeTimer = 0
+    const handleResize = () => {
+      window.clearTimeout(resizeTimer)
+      resizeTimer = window.setTimeout(() => ScrollTrigger.refresh(), 180)
+    }
     window.addEventListener('resize', handleResize)
 
     return () => {
       unregisterScroller()
       gsap.ticker.remove(tickerCallback)
+      window.clearTimeout(resizeTimer)
       window.removeEventListener('resize', handleResize)
       lenis.destroy()
       ScrollTrigger.getAll().forEach((t) => t.kill())
@@ -51,17 +80,27 @@ export default function App() {
 
   return (
     <>
+      <Loader />
+
       {/* One persistent WebGL surface behind everything (PAGE_STRUCTURE §14) */}
       <ExperienceCanvas />
 
-      <main>
+      <Header />
+
+      <main id="main">
         <Hero />
         <Journey />
         <Innovation />
         <Technology />
         <Capabilities />
-        {/* 06 Research onward mounts here */}
+        <Research />
+        <Impact />
+        <Cta />
       </main>
+
+      {/* A sibling of <main>, not a child: the footer is a page-level landmark
+          rather than part of section 08's argument. */}
+      <SiteFooter />
     </>
   )
 }

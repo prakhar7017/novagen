@@ -560,36 +560,6 @@
    Bone needs !important. Scoped to the attribute the surface trigger sets, and
    deliberately limited to colour.                                            */
 
-/* Declared for both surfaces so the change reads as a fade rather than a pop as
-   the aperture floods the top of the screen. It has to beat the nav links'
-   inline transition, otherwise the links and the wordmark cross over at
-   different speeds; 0.3s is close enough to the Hero's own 0.2s hover that the
-   hover feel is unchanged. */
-header a {
-  transition: color 0.3s var(--ease-out-expo) !important;
-}
-
-[data-surface='light'] header a {
-  color: rgba(7, 17, 15, 0.62) !important;
-}
-
-/* The inline mouseenter handler writes a Bone colour that this has to beat. */
-[data-surface='light'] header a:hover {
-  color: var(--color-abyss) !important;
-}
-
-[data-surface='light'] header > a {
-  color: var(--color-abyss) !important;
-}
-
-[data-surface='light'] header > a span {
-  color: #4e9c19 !important;
-}
-
-[data-surface='light'] .hero-nav-compact {
-  color: #4e9c19 !important;
-}
-
 /* ── Large desktop ───────────────────────────────────────────────────────── */
 
 @media (min-width: 1601px) {

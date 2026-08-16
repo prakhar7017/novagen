@@ -1,0 +1,321 @@
+/* ── Site header (§6–§13) ─────────────────────────────────────────────────
+   Three appearance inputs, all declarative:
+
+     [data-scrolled]        past the Hero, the bar earns a surface
+     html[data-surface]     which kind of section is underneath it
+     [aria-current]         which entry is the section the reader is in
+
+   The surface treatment is expressed as four custom properties redefined per
+   surface, rather than as colour rules per element. That is what lets the bar,
+   the border, the wordmark and the links all cross over together on one
+   transition instead of drifting apart — the problem the old `!important`
+   block in innovation.css was written to paper over.                          */
+
+:root {
+  --header-fg: rgba(245, 247, 244, 0.66);
+  --header-fg-strong: var(--color-bone);
+  --header-accent: var(--color-bio-green);
+  --header-bg: transparent;
+  --header-border: transparent;
+}
+
+/* Innovation and Research put Bone under the bar. Bio Green on Bone is 1.6:1,
+   so the accent takes a darkened variant here rather than the brand value —
+   the only place on the site where it is not used literally, and the
+   alternative is an unreadable wordmark on the two light sections. */
+[data-surface='light'] {
+  --header-fg: rgba(7, 17, 15, 0.62);
+  --header-fg-strong: var(--color-abyss);
+  --header-accent: #4e9c19;
+}
+
+.site-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  /* §7 — 72–88px tall. The padding is what sets the height; the content is
+     one line of type on both sides. */
+  min-height: 72px;
+  padding: clamp(16px, 2vh, 24px) clamp(20px, 4.4vw, 64px);
+  background: var(--header-bg);
+  border-bottom: 1px solid var(--header-border);
+  transition:
+    background 0.4s var(--ease-out-expo),
+    border-color 0.4s var(--ease-out-expo),
+    backdrop-filter 0.4s var(--ease-out-expo);
+}
+
+/* §8 — a surface, not a slab. Deliberately below the threshold where the bar
+   starts reading as a UI chrome element sitting on top of the experience. */
+.site-header[data-scrolled] {
+  --header-bg: rgba(7, 17, 15, 0.72);
+  --header-border: rgba(198, 245, 225, 0.08);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+[data-surface='light'] .site-header[data-scrolled] {
+  --header-bg: rgba(245, 247, 244, 0.72);
+  --header-border: rgba(7, 17, 15, 0.08);
+}
+
+/* ── Wordmark ───────────────────────────────────────────────────────────── */
+
+.site-logo {
+  font-family: var(--font-sans);
+  font-size: clamp(14px, 1.1vw, 16px);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--header-fg-strong);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color 0.4s var(--ease-out-expo);
+}
+
+.site-logo span {
+  color: var(--header-accent);
+  font-weight: 300;
+  margin: 0 1px;
+  transition: color 0.4s var(--ease-out-expo);
+}
+
+/* ── Links ──────────────────────────────────────────────────────────────── */
+
+.site-nav {
+  display: flex;
+  align-items: center;
+  gap: clamp(20px, 2.4vw, 32px);
+}
+
+.site-nav-list {
+  display: flex;
+  align-items: center;
+  gap: clamp(24px, 2.8vw, 40px);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.site-nav-link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-sans);
+  font-size: clamp(13px, 0.95vw, 15px);
+  letter-spacing: 0.02em;
+  color: var(--header-fg);
+  text-decoration: none;
+  /* §35 — the link's box is the touch target, and 13px of type is not one.
+     Vertical padding rather than a min-height so the row keeps its rhythm. */
+  padding: 10px 0;
+  transition: color 0.3s var(--ease-out-expo);
+}
+
+.site-nav-link:hover,
+.site-nav-link:focus-visible {
+  color: var(--header-fg-strong);
+}
+
+/* §10 — the current section, stated as one small mark. A dot rather than an
+   underline: an underline under a link that is already changing colour on
+   hover reads as a hover state, and the indicator has to survive being looked
+   at while the pointer is elsewhere. */
+.site-nav-dot {
+  position: absolute;
+  left: -11px;
+  top: 50%;
+  width: 4px;
+  height: 4px;
+  margin-top: -2px;
+  border-radius: 50%;
+  background: var(--header-accent);
+  opacity: 0;
+  transform: scale(0.4);
+  transition:
+    opacity 0.4s var(--ease-out-expo),
+    transform 0.4s var(--ease-out-expo);
+}
+
+.site-nav-link[aria-current] {
+  color: var(--header-fg-strong);
+}
+
+.site-nav-link[aria-current] .site-nav-dot {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* ── Menu toggle ────────────────────────────────────────────────────────── */
+
+.site-menu-toggle {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  /* §35 — 44px minimum touch target, achieved by the button rather than by an
+     invisible overlay. */
+  width: 44px;
+  height: 44px;
+  margin-right: -10px;
+  background: none;
+  border: 0;
+  color: var(--header-fg-strong);
+  cursor: pointer;
+}
+
+.site-menu-bars {
+  position: relative;
+  display: block;
+  width: 22px;
+  height: 10px;
+}
+
+.site-menu-bars span {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 1.5px;
+  background: currentColor;
+  transition:
+    transform 0.42s var(--ease-out-expo),
+    opacity 0.24s var(--ease-out-expo);
+}
+
+.site-menu-bars span:first-child {
+  top: 0;
+}
+
+.site-menu-bars span:last-child {
+  bottom: 0;
+}
+
+/* §12 — the two lines morph rather than being swapped for an icon. */
+[data-menu-open] .site-menu-bars span:first-child {
+  transform: translateY(4.25px) rotate(45deg);
+}
+
+[data-menu-open] .site-menu-bars span:last-child {
+  transform: translateY(-4.25px) rotate(-45deg);
+}
+
+/* The panel is Abyss whatever is underneath it, so the toggle stops following
+   the surface once it is open. */
+.site-header[data-menu-open] .site-menu-toggle {
+  color: var(--color-bone);
+}
+
+/* ── Full-screen menu (§11) ─────────────────────────────────────────────── */
+
+.site-menu {
+  position: fixed;
+  inset: 0;
+  z-index: 45;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: calc(72px + clamp(24px, 8vh, 72px)) clamp(20px, 6vw, 48px)
+    clamp(32px, 6vh, 56px);
+  background: var(--color-abyss);
+}
+
+.site-menu-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.site-menu-link {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  padding: clamp(10px, 1.6vh, 16px) 0;
+  font-family: var(--font-sans);
+  font-size: clamp(1.9rem, 8.4vw, 2.6rem);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  color: var(--color-bone);
+  text-decoration: none;
+}
+
+.site-menu-index {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.14em;
+  color: var(--color-muted);
+}
+
+.site-menu-link[aria-current] .site-menu-index {
+  color: var(--color-bio-green);
+}
+
+.site-menu-foot {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding-top: 32px;
+  border-top: 1px solid rgba(198, 245, 225, 0.1);
+}
+
+.site-menu-cta {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 22px;
+  border-radius: 2px;
+  background: var(--color-bio-green);
+  color: var(--color-abyss);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  text-decoration: none;
+}
+
+.site-menu-line {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+/* ── Compact (§11) ──────────────────────────────────────────────────────── */
+
+@media (max-width: 768px) {
+  .site-nav-list {
+    display: none;
+  }
+  .site-menu-toggle {
+    display: inline-flex;
+  }
+}
+
+/* The panel has no reason to exist above the breakpoint that shows the links
+   inline, and leaving it in the layout would let a stale open state cover a
+   desktop page. */
+@media (min-width: 769px) {
+  .site-menu {
+    display: none;
+  }
+}
+
+/* ── Reduced motion (§44) ───────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .site-header,
+  .site-logo,
+  .site-logo span,
+  .site-nav-link,
+  .site-nav-dot,
+  .site-menu-bars span {
+    transition-duration: 0.01ms;
+  }
+}

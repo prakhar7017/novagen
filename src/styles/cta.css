@@ -1,0 +1,648 @@
+/* ── Section 08 · Final CTA / Closing Vision ──────────────────────────────
+   The quietest dark section on the page, and quiet is a layout property before
+   it is a colour one. §4 asks for "silence after complexity"; §57 asks whether
+   the frame would still read as a premium closing statement with every
+   animation removed. Both are answered here rather than in the timeline —
+   negative space, one measure of type, one action, and a grid that does not
+   exist (§37).
+
+   Every layer is transparent or semi-transparent, for the same reason Impact's
+   are: the shared canvas is fixed *behind* the document, and an opaque
+   background would hide the cell this section exists to end on.               */
+
+.cta {
+  position: relative;
+  /* Above Impact (z:4) so the closing stage covers the end of it, and below the
+     fixed header (z:50). */
+  z-index: 5;
+  width: 100%;
+}
+
+/* The stage is held while the footer rises over it (§9, §41). Without the hold
+   the footer would begin covering the headline the instant the section finished
+   arriving, and §41 rules that out by name. */
+.cta-stage {
+  position: sticky;
+  top: 0;
+  min-height: 100svh;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+
+/* ── Environment (§5, §35–§37) ───────────────────────────────────────────── */
+
+.cta-bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  /* Calmer than Impact's by design: one wide field instead of two tight ones,
+     and the vertical wash carries more weight than the colour does. §5 asks
+     this to be almost meditative, which mostly means the eye should find no
+     edge anywhere in the background. */
+  background:
+    radial-gradient(ellipse 60% 58% at 74% 46%, rgba(166, 255, 106, 0.03) 0%, transparent 72%),
+    linear-gradient(180deg, rgba(7, 17, 15, 0.55) 0%, rgba(6, 14, 13, 0.3) 52%, rgba(4, 11, 9, 0.72) 100%);
+}
+
+/* §35 — one soft Bio Green glow behind the cell, 5–8%, large and diffused. The
+   strength lives in the gradient's own alpha; GSAP owns the element opacity as
+   a plain 0→1 gate that arrives with the formation. */
+.cta-glow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      ellipse 42% 48% at 73.5% 45.5%,
+      rgba(166, 255, 106, 0.07) 0%,
+      rgba(166, 255, 106, 0.02) 44%,
+      transparent 74%
+    ),
+    /* §35's secondary mint, at 2–3%. Off to the other side, so the frame has
+       depth rather than one lit corner. */
+    radial-gradient(ellipse 44% 42% at 22% 62%, rgba(198, 245, 225, 0.024) 0%, transparent 70%);
+}
+
+/* §36 — 2–3%, and static. Weaker than Impact's 3.5%: the closing frame has
+   less light in it, and grain is only invisible relative to what it sits on. */
+.cta-grain {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.026;
+  filter: url(#cta-grain);
+  background: #4a6b5c;
+  mix-blend-mode: screen;
+}
+
+/* §37 has no rule here on purpose. There is no .cta-grid, and there is not
+   meant to be one — the absence of technical structure is what communicates
+   resolution, and a 0.5% grid is still a grid. */
+
+/* ── Shell (§11) ─────────────────────────────────────────────────────────
+   Centred-to-slightly-left content with the cell at 73% of the viewport, so the
+   composition is one column of type and one punctuation mark. §11 warns
+   explicitly against turning this into another strict two-column section: the
+   right half of the frame is mostly empty, and that is the design.            */
+
+.cta-inner {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  /* §40 — content stops growing at 1560px, matching Impact, so the closing
+     composition does not drift apart on a 1920 display. */
+  max-width: 1560px;
+  margin: 0 auto;
+  padding: clamp(72px, 10vh, 112px) 64px clamp(56px, 8vh, 88px);
+}
+
+/* ── Label (§12) ─────────────────────────────────────────────────────────── */
+
+.cta-label {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 24px;
+  /* Narrower than the shell: the metadata pair belongs beside the label, not
+     pushed to the far edge of a 1560px frame where it reads as chrome. */
+  max-width: 1120px;
+  font-family: var(--font-mono);
+  font-size: clamp(10px, 0.78vw, 12px);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-signal-mint);
+  margin-bottom: clamp(28px, 4.4vh, 48px);
+}
+
+.cta-label-name {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.cta-label-index {
+  color: var(--color-bio-green);
+}
+
+.cta-label-slash {
+  color: rgba(198, 245, 225, 0.35);
+}
+
+/* §28 — the one metadata pair that survives into the closing frame, and it is
+   deliberately faint. Everything it replaced (SIGNAL_048, LOCUS, CONFIDENCE)
+   belongs to the part of the story that has finished. */
+.cta-label-meta {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  color: var(--color-muted);
+}
+
+.cta-label-meta-val {
+  color: rgba(198, 245, 225, 0.55);
+}
+
+/* ── Headline (§14, §15) ─────────────────────────────────────────────────
+   The largest editorial type on the page after Impact's figures.
+
+   The size is set by the *longest authored line*, not by §14's band directly.
+   "From biological complexity" measures about 12.3em of Space Grotesk Bold, and
+   §40 caps the measure at 1100–1200px — so any size above 1200 / 12.3 ≈ 97px
+   forces the browser to wrap a line the copy already broke, which strands
+   "complexity" on a line of its own. That is the exact failure §14 names, and
+   it is why this tops out at 6rem rather than at the 110px the band allows:
+   82–110 at 1440 is satisfied at 92px, and the two lines stay two lines.      */
+
+.cta-headline {
+  font-family: var(--font-sans);
+  font-size: clamp(3.4rem, 6.4vw, 6rem);
+  font-weight: 700;
+  line-height: 0.94;
+  letter-spacing: -0.03em;
+  color: var(--color-bone);
+  /* §40 — 1100–1200px. Wide enough for the longest authored line at every size
+     above, which is the only constraint that actually binds here. */
+  max-width: 1200px;
+}
+
+/* overflow:hidden on .line-clip cuts descenders at a line-height under 1, so
+   the box is extended and the extra space cancelled — same device as the Hero's
+   and Impact's, at this headline's larger optical size. */
+.cta-headline .line-clip {
+  padding-bottom: 0.2em;
+  margin-bottom: -0.16em;
+}
+
+/* §15 — the accent, reduced to a single glyph. A hundred-pixel neon headline
+   would be the loudest thing this page ever did, in the section that exists to
+   be quiet; a green full stop is the last mark on the page and the smallest
+   one that can carry the brand. */
+.cta-headline-mark {
+  color: var(--color-bio-green);
+}
+
+/* ── Supporting copy (§16) ───────────────────────────────────────────────── */
+
+.cta-lead {
+  margin-top: clamp(22px, 3.4vh, 36px);
+  font-size: clamp(1.02rem, 1.16vw, 1.24rem);
+  line-height: 1.62;
+  color: var(--color-muted);
+  /* §16 — 500–600px. Narrow enough that the paragraph reads as a caption to the
+     headline rather than as a second block of body copy. */
+  max-width: 560px;
+}
+
+/* ── Actions (§17–§19) ───────────────────────────────────────────────────── */
+
+.cta-actions {
+  display: flex;
+  align-items: center;
+  gap: clamp(24px, 2.6vw, 40px);
+  margin-top: clamp(32px, 4.8vh, 52px);
+}
+
+/* §17 — Bio Green on Abyss, 52–58px tall, 24–30px of padding, fully rounded.
+   Sized to its label rather than stretched to a fixed width: §17 rules out the
+   240px flashy button, and a pill that is exactly as wide as what it says is
+   the version that reads as considered. */
+.cta-action {
+  --cta-hx: 50%;
+  --cta-hy: 50%;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  height: clamp(52px, 3.8vw, 58px);
+  padding: 0 clamp(24px, 2vw, 30px);
+  border-radius: 999px;
+  background: var(--color-bio-green);
+  color: var(--color-abyss);
+  font-family: var(--font-sans);
+  font-size: clamp(14.5px, 1.05vw, 16px);
+  font-weight: 600;
+  letter-spacing: 0.005em;
+  text-decoration: none;
+  overflow: hidden;
+  isolation: isolate;
+  /* §18 — 1.015 and no more. Above that the button starts to feel like it is
+     reaching for the cursor. */
+  transition: transform 0.35s var(--ease-out-expo);
+  will-change: transform;
+}
+
+/* The moving highlight §18 asks for. A gradient positioned from two custom
+   properties the pointer handler writes, so it is one paint that follows the
+   cursor exactly — rather than a second animated element chasing it. */
+.cta-action::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: radial-gradient(
+    circle 120px at var(--cta-hx) var(--cta-hy),
+    rgba(255, 255, 255, 0.4) 0%,
+    rgba(255, 255, 255, 0) 68%
+  );
+  opacity: 0;
+  transition: opacity 0.4s var(--ease-out-expo);
+}
+
+.cta-action:hover::before {
+  opacity: 1;
+}
+
+/* Scale lives on a wrapper property GSAP does not own — the magnet writes x/y,
+   so a transform here would fight it. `scale` is its own property in modern
+   browsers, which is exactly what makes this safe. */
+.cta-action:hover {
+  scale: 1.015;
+}
+
+.cta-action-label {
+  position: relative;
+}
+
+/* §18 — about 4px. */
+.cta-action-arrow {
+  display: inline-block;
+  transition: transform 0.35s var(--ease-out-expo);
+}
+
+.cta-action:hover .cta-action-arrow,
+.cta-action:focus-visible .cta-action-arrow {
+  transform: translateX(4px);
+}
+
+/* §19 — a plain link, not a second button. The primary has to stay obviously
+   primary, and two pills of equal weight is exactly how that is lost. */
+.cta-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  /* §47 — 44px of touch target, from the link's own box rather than from a
+     min-height that would break the row's baseline. */
+  padding: 12px 0;
+  font-family: var(--font-sans);
+  font-size: clamp(14px, 1vw, 15.5px);
+  color: var(--color-muted);
+  text-decoration: none;
+  transition: color 0.3s var(--ease-out-expo);
+}
+
+.cta-link:hover,
+.cta-link:focus-visible {
+  color: var(--color-bone);
+}
+
+.cta-link-mark {
+  display: inline-block;
+  transition: transform 0.35s var(--ease-out-expo);
+}
+
+.cta-link:hover .cta-link-mark {
+  transform: translate(2px, -2px);
+}
+
+/* ── Brand lockup (§29) ──────────────────────────────────────────────────
+   Small, and after the action rather than competing with the headline. It is
+   the signature on the page, not a second headline.                          */
+
+.cta-brand {
+  display: flex;
+  align-items: baseline;
+  gap: clamp(12px, 1.4vw, 20px);
+  margin-top: clamp(48px, 8vh, 92px);
+  flex-wrap: wrap;
+}
+
+.cta-brand-name {
+  font-family: var(--font-sans);
+  font-size: clamp(14px, 1.1vw, 16px);
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  color: var(--color-bone);
+}
+
+.cta-brand-name span {
+  color: var(--color-bio-green);
+  font-weight: 300;
+  margin: 0 1px;
+}
+
+.cta-brand-line {
+  font-family: var(--font-mono);
+  font-size: clamp(10px, 0.78vw, 11.5px);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+/* ── The drawn cell (§45, §50) ───────────────────────────────────────────
+   Only ever rendered below 769px or under reduced motion, where there is no
+   shared canvas to inherit from. Above that the cell is WebGL and this markup
+   does not exist.                                                             */
+
+.cta-cell {
+  position: absolute;
+  z-index: 1;
+  pointer-events: none;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  /* The SVG's membrane occupies 62% of its viewBox, so the box is the perceived
+     diameter divided by that — which keeps this drawing and the WebGL one the
+     same size at the breakpoint where they swap. */
+  width: calc(clamp(220px, 62vw, 300px) / 0.62);
+  top: clamp(-40px, -3vh, 0px);
+  right: clamp(-64px, -12vw, -24px);
+}
+
+.cta-cell-svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+/* The soft interior, and §35's glow behind it, in one layer. A gradient rather
+   than the flat SVG fill it replaces: a membrane has no edge on the inside. */
+.cta-cell-glow {
+  position: absolute;
+  inset: -18%;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(166, 255, 106, 0.1) 0%,
+    rgba(166, 255, 106, 0.05) 22%,
+    rgba(166, 255, 106, 0.018) 40%,
+    transparent 66%
+  );
+}
+
+/* §22 — dark emerald and translucent. The values here are deliberately close to
+   invisible: this is a membrane seen against a dark room, and the filled disc
+   with a bright outline it started as read as a radar sweep, which is exactly
+   the "another dashboard" §56 fails the section for. What makes the boundary
+   legible is the interior falling away behind it, not the stroke. */
+.cta-cell-membrane {
+  fill: rgba(18, 79, 59, 0.13);
+  stroke: rgba(166, 255, 106, 0.17);
+  stroke-width: 0.6;
+}
+
+.cta-cell-filament {
+  fill: none;
+  stroke: rgba(166, 255, 106, 0.16);
+  stroke-width: 0.55;
+  stroke-linecap: round;
+}
+
+/* §22 — very low density. Signal Mint, but at the brightness of dust rather
+   than of data points. */
+.cta-cell-point {
+  fill: var(--color-signal-mint);
+  opacity: 0.5;
+}
+
+.cta-cell-core {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #e8fff0;
+  /* The loader's two-falloff glow, and Impact's: the point the page opens on,
+     the point it collapses to and the point it ends on are one object. */
+  box-shadow:
+    0 0 9px rgba(166, 255, 106, 0.9),
+    0 0 30px rgba(166, 255, 106, 0.3);
+}
+
+/* ── Large desktop (§40) ─────────────────────────────────────────────────── */
+
+@media (min-width: 1600px) {
+  /* §40 — the headline stops growing before the frame does, which is what keeps
+     a 1920 display from reading as a zoomed 1440. The cap is already in the
+     base rule; what large desktops get is more space around the type, not more
+     type — so the column is pushed a little further down the stage instead. */
+  .cta-inner {
+    padding-top: clamp(96px, 12vh, 140px);
+  }
+}
+
+/* ── Laptop (§42) ────────────────────────────────────────────────────────
+   §42 asks for 48px gutters and 68–86px of headline. 6.6vw lands at 84px at
+   1280 and 68px at 1024, so one rule covers both this tier and the tablet
+   landscape one below it.                                                     */
+
+@media (max-width: 1366px) {
+  .cta-inner {
+    padding-left: 48px;
+    padding-right: 48px;
+  }
+  .cta-headline {
+    /* Same slope as the base rule so nothing jumps across the breakpoint —
+       §42's 68–86px band is what 6.4vw produces at 1280 anyway. */
+    font-size: clamp(3.4rem, 6.4vw, 5.5rem);
+  }
+  .cta-lead {
+    margin-top: clamp(18px, 2.8vh, 28px);
+  }
+  .cta-brand {
+    margin-top: clamp(40px, 6vh, 72px);
+  }
+}
+
+/* ── Tablet landscape (§43) ──────────────────────────────────────────────
+   The composition survives; the type comes down and the cell moves further
+   right, which the scene handles on its own breakpoint (cellDiameterPx).      */
+
+@media (max-width: 1100px) and (min-width: 769px) {
+  .cta-inner {
+    padding-left: 40px;
+    padding-right: 40px;
+  }
+  .cta-lead {
+    max-width: 500px;
+  }
+}
+
+/* ── Tablet portrait (§44) ───────────────────────────────────────────────
+   §44 prefers the visual above the copy here rather than the desktop overlap
+   forced into a narrow frame. The WebGL cell is positioned by the scene, so
+   this tier is about giving the type room under it: the content is pushed down
+   the stage and the headline comes to 52–64px.                                */
+
+@media (max-width: 1024px) and (min-width: 769px) and (orientation: portrait) {
+  .cta-stage {
+    align-items: flex-end;
+  }
+  .cta-inner {
+    padding-left: 32px;
+    padding-right: 32px;
+    padding-bottom: clamp(64px, 12vh, 120px);
+  }
+  .cta-headline {
+    /* §44 — 52–64px. The measure comes off the cap entirely: at this width the
+       longest authored line is ~690px and the column is ~700, so a 640px
+       ceiling would wrap it. */
+    font-size: clamp(3rem, 7vw, 3.9rem);
+    max-width: 100%;
+  }
+  .cta-lead {
+    max-width: 520px;
+  }
+}
+
+/* ── Mobile (§45–§48) ────────────────────────────────────────────────────
+   No sticky stage, no held composition and no formation: the section is a
+   normally-flowing document with the cell drawn above the copy.               */
+
+@media (max-width: 768px) {
+  .cta-stage {
+    /* `relative`, not `static`. The drawn cell is absolutely positioned and
+       crops past the right edge on purpose (§45); `overflow: hidden` only
+       clips it if this element is also its containing block, and a static
+       parent hands that job to `.cta` instead — at which point the crop becomes
+       118px of horizontal overflow, which §49 fails outright. */
+    position: relative;
+    display: block;
+    overflow: hidden;
+  }
+  .cta-inner {
+    padding: clamp(300px, 74vw, 380px) 20px clamp(56px, 9vh, 80px);
+  }
+  .cta-label {
+    margin-bottom: clamp(20px, 3.4vh, 30px);
+  }
+  /* §46 — 13vw would give 51px at 390, but "human possibility." is ~8em of
+     Space Grotesk Bold and 8em × 51px is 408px inside a 350px column. Type
+     that clips is a hard failure (§49) and a size band is a recommendation, so
+     the measure wins: 10.8vw fits the longest authored line at both 390 and
+     360 with the gutters §45 asks for. */
+  .cta-headline {
+    font-size: clamp(2.2rem, 10.5vw, 2.95rem);
+    line-height: 0.98;
+    letter-spacing: -0.024em;
+    max-width: 100%;
+  }
+  .cta-lead {
+    margin-top: 20px;
+    font-size: 1rem;
+    line-height: 1.6;
+    max-width: 100%;
+  }
+  .cta-actions {
+    /* §47 — the two actions stack rather than being squeezed onto one row,
+       where the secondary link would wrap under a pill and read as a caption
+       for it. */
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 18px;
+    margin-top: 30px;
+  }
+  .cta-action {
+    /* §47 — fit-content, minimum 52px, and no magnetism (the handler is not
+       installed on a coarse pointer at all). */
+    height: 54px;
+    font-size: 15px;
+  }
+  .cta-brand {
+    margin-top: clamp(44px, 8vh, 64px);
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+}
+
+/* ── Large phone / tablet portrait at the flowing breakpoint (§44) ───────
+   768px still takes the flowing layout — the same 769px boundary Impact and
+   Technology use — but it has more than twice the measure of a 390px phone, and
+   the phone's type size there lands at 47px against §44's 52–64 band. The
+   binding constraint on this section's headline is always the longest authored
+   line, and at this width "human possibility." leaves room to spare.          */
+
+@media (min-width: 481px) and (max-width: 768px) {
+  .cta-headline {
+    font-size: clamp(2.95rem, 7.6vw, 4rem);
+  }
+  .cta-lead {
+    max-width: 540px;
+  }
+  .cta-actions {
+    flex-direction: row;
+    align-items: center;
+    gap: 28px;
+  }
+}
+
+/* ── Small mobile (§49) ──────────────────────────────────────────────────── */
+
+@media (max-width: 380px) {
+  .cta-inner {
+    padding-top: clamp(268px, 76vw, 320px);
+  }
+  .cta-cell {
+    width: calc(clamp(200px, 62vw, 260px) / 0.62);
+  }
+}
+
+/* ── Short viewport ──────────────────────────────────────────────────────
+   The stage is one 100svh screen with a centred column, so height is a real
+   constraint on a wide-and-short window — a 1440x900 display is about 760px of
+   viewport once browser chrome is subtracted, and §41 wants the CTA above the
+   fold there.                                                                 */
+
+@media (min-width: 769px) and (max-height: 860px) {
+  .cta-inner {
+    padding-top: clamp(56px, 7vh, 80px);
+    padding-bottom: clamp(40px, 6vh, 64px);
+  }
+  .cta-headline {
+    font-size: clamp(3rem, min(6.4vw, 11.2vh), 5.6rem);
+  }
+  .cta-label {
+    margin-bottom: clamp(20px, 3.2vh, 34px);
+  }
+  .cta-brand {
+    margin-top: clamp(32px, 5.4vh, 56px);
+  }
+}
+
+@media (min-width: 769px) and (max-height: 700px) {
+  .cta-headline {
+    font-size: clamp(2.6rem, min(6vw, 10vh), 4.4rem);
+  }
+  .cta-lead {
+    margin-top: 16px;
+    line-height: 1.5;
+  }
+  .cta-brand {
+    margin-top: clamp(24px, 4vh, 40px);
+  }
+}
+
+/* ── Reduced motion (§50) ────────────────────────────────────────────────
+   The drawn cell is what renders and no timelines are built at all, so every
+   element is already in its final state. What is left is to silence the
+   transitions CSS owns — a magnetic pull is never installed, but a hover scale
+   and a travelling arrow are still motion the reader did not ask for.         */
+
+@media (prefers-reduced-motion: reduce) {
+  .cta-action,
+  .cta-action::before,
+  .cta-action-arrow,
+  .cta-link,
+  .cta-link-mark {
+    transition: none;
+  }
+  .cta-action:hover {
+    scale: 1;
+  }
+  .cta-action:hover .cta-action-arrow,
+  .cta-link:hover .cta-link-mark {
+    transform: none;
+  }
+}

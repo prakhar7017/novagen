@@ -186,6 +186,45 @@ function buildExit(refs: CapabilitiesRefs) {
 }
 
 /**
+ * The settle into 06 / Research (§5, §6 of the Research brief).
+ *
+ * The four modules are instruments, and an instrument that is still lit while
+ * the next section is arriving competes with it. So the section stands down:
+ * borders lose most of their opacity, the interior glow under each module goes
+ * out, the environment's own green wash flattens toward the flat surface
+ * colour, and the visuals themselves step back — TOOL, then OBSERVATION.
+ *
+ * One custom property drives all of it, which keeps the look in the stylesheet
+ * where it can be reasoned about, and reduces the whole transition to a single
+ * scrubbed tween. Research's Bone panel rises over the result on its own
+ * schedule; neither side needs to know the other's timing.
+ */
+function buildSettle(refs: CapabilitiesRefs) {
+  const section = refs.section.current
+  const exit = refs.exit.current
+  if (!section || !exit) return
+
+  gsap.fromTo(
+    section,
+    { '--cap-settle': 0 },
+    {
+      '--cap-settle': 1,
+      ease: 'none',
+      scrollTrigger: {
+        trigger: exit,
+        // Begins as the closing line reaches the lower third of the screen —
+        // by which point the grid is most of the way past — and completes over
+        // most of a viewport, so nothing dims while it is still being read.
+        start: 'top 72%',
+        end: () => `+=${window.innerHeight * 0.9}`,
+        scrub: 0.6,
+        invalidateOnRefresh: true,
+      },
+    },
+  )
+}
+
+/**
  * The canvas gate.
  *
  * Capabilities is opaque and there is no WebGL behind it, so the shared render
@@ -230,4 +269,5 @@ export function buildCapabilitiesTimeline(refs: CapabilitiesRefs, reduced: boole
   buildEntrance(refs)
   buildReveal(refs)
   buildExit(refs)
+  buildSettle(refs)
 }

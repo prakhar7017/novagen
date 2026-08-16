@@ -1,0 +1,243 @@
+/* ── Site footer (§31–§34) ────────────────────────────────────────────────
+   The page's last surface. §32 asks for the same Abyss or slightly darker, and
+   darker is the right answer: #040B09 under #07110F is the one place on this
+   site where the background steps down rather than up, and it reads as the
+   lights going off rather than as a separate component being appended.
+
+   It is also the only opaque full-width surface below Impact, which is what
+   hides the shared canvas once the closing cell has travelled past it.        */
+
+.site-footer {
+  position: relative;
+  /* Above the closing stage it rises over, below the fixed header. */
+  z-index: 6;
+  width: 100%;
+  background: #040b09;
+  border-top: 1px solid rgba(198, 245, 225, 0.1);
+}
+
+/* §33 — 260–380px on a desktop. The padding above sets the height from the
+   content, which lands a little under the floor at the narrower desktop tiers
+   where the type is smaller; this holds the band without inflating the wide
+   ones. §33 also warns against unnecessary whitespace, so there is no maximum
+   here — the content never reaches one. */
+@media (min-width: 769px) {
+  .site-footer {
+    min-height: 268px;
+  }
+}
+
+.site-footer-inner {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: clamp(32px, 6vw, 96px);
+  max-width: 1560px;
+  margin: 0 auto;
+  /* §33 — 260–380px on a desktop, and the padding is what sets it: two short
+     rows of type is all the content there is. */
+  padding: clamp(56px, 7vh, 76px) 64px clamp(36px, 4.5vh, 48px);
+}
+
+.site-footer-brand {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.site-footer-word {
+  font-family: var(--font-sans);
+  font-size: clamp(15px, 1.2vw, 18px);
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  color: var(--color-bone);
+}
+
+.site-footer-word span {
+  color: var(--color-bio-green);
+  font-weight: 300;
+  margin: 0 1px;
+}
+
+.site-footer-tagline {
+  font-family: var(--font-mono);
+  font-size: clamp(10px, 0.78vw, 11.5px);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+/* ── Links (§55) ────────────────────────────────────────────────────────── */
+
+.site-footer-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: clamp(20px, 2.6vw, 40px);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.site-footer-link {
+  position: relative;
+  display: inline-block;
+  /* The link's own box is the touch target; 14px of type is not one. */
+  padding: 8px 0;
+  font-family: var(--font-sans);
+  font-size: clamp(13.5px, 1vw, 15px);
+  color: rgba(245, 247, 244, 0.7);
+  text-decoration: none;
+  transition: color 0.3s var(--ease-out-expo);
+}
+
+.site-footer-link::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 4px;
+  height: 1px;
+  background: var(--color-bio-green);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.4s var(--ease-out-expo);
+}
+
+.site-footer-link:hover,
+.site-footer-link:focus-visible {
+  color: var(--color-bone);
+}
+
+.site-footer-link:hover::after,
+.site-footer-link:focus-visible::after {
+  transform: scaleX(1);
+}
+
+/* ── Base row (§31, §34) ────────────────────────────────────────────────── */
+
+.site-footer-base {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: clamp(24px, 4vw, 64px);
+  max-width: 1560px;
+  margin: 0 auto;
+  padding: clamp(18px, 2.4vh, 26px) 64px clamp(32px, 4.5vh, 44px);
+  border-top: 1px solid rgba(198, 245, 225, 0.07);
+}
+
+/* §31 — no copyright claim. This is a portfolio piece and says so, which is
+   both more honest and more interesting than a fabricated © line. */
+.site-footer-note {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  line-height: 1.75;
+  letter-spacing: 0.06em;
+  color: var(--color-muted);
+  max-width: 560px;
+}
+
+/* §34 — one small technical detail. Any more and the footer turns back into
+   the HUD the closing section just finished dismantling. */
+.site-footer-meta {
+  display: flex;
+  gap: 10px;
+  white-space: nowrap;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(198, 245, 225, 0.4);
+}
+
+/* ── Laptop ──────────────────────────────────────────────────────────────── */
+
+@media (max-width: 1366px) {
+  .site-footer-inner,
+  .site-footer-base {
+    padding-left: 48px;
+    padding-right: 48px;
+  }
+}
+
+@media (max-width: 1100px) {
+  .site-footer-inner,
+  .site-footer-base {
+    padding-left: 40px;
+    padding-right: 40px;
+  }
+}
+
+@media (max-width: 1024px) and (orientation: portrait) {
+  .site-footer-inner,
+  .site-footer-base {
+    padding-left: 32px;
+    padding-right: 32px;
+  }
+}
+
+/* ── Mobile (§48) ────────────────────────────────────────────────────────
+   §48 rules out squeezing the desktop row into a tiny horizontal layout. The
+   order §48 asks for is brand, links, tagline, concept line — so the tagline
+   moves below the links rather than staying attached to the wordmark.         */
+
+@media (max-width: 768px) {
+  .site-footer-inner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 28px;
+    padding: clamp(44px, 7vh, 60px) 20px 28px;
+  }
+  .site-footer-brand {
+    order: 1;
+    gap: 0;
+  }
+  .site-footer-tagline {
+    /* Below the links, per §48's order, without leaving the brand block — the
+       two belong to each other semantically even when they are not adjacent. */
+    order: 3;
+    margin-top: -6px;
+  }
+  .site-footer-nav {
+    order: 2;
+    width: 100%;
+  }
+  .site-footer-list {
+    /* Two columns rather than one long stack: four short words in a single
+       column is 200px of near-empty footer. */
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 4px 20px;
+  }
+  .site-footer-link {
+    font-size: 15px;
+    padding: 10px 0;
+  }
+  .site-footer-base {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 20px 20px clamp(36px, 6vh, 52px);
+  }
+  .site-footer-note {
+    max-width: 100%;
+  }
+}
+
+/* The tagline is inside .site-footer-brand, so the reorder above needs the
+   brand block to participate in the parent's flex ordering. Splitting it into
+   two elements in the markup would put the wordmark and its own tagline in
+   different containers, which is worse for the document than this is for the
+   stylesheet. */
+@media (max-width: 768px) {
+  .site-footer-brand {
+    display: contents;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-footer-link,
+  .site-footer-link::after {
+    transition: none;
+  }
+}

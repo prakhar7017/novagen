@@ -98,7 +98,7 @@ export default function HeroContent({
         {/* Primary */}
         <a
           ref={primaryCtaRef}
-          href="#platform"
+          href="#technology"
           style={{
             display: 'inline-flex',
             alignItems: 'center',

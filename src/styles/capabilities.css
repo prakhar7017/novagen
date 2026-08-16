@@ -9,7 +9,12 @@
    canvases, and the shared one is stopped for the whole section — there is
    nothing behind this to draw.                                              */
 
+/* 0 while the section is being read, 1 by the time Research's Bone panel is
+   rising over it. Every part of the stand-down below is a function of it, so
+   the whole Capabilities → Research settle is one scrubbed tween and one
+   number (§5, §6 of the Research brief). */
 .capabilities {
+  --cap-settle: 0;
   position: relative;
   z-index: 2; /* above the fixed ExperienceCanvas */
   width: 100%;
@@ -25,6 +30,9 @@
   position: absolute;
   inset: 0;
   pointer-events: none;
+  /* Fades toward the flat surface colour underneath as the section stands
+     down: the environment's green wash is the first thing to go. */
+  opacity: calc(1 - 0.62 * var(--cap-settle));
   background:
     radial-gradient(ellipse 76% 44% at 50% 30%, rgba(166, 255, 106, 0.045) 0%, transparent 70%),
     radial-gradient(ellipse 90% 60% at 50% 42%, rgba(14, 29, 23, 0) 0%, #07110f 100%),
@@ -202,9 +210,17 @@
   flex-direction: column;
   overflow: hidden;
   border-radius: 28px;
-  border: 1px solid rgba(198, 245, 225, 0.1);
+  /* Both the border and the interior glow are written against the settle, so
+     the modules flatten into thin outlines rather than being faded out
+     wholesale — the instruments are still there, they are simply no longer
+     lit. */
+  border: 1px solid rgb(198 245 225 / calc(0.1 - 0.072 * var(--cap-settle)));
   background:
-    radial-gradient(ellipse 70% 55% at 50% 26%, rgba(166, 255, 106, 0.045) 0%, transparent 74%),
+    radial-gradient(
+      ellipse 70% 55% at 50% 26%,
+      rgb(166 255 106 / calc(0.045 * (1 - var(--cap-settle)))) 0%,
+      transparent 74%
+    ),
     rgba(7, 17, 15, 0.72);
   /* §28 — the container is allowed 1–2px and no more. The interaction belongs
      inside the instrument, not to the card holding it. */
@@ -221,6 +237,10 @@
 }
 
 .cap-module-visual {
+  /* The science steps back with the surface it sits on. Not to zero: a module
+     that empties as it leaves reads as a loading failure rather than as an
+     instrument standing down. */
+  opacity: calc(1 - 0.48 * var(--cap-settle));
   position: relative;
   /* §13 — the visual takes 50–65% of the module; the body below takes what it
      needs and this absorbs the rest. */

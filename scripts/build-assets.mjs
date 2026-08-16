@@ -12,7 +12,13 @@ import { dirname, join } from 'node:path'
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 
-/** @type {{src: string, dir: string, out: string, width: number, alpha: boolean, quality?: number}[]} */
+/**
+ * @type {{
+ *   src: string, dir: string, out: string, width: number, alpha: boolean,
+ *   quality?: number,
+ *   crop?: {left: number, top: number, width: number, height: number},
+ * }[]}
+ */
 const JOBS = [
   { src: 'organism.png',                     dir: 'story', out: '01-organism.webp',            width: 1600, alpha: true },
   { src: 'CELL_CLUSTER.png',                 dir: 'story', out: '02-cell-cluster.webp',        width: 1920, alpha: false },
@@ -40,6 +46,27 @@ const JOBS = [
   // its rim glow reads through the transparent corners.
   { src: 'SPATIAL_BIOLOGY_MICROSCOPY.png',   dir: 'capabilities', out: 'spatial-biology.webp',     width: 1280, alpha: false, quality: 76 },
   { src: 'PROTEIN_ENGINEERING_STRUCTURE.png', dir: 'capabilities', out: 'protein-engineering.webp', width: 880,  alpha: true,  quality: 84 },
+  // Section 06 · Research. Both studies ship at two widths rather than one:
+  // the lead image is ~880px wide on a 1440 desktop and 100% of a 350px phone,
+  // and sending the desktop file to the phone is most of a megabyte of pixels
+  // it will never resolve (§51). The narrow variants are what `srcset` picks.
+  //
+  // The cellular field is used uncropped at 3:2, so the annotations over it
+  // land on the biology they name; the source is already that ratio.
+  { src: 'Neon_Cellular_Tissue_Network.png',  dir: 'research', out: 'research-cellular-field.webp',     width: 1536, alpha: false, quality: 78 },
+  { src: 'Neon_Cellular_Tissue_Network.png',  dir: 'research', out: 'research-cellular-field-820.webp', width: 820,  alpha: false, quality: 76 },
+  // The protein is framed at 16:10 from a 4:3 source, so it carries a little
+  // more width than the box needs and the crop stays centred on the structure.
+  { src: 'Neon_Ligand_in_Molecular_Depths.png', dir: 'research', out: 'research-protein-study.webp',     width: 1200, alpha: false, quality: 80 },
+  { src: 'Neon_Ligand_in_Molecular_Depths.png', dir: 'research', out: 'research-protein-study-720.webp', width: 720,  alpha: false, quality: 78 },
+  // Section 07 · Impact. The human moment (§26, §27) is a small editorial
+  // crop, never a full-bleed photograph — ~320px wide on a 1440 desktop, so
+  // 720px covers a 2x display. The source is a 4:5 portrait; the crop takes a
+  // 1.6:1 band through the middle of it, which keeps the researcher, the
+  // pipette and the green field on the monitor and drops the empty ceiling and
+  // the foreground glassware. Opaque: it sits inside a framed panel.
+  { src: 'Focused_Scientist_in_a_Teal_Laboratory.png', dir: 'impact', out: 'human-impact.webp', width: 720, alpha: false, quality: 80,
+    crop: { left: 0, top: 308, width: 1122, height: 701 } },
 ]
 
 for (const job of JOBS) {
@@ -57,7 +84,9 @@ for (const job of JOBS) {
 
   const outPath = join(outDir, job.out)
 
-  const pipeline = sharp(inPath).resize({
+  let pipeline = sharp(inPath)
+  if (job.crop) pipeline = pipeline.extract(job.crop)
+  pipeline = pipeline.resize({
     width: job.width,
     withoutEnlargement: true,
   })

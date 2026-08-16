@@ -1,0 +1,231 @@
+/* ── Loading experience (§14–§17) ─────────────────────────────────────────
+   A cover, not a screen: it holds the page's own background and one small
+   biological mark, so the transition into the Hero is the mark leaving rather
+   than a different design being replaced.
+
+   Every animation below is `transform` and `opacity` only. This is the busiest
+   moment on the main thread in the whole session — React mounting the document,
+   the GL context initialising, fourteen shader programs compiling behind the
+   cover — so anything that needs layout, paint or a JS tick would visibly
+   stutter. These run on the compositor and do not.                          */
+
+.site-loader {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+  background: var(--color-abyss);
+  /* Nothing here is interactive, and a cover that swallows the first click
+     after it has visually gone is worse than one that lingers. */
+  pointer-events: none;
+}
+
+.site-loader-mark {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  display: grid;
+  place-items: center;
+}
+
+/* ── The mark ─────────────────────────────────────────────────────────────
+   Borders on plain elements rather than an SVG stroke: `stroke-dashoffset` is
+   the natural way to draw a circle and the one property here that cannot be
+   composited, and a rotating arc — the usual substitute — is a spinner.
+   Rippling outward from the seed says the same thing and costs nothing.     */
+
+.site-loader-ring {
+  position: absolute;
+  inset: 0;
+  border: 1px solid rgba(198, 245, 225, 0.28);
+  border-radius: 50%;
+  opacity: 0;
+  transform: scale(0.12);
+  will-change: transform, opacity;
+  animation: loader-ring 0.72s cubic-bezier(0.16, 0.84, 0.34, 1) 0.14s both;
+}
+
+.site-loader-ring--wave {
+  border-color: rgba(166, 255, 106, 0.34);
+  animation: loader-wave 0.66s cubic-bezier(0.22, 0.61, 0.36, 1) 0.34s both;
+}
+
+.site-loader-seed {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-bio-green);
+  /* The same two-falloff glow the Impact seed uses, so the point the page
+     opens on and the point it closes on are recognisably one object. Static:
+     the element is scaled by transform, which moves the rasterised glow with
+     it instead of repainting a shadow every frame. */
+  box-shadow:
+    0 0 8px rgba(166, 255, 106, 0.85),
+    0 0 26px rgba(166, 255, 106, 0.28);
+  will-change: transform, opacity;
+  animation: loader-seed 0.44s cubic-bezier(0.16, 0.84, 0.34, 1) both;
+}
+
+.site-loader-word {
+  font-family: var(--font-sans);
+  font-size: clamp(15px, 1.2vw, 17px);
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--color-bone);
+  will-change: transform, opacity;
+  animation: loader-rise 0.44s cubic-bezier(0.22, 0.61, 0.36, 1) 0.46s both;
+}
+
+.site-loader-word span {
+  color: var(--color-bio-green);
+  font-weight: 300;
+  margin: 0 1px;
+}
+
+.site-loader-meta {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+  will-change: opacity;
+  animation: loader-fade 0.36s linear 0.6s both;
+}
+
+@keyframes loader-seed {
+  from {
+    opacity: 0;
+    transform: scale(0);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes loader-ring {
+  from {
+    opacity: 0;
+    transform: scale(0.12);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes loader-wave {
+  from {
+    opacity: 0;
+    transform: scale(0.12);
+  }
+  45% {
+    opacity: 0.85;
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.85);
+  }
+}
+
+@keyframes loader-rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes loader-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ── The handover (§16) ───────────────────────────────────────────────────
+   The seed expands past the viewport as the cover fades: the point the page
+   opened on becomes the space the Hero occupies. Each rule replaces the
+   element's intro animation outright, which is safe because the floor on the
+   loader's hold is set past the end of the intro — nothing is ever caught
+   mid-fade and snapped back to full.                                        */
+
+.site-loader.is-leaving {
+  animation: loader-fade 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.2s reverse forwards;
+}
+
+.site-loader.is-leaving .site-loader-word,
+.site-loader.is-leaving .site-loader-meta {
+  animation: loader-lift 0.26s cubic-bezier(0.4, 0, 1, 1) both;
+}
+
+.site-loader.is-leaving .site-loader-seed,
+.site-loader.is-leaving .site-loader-ring {
+  animation: loader-open 0.62s cubic-bezier(0.4, 0, 0.2, 1) 0.06s both;
+}
+
+/* The wave has already faded to nothing by this point; keeping it out of the
+   opening avoids a second ring reappearing to leave. */
+.site-loader.is-leaving .site-loader-ring--wave {
+  animation: none;
+  opacity: 0;
+}
+
+@keyframes loader-lift {
+  from {
+    opacity: 1;
+    transform: none;
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes loader-open {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(2.4);
+  }
+}
+
+/* ── Reduced motion (§44) ─────────────────────────────────────────────────
+   No sequence at all. The cover exists only to hide the font swap, so it is
+   present at rest and leaves on a plain fade.                               */
+
+@media (prefers-reduced-motion: reduce) {
+  .site-loader-seed,
+  .site-loader-ring,
+  .site-loader-word,
+  .site-loader-meta,
+  .site-loader.is-leaving .site-loader-seed,
+  .site-loader.is-leaving .site-loader-ring,
+  .site-loader.is-leaving .site-loader-word,
+  .site-loader.is-leaving .site-loader-meta {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+
+  .site-loader-ring--wave,
+  .site-loader.is-leaving .site-loader-ring--wave {
+    opacity: 0;
+  }
+
+  .site-loader.is-leaving {
+    animation: loader-fade 0.24s linear reverse forwards;
+  }
+}

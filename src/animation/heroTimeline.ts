@@ -8,12 +8,12 @@ gsap.registerPlugin(ScrollTrigger)
 
 // ── Entrance ────────────────────────────────────────────────────────────────
 export function buildEntranceTimeline(refs: HeroRefs, reduced: boolean) {
-  const { nav, eyebrow, headlineLines, body, ctaWrap, meta, breathWrap } = refs
+  const { eyebrow, headlineLines, body, ctaWrap, meta, breathWrap } = refs
 
   if (reduced) {
     // Instant reveal for reduced-motion users
     gsap.set(
-      [nav.current, eyebrow.current, ...(headlineLines.current ?? []), body.current, ctaWrap.current, meta.current, breathWrap.current],
+      [eyebrow.current, ...(headlineLines.current ?? []), body.current, ctaWrap.current, meta.current, breathWrap.current],
       { opacity: 1, y: 0, x: 0, filter: 'none' },
     )
     return null
@@ -26,14 +26,6 @@ export function buildEntranceTimeline(refs: HeroRefs, reduced: boolean) {
     breathWrap.current,
     { opacity: 0, scale: 1.06, x: 20, filter: 'blur(10px)' },
     { opacity: 1, scale: 1, x: 0, filter: 'blur(0px)', duration: 1.0 },
-    0.15,
-  )
-
-  // Nav slides down subtly
-  tl.fromTo(
-    nav.current,
-    { opacity: 0, y: -8 },
-    { opacity: 1, y: 0, duration: 0.6 },
     0.15,
   )
 

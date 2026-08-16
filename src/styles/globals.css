@@ -1,13 +1,28 @@
 @import "tailwindcss";
 @import "./tokens.css";
+@import "./header.css";
+@import "./loader.css";
 @import "./journey.css";
 @import "./innovation.css";
 @import "./technology.css";
 @import "./capabilities.css";
+@import "./research.css";
+@import "./impact.css";
+@import "./cta.css";
+@import "./footer.css";
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 html { scroll-behavior: auto; } /* Lenis handles smooth scroll */
+
+/* Set while a full-screen overlay owns the viewport. Lenis is stopped at the
+   same time — this is the native fallback, for the case where Lenis never
+   registered, and it also stops iOS rubber-banding the page behind the menu. */
+html.is-scroll-locked,
+html.is-scroll-locked body {
+  overflow: hidden;
+  touch-action: none;
+}
 
 body {
   background: var(--color-abyss);
@@ -98,29 +113,9 @@ body {
   .hero-copy { max-width: 78%; }
 }
 
-/* ── Header ──────────────────────────────────────────────────────────────── */
-
-.hero-nav-links {
-  display: flex;
-}
-
-.hero-nav-compact {
-  display: none;
-  font-family: var(--font-sans);
-  font-size: 14px;
-  font-weight: 500;
-  letter-spacing: 0.02em;
-  color: var(--color-bio-green);
-  text-decoration: none;
-  padding: 6px 0;
-}
-
 /* Mobile — copy spans the viewport; percentage widths would starve the
    headline and reintroduce the clip. */
 @media (max-width: 768px) {
-  .hero-nav-links { display: none; }
-  .hero-nav-compact { display: inline-flex; }
-
   .hero-copy {
     max-width: 100%;
     padding-right: 20px;
