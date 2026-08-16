@@ -5,6 +5,7 @@ import {
   coverScale as apertureCoverScale,
   seedScale as apertureSeedScale,
 } from '@/sections/Innovation/aperture.geometry'
+import { viewportHeight } from '@/lib/viewport'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -34,7 +35,7 @@ export function buildHandoffTimeline(els: HandoffEls, reduced: boolean) {
   const tl = gsap.timeline({
     scrollTrigger: {
       trigger: journey,
-      start: () => `bottom bottom+=${(window.innerHeight * handoffVh) / 100}`,
+      start: () => `bottom bottom+=${(viewportHeight() * handoffVh) / 100}`,
       end: 'bottom bottom',
       scrub: 0.6,
       invalidateOnRefresh: true,

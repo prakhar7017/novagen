@@ -17,6 +17,7 @@ import ExperienceCanvas from '@/scene/ExperienceCanvas'
 import { registerScroller } from '@/lib/scroller'
 import { useActiveSection } from '@/hooks/useActiveSection'
 import { resolveDeviceTier } from '@/lib/deviceTier'
+import { invalidateViewportHeight } from '@/lib/viewport'
 import { useExperienceStore } from '@/store/experienceStore'
 
 export default function App() {
@@ -47,10 +48,26 @@ export default function App() {
 
     const unregisterScroller = registerScroller(lenis)
 
+    // iOS fires `resize` every time its URL bar collapses or expands under a
+    // scroll gesture, even though nothing about the layout changed. A refresh
+    // there re-measures the pinned hero and every viewport-derived start/end
+    // mid-gesture, so section boundaries shift beneath the finger — the jump
+    // you feel scrolling back up a phone. Only a width change means the layout
+    // moved, so on touch devices that is the only thing we refresh for.
+    ScrollTrigger.config({ ignoreMobileResize: true })
+
+    const barOnlyResize = window.matchMedia('(pointer: coarse)').matches
+    let lastWidth = window.innerWidth
     let resizeTimer = 0
     const handleResize = () => {
+      const width = window.innerWidth
+      if (barOnlyResize && width === lastWidth) return
+      lastWidth = width
       window.clearTimeout(resizeTimer)
-      resizeTimer = window.setTimeout(() => ScrollTrigger.refresh(), 180)
+      resizeTimer = window.setTimeout(() => {
+        invalidateViewportHeight()
+        ScrollTrigger.refresh()
+      }, 180)
     }
     window.addEventListener('resize', handleResize)
 

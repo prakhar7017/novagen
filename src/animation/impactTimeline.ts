@@ -10,6 +10,7 @@ import {
   type ImpactStageId,
 } from '@/sections/Impact/impact.constants'
 import { scrollProgress } from '@/store/progressRef'
+import { viewportHeight } from '@/lib/viewport'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -31,7 +32,7 @@ export interface ImpactRefs {
   humanFrame: React.RefObject<HTMLDivElement | null>
 }
 
-const ingressPx = () => (window.innerHeight * IMPACT_SCROLL.ingressVh) / 100
+const ingressPx = () => (viewportHeight() * IMPACT_SCROLL.ingressVh) / 100
 
 const STORY_OVERLAP = 0.66
 

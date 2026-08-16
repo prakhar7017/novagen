@@ -1,6 +1,7 @@
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { CAPABILITIES } from '@/sections/Capabilities/capabilities.constants'
+import { viewportHeight } from '@/lib/viewport'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -153,7 +154,7 @@ function buildSettle(refs: CapabilitiesRefs) {
       scrollTrigger: {
         trigger: exit,
         start: 'top 72%',
-        end: () => `+=${window.innerHeight * 0.9}`,
+        end: () => `+=${viewportHeight() * 0.9}`,
         scrub: 0.6,
         invalidateOnRefresh: true,
       },

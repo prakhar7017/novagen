@@ -1,5 +1,6 @@
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { viewportHeight } from '@/lib/viewport'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -36,7 +37,7 @@ export function buildResearchSurface(
     trigger: section,
     start: reduced
       ? 'top top'
-      : () => `top top+=${window.innerHeight * (INGRESS_VH / 100) * 0.96}`,
+      : () => `top top+=${viewportHeight() * (INGRESS_VH / 100) * 0.96}`,
     end: 'bottom bottom',
     onEnter: () => setSurface(true),
     onEnterBack: () => setSurface(true),

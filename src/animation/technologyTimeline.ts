@@ -10,6 +10,7 @@ import {
   type TechnologyStageId,
 } from '@/sections/Technology/technology.constants'
 import { scrollProgress } from '@/store/progressRef'
+import { viewportHeight } from '@/lib/viewport'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -31,7 +32,7 @@ export interface TechnologyRefs {
   stageNodes: React.RefObject<(HTMLElement | null)[]>
 }
 
-const ingressPx = () => (window.innerHeight * TECH_SCROLL.ingressVh) / 100
+const ingressPx = () => (viewportHeight() * TECH_SCROLL.ingressVh) / 100
 
 const STORY_OVERLAP = 0.65
 
@@ -259,7 +260,7 @@ export function buildTechnologySurface(
   const surface = ScrollTrigger.create({
     trigger: section,
     start: flowing
-      ? () => `top top-=${window.innerHeight * 0.12}`
+      ? () => `top top-=${viewportHeight() * 0.12}`
       : () => `top top-=${ingressPx() * 0.42}`,
     end: 'bottom top',
     onEnter: () => setSurface(true),
@@ -331,7 +332,7 @@ export function buildTechnologyFlow(refs: TechnologyRefs, reduced: boolean) {
 export function scrollToStage(section: HTMLElement, index: number) {
   const top = section.getBoundingClientRect().top + window.scrollY
   const startY = top + ingressPx() * STORY_OVERLAP
-  const endY = top + section.offsetHeight - window.innerHeight
+  const endY = top + section.offsetHeight - viewportHeight()
   const target = STAGE_ANCHOR[index] ?? 0
   return startY + (endY - startY) * target
 }

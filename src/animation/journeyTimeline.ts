@@ -2,6 +2,7 @@ import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { JOURNEY_STATES } from '@/sections/Journey/journey.constants'
 import { scrollProgress } from '@/store/progressRef'
+import { viewportHeight } from '@/lib/viewport'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -27,7 +28,7 @@ export function buildJourneyTimeline(
     scrollTrigger: {
       trigger: section,
       start: 'top top',
-      end: () => `bottom bottom+=${(window.innerHeight * handoffVh) / 100}`,
+      end: () => `bottom bottom+=${(viewportHeight() * handoffVh) / 100}`,
       scrub: 0.8,
       invalidateOnRefresh: true,
       onUpdate: (self) => {
